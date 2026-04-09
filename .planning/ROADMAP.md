@@ -28,7 +28,10 @@
   3. All entry primary keys are UUID TEXT — no auto-increment integer IDs anywhere in the schema
   4. A `metadata` JSON column exists on the entries table, confirmed by inspecting the schema
   5. The app runs fully offline — no network call is made under any condition, including first launch
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Scaffold Tauri v2 project with all dependencies, Tailwind v3 + shadcn/ui design system
+- [ ] 01-02-PLAN.md — SQLite schema (AI-ready), DB initialization, app shell UI, and empty state
 **UI hint**: yes
 
 ### Phase 2: Editor & Tags
@@ -103,7 +106,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 0/2 | Planned | - |
 | 2. Editor & Tags | 0/? | Not started | - |
 | 3. Timeline & Calendar | 0/? | Not started | - |
 | 4. Search & Discovery | 0/? | Not started | - |
