@@ -54,9 +54,11 @@ Exceptions: none for Phase 1.
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 14px | 400 | 1.5 | Sidebar labels, metadata text, descriptions |
-| Label | 12px | 500 | 1.4 | Tag pills, timestamps, word count indicators, secondary metadata |
+| Label | 12px | 400 | 1.4 | Tag pills, timestamps, word count indicators, secondary metadata |
 | Heading | 20px | 600 | 1.2 | Panel titles, section headings |
 | Display | 28px | 600 | 1.15 | Empty state headings, onboarding copy |
+
+Label elements are differentiated from Body by size alone (12px vs 14px), both at weight 400. This keeps the weight system to exactly 2 values: 400 (regular) and 600 (semibold).
 
 **Font family:** `Inter, ui-sans-serif, system-ui, sans-serif`
 
@@ -133,6 +135,20 @@ These are the only components required to ship Phase 1. Future phases add compon
 Sidebar background: secondary color. Main area background: dominant color. Divider: 1px border color.
 
 Minimum window size: 960px wide × 600px tall. Set in `tauri.conf.json` under `windows[0].minWidth` / `minHeight`.
+
+---
+
+## Empty State Visual Hierarchy
+
+**Primary focal point:** Empty state display heading — "Your journal is ready" — rendered at 28px / weight 600 / line-height 1.15. This is the first element the eye lands on.
+
+**Secondary:** A muted lucide icon at 48px, centered above the heading. Color: `text-muted` (`#6B7280` light / `#9CA3AF` dark). The icon does not compete with the heading — it reinforces it.
+
+**Tertiary:** Body copy at 14px / weight 400 / line-height 1.5 directly below the heading.
+
+**Quaternary:** The accent-colored CTA link ("Write your first entry") below the body copy.
+
+Vertical stacking order (top to bottom): icon → heading → body → CTA. No card chrome, no border, no shadow. The empty state is a centered flex column with 16px gap between elements.
 
 ---
 
