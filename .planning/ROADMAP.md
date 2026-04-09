@@ -8,7 +8,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Foundation** — Tauri project, SQLite schema, AI-ready data layer, offline guarantee
+- [x] **Phase 1: Foundation** — Tauri project, SQLite schema, AI-ready data layer, offline guarantee (completed 2026-04-09)
 - [ ] **Phase 2: Editor & Tags** — Full journal entry creation, editing, mood, auto-save, and tag management
 - [ ] **Phase 3: Timeline & Calendar** — Browsing all entries chronologically and by month
 - [ ] **Phase 4: Search & Discovery** — Full-text search, multi-filter, and On This Day
@@ -28,10 +28,10 @@
   3. All entry primary keys are UUID TEXT — no auto-increment integer IDs anywhere in the schema
   4. A `metadata` JSON column exists on the entries table, confirmed by inspecting the schema
   5. The app runs fully offline — no network call is made under any condition, including first launch
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 01-01-PLAN.md — Scaffold Tauri v2 project with all dependencies, Tailwind v3 + shadcn/ui design system
-- [ ] 01-02-PLAN.md — SQLite schema (AI-ready), DB initialization, app shell UI, and empty state
+- [x] 01-02-PLAN.md — SQLite schema (AI-ready), DB initialization, app shell UI, and empty state
 **UI hint**: yes
 
 ### Phase 2: Editor & Tags

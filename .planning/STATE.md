@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-04-09T21:36:36.762Z"
+status: verifying
+last_updated: "2026-04-09T21:41:43.054Z"
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 50
+  completed_plans: 2
+  percent: 100
 ---
 
 # Project State: MemoryLane
@@ -40,8 +40,8 @@ Plan: 1 of 2
 
 - **Phase:** 1 — Foundation
 - **Plan:** 2 of 2 (next to execute)
-- **Status:** Executing Phase 01 — Plan 01 complete, Plan 02 pending
-- **Progress:** [█████░░░░░] 50%
+- **Status:** Phase complete — ready for verification
+- **Progress:** [██████████] 100%
 
 ## Performance Metrics
 
@@ -61,6 +61,9 @@ Plan: 1 of 2
 - [Phase 01-foundation]: Tailwind v3 pinned (shadcn/ui requires v3; v4 breaks component compatibility)
 - [Phase 01-foundation]: shadcn 2.3.0 used (v4+ requires Tailwind v4 CSS-based config; v2.3.0 is last supporting tailwind.config.js)
 - [Phase 01-foundation]: Amber accent override: --color-accent #F59E0B overrides shadcn default blue --primary
+- [Phase 01-foundation]: Migration SQL inlined in db.ts — ?raw import unreliable for files outside src/
+- [Phase 01-foundation]: Multi-statement SQL splitter with BEGIN...END tracking handles FTS5 trigger bodies correctly
+- [Phase 01-foundation]: Window controls placed outside data-tauri-drag-region to prevent mousedown interception
 
 ### Todos
 
