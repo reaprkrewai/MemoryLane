@@ -72,7 +72,7 @@
 - [ ] **SETT-01**: User can toggle between light mode and dark mode
 - [ ] **SETT-02**: User can select a font size (small / medium / large)
 - [ ] **SETT-03**: User can export all journal data to a JSON file
-- [ ] **SETT-04**: App works 100% offline — no network calls, no telemetry, no analytics
+- [x] **SETT-04**: App works 100% offline — no network calls, no telemetry, no analytics
 
 ### AI Readiness (schema-level, Phase 2 foundation)
 
@@ -163,7 +163,7 @@
 | SETT-01 | Phase 5 | Pending |
 | SETT-02 | Phase 5 | Pending |
 | SETT-03 | Phase 5 | Pending |
-| SETT-04 | Phase 1 | Pending |
+| SETT-04 | Phase 1 | Complete |
 | AI-01 | Phase 1 | Pending |
 | AI-02 | Phase 1 | Pending |
 | AI-03 | Phase 1 | Pending |
