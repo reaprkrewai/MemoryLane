@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { AppShell } from "./components/AppShell";
-import { EmptyState } from "./components/EmptyState";
+import { JournalView } from "./components/JournalView";
 import { initializeDatabase } from "./lib/db";
 import { useUiStore } from "./stores/uiStore";
 
@@ -47,7 +47,7 @@ function App() {
             </p>
           </div>
         )}
-        {isDbReady && !dbError && <EmptyState />}
+        {isDbReady && !dbError && <JournalView />}
       </AppShell>
       <Toaster position="bottom-right" />
     </>
