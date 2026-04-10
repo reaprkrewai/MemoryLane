@@ -17,15 +17,19 @@ A journaling app where you can eventually have AI understand your entries — an
 - [x] Entry content stored with UUID TEXT PKs and metadata JSON column (AI-02, AI-03)
 - [x] Zero network calls enforced at capability level — SETT-04 verified
 
-### Active
+### Validated
 
-**Core Journal**
-- [ ] User can create entries with rich text (TipTap/Markdown WYSIWYG)
-- [ ] User can assign a mood to each entry (great / good / okay / bad / awful)
-- [ ] User can add/remove tags on entries with autocomplete
-- [ ] Entries auto-save every 5 seconds (debounced 500ms on change)
-- [ ] User can edit and delete existing entries
-- [ ] Word count and character count display while writing
+**Core Journal — Validated in Phase 2: Editor & Tags**
+- [x] User can create entries with rich text (TipTap/Markdown WYSIWYG) — EDIT-01
+- [x] User can assign a mood to each entry (great / good / okay / bad / awful) — EDIT-02
+- [x] User can add/remove tags on entries with autocomplete — TAG-01, TAG-02, TAG-03
+- [x] Entries auto-save every 5 seconds (debounced 500ms on change) — EDIT-03, EDIT-04
+- [x] User can edit and delete existing entries — EDIT-06, EDIT-07
+- [x] Word count and character count display while writing — EDIT-08
+- [x] User can delete unused tags via trash icon in autocomplete dropdown — TAG-04
+- [x] User can configure auto-save interval (5s / 10s / 30s) — EDIT-05
+
+### Active
 
 **Timeline View**
 - [ ] User can view entries in reverse-chronological timeline with infinite scroll
@@ -118,4 +122,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 — Phase 1 (Foundation) complete*
+*Last updated: 2026-04-10 — Phase 2 (Editor & Tags) complete*
