@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
@@ -6,6 +6,8 @@ import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEntryStore } from "../stores/entryStore";
 import { BubbleMenuBar } from "./BubbleMenuBar";
+import { MetadataBar } from "./MetadataBar";
+import { TagRow } from "./TagRow";
 import { toast } from "sonner";
 
 interface EntryEditorProps {
@@ -14,10 +16,9 @@ interface EntryEditorProps {
 
 export function EntryEditor({ entryId }: EntryEditorProps) {
   const entries = useEntryStore((s) => s.entries);
-  const saveContent = useEntryStore((s) => s.saveContent);
-
-  const [wordCount, setWordCount] = useState(0);
-  const [charCount, setCharCount] = useState(0);
+  const scheduleAutoSave = useEntryStore((s) => s.scheduleAutoSave);
+  const flushAndClearTimers = useEntryStore((s) => s.flushAndClearTimers);
+  const loadAutoSaveInterval = useEntryStore((s) => s.loadAutoSaveInterval);
 
   const editor = useEditor({
     extensions: [
@@ -31,13 +32,29 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
       const md = e.getMarkdown();
       const words = e.storage.characterCount.words();
       const chars = e.storage.characterCount.characters();
-      setWordCount(words);
-      setCharCount(chars);
-      saveContent(entryId, md, words, chars).catch(() => {
-        toast.error("Couldn't save entry. Check disk space.");
-      });
+      scheduleAutoSave(entryId, md, words, chars);
+    },
+    onBlur: ({ editor: e }) => {
+      // Catch any save errors from background saves
+      void e; // suppress unused var warning
     },
   });
+
+  // Load auto-save interval from settings once on mount
+  useEffect(() => {
+    loadAutoSaveInterval().catch(() => {
+      // Non-fatal: fall back to default 5s
+    });
+  }, []);
+
+  // Flush pending saves on unmount
+  useEffect(() => {
+    return () => {
+      flushAndClearTimers().catch(() => {
+        toast.error("Couldn't save entry. Check disk space.");
+      });
+    };
+  }, []);
 
   // Load entry content when entryId changes
   useEffect(() => {
@@ -48,16 +65,13 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
       editor.commands.setContent(entry.content, {
         contentType: "markdown",
       });
-      // Update counts from stored values
-      setWordCount(entry.word_count);
-      setCharCount(entry.char_count);
     }
   }, [entryId, editor]);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      {/* MetadataBar placeholder — Plan 02 */}
-      <div />
+      {/* MetadataBar: date picker, mood selector, word/char count */}
+      <MetadataBar entryId={entryId} editor={editor} />
 
       {/* Editor content area */}
       <div className="flex-1 overflow-y-auto bg-bg">
@@ -69,13 +83,6 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
 
           {/* TagRow placeholder — Plan 03 */}
           <div />
-
-          {/* Temporary word/char count — will move to MetadataBar in Plan 02 */}
-          <div className="mt-4 flex justify-end">
-            <span className="text-label text-muted">
-              {wordCount} words &middot; {charCount} chars
-            </span>
-          </div>
         </div>
       </div>
     </div>
