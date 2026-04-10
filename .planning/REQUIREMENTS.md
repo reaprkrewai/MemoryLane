@@ -7,21 +7,21 @@
 
 ### Editor
 
-- [ ] **EDIT-01**: User can create a journal entry with rich text (bold, italic, headings, lists, code blocks, blockquote)
-- [ ] **EDIT-02**: User can edit and delete existing entries
-- [ ] **EDIT-03**: Entry content is stored as clean Markdown (not HTML or ProseMirror JSON)
-- [ ] **EDIT-04**: Entry auto-saves 500ms after the user stops typing, and every 5 seconds while typing continues
-- [ ] **EDIT-05**: User can configure the auto-save interval (5s / 10s / 30s)
-- [ ] **EDIT-06**: User can see live word count and character count while writing
-- [ ] **EDIT-07**: User can assign a mood to an entry (great / good / okay / bad / awful)
-- [ ] **EDIT-08**: User can set the entry date/time (defaults to current time)
+- [x] **EDIT-01**: User can create a journal entry with rich text (bold, italic, headings, lists, code blocks, blockquote)
+- [x] **EDIT-02**: User can edit and delete existing entries
+- [x] **EDIT-03**: Entry content is stored as clean Markdown (not HTML or ProseMirror JSON)
+- [x] **EDIT-04**: Entry auto-saves 500ms after the user stops typing, and every 5 seconds while typing continues
+- [x] **EDIT-05**: User can configure the auto-save interval (5s / 10s / 30s)
+- [x] **EDIT-06**: User can see live word count and character count while writing
+- [x] **EDIT-07**: User can assign a mood to an entry (great / good / okay / bad / awful)
+- [x] **EDIT-08**: User can set the entry date/time (defaults to current time)
 
 ### Tags
 
-- [ ] **TAG-01**: User can create and assign tags to an entry while writing (on-the-fly creation)
-- [ ] **TAG-02**: Tag input shows autocomplete from existing tags with usage count
-- [ ] **TAG-03**: Each tag has a color selected from 8 preset colors
-- [ ] **TAG-04**: User can delete tags that have no entries
+- [x] **TAG-01**: User can create and assign tags to an entry while writing (on-the-fly creation)
+- [x] **TAG-02**: Tag input shows autocomplete from existing tags with usage count
+- [x] **TAG-03**: Each tag has a color selected from 8 preset colors
+- [x] **TAG-04**: User can delete tags that have no entries
 
 ### Timeline
 
@@ -122,18 +122,18 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EDIT-01 | Phase 2 | Pending |
-| EDIT-02 | Phase 2 | Pending |
-| EDIT-03 | Phase 2 | Pending |
-| EDIT-04 | Phase 2 | Pending |
-| EDIT-05 | Phase 2 | Pending |
-| EDIT-06 | Phase 2 | Pending |
-| EDIT-07 | Phase 2 | Pending |
-| EDIT-08 | Phase 2 | Pending |
-| TAG-01 | Phase 2 | Pending |
-| TAG-02 | Phase 2 | Pending |
-| TAG-03 | Phase 2 | Pending |
-| TAG-04 | Phase 2 | Pending |
+| EDIT-01 | Phase 2 | Complete |
+| EDIT-02 | Phase 2 | Complete |
+| EDIT-03 | Phase 2 | Complete |
+| EDIT-04 | Phase 2 | Complete |
+| EDIT-05 | Phase 2 | Complete |
+| EDIT-06 | Phase 2 | Complete |
+| EDIT-07 | Phase 2 | Complete |
+| EDIT-08 | Phase 2 | Complete |
+| TAG-01 | Phase 2 | Complete |
+| TAG-02 | Phase 2 | Complete |
+| TAG-03 | Phase 2 | Complete |
+| TAG-04 | Phase 2 | Complete |
 | TIME-01 | Phase 3 | Pending |
 | TIME-02 | Phase 3 | Pending |
 | TIME-03 | Phase 3 | Pending |
