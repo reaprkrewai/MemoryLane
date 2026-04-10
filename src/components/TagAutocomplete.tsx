@@ -1,3 +1,6 @@
+import { Trash2 } from "lucide-react";
+import { useTagStore } from "../stores/tagStore";
+
 interface TagWithCount {
   id: string;
   name: string;
@@ -27,6 +30,8 @@ export function TagAutocomplete({
   activeIndex,
   onActiveIndexChange,
 }: TagAutocompleteProps) {
+  const deleteTag = useTagStore((s) => s.deleteTag);
+
   if (!visible || query.trim() === "") return null;
 
   const trimmedQuery = query.trim().toLowerCase();
@@ -71,6 +76,20 @@ export function TagAutocomplete({
           />
           <span className="flex-1 text-body text-text">{tag.name}</span>
           <span className="text-label text-muted">{tag.usage_count}</span>
+          {tag.usage_count === 0 && (
+            <button
+              type="button"
+              className="ml-1 shrink-0 opacity-40 hover:opacity-100 hover:text-destructive transition-opacity"
+              aria-label={`Delete tag ${tag.name}`}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                deleteTag(tag.id);
+              }}
+            >
+              <Trash2 size={13} />
+            </button>
+          )}
         </div>
       ))}
 
