@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-10T12:31:00.275Z"
+last_updated: "2026-04-10T17:34:18.651Z"
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 7
   percent: 100
 ---
 
@@ -35,12 +35,12 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-Phase: 02 (editor-tags) — COMPLETE
-Plan: 3 of 3 (all plans complete)
+Phase: 02 (editor-tags) — EXECUTING
+Plan: 1 of 5
 
 - **Phase:** 2
 - **Plan:** 02-03 complete — all Phase 2 plans done
-- **Status:** Phase 02 Complete, ready for Phase 03
+- **Status:** Executing Phase 02
 - **Progress:** [██████████] 100%
 
 ## Performance Metrics
@@ -73,6 +73,9 @@ Plan: 3 of 3 (all plans complete)
 - [Phase 02-02]: MetadataBar uses editor.on('update') + local state tick for live word/char count re-renders
 - [Phase 02-editor-tags]: TagRow placed outside scroll container in EntryEditor so tag row stays fixed at bottom as editor content grows
 - [Phase 02-editor-tags]: Blur timeout 150ms on TagInput allows autocomplete onMouseDown to fire before input blur hides dropdown
+- [Phase 02-editor-tags]: useTagStore called directly inside TagAutocomplete (no onDelete prop) — consistent with TagRow pattern, no prop drilling
+- [Phase 02-editor-tags]: onMouseDown + e.stopPropagation() on trash button prevents row onSelect from firing and blur race condition in TagAutocomplete
+- [Phase 02]: Native <select> used in MetadataBar for auto-save interval — no popover overlap, no new imports, fits 48px bar height
 
 ### Todos
 
