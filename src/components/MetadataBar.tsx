@@ -14,6 +14,7 @@ export function MetadataBar({ entryId, editor }: MetadataBarProps) {
   const lastSavedAt = useEntryStore((s) => s.lastSavedAt)
   const updateMood = useEntryStore((s) => s.updateMood)
   const updateCreatedAt = useEntryStore((s) => s.updateCreatedAt)
+  const updateAutoSaveInterval = useEntryStore((s) => s.updateAutoSaveInterval)
 
   const entry = entries.find((e) => e.id === entryId)
 
@@ -22,6 +23,9 @@ export function MetadataBar({ entryId, editor }: MetadataBarProps) {
 
   // "Saved" flash indicator
   const [showSaved, setShowSaved] = useState(false)
+
+  // Currently selected auto-save interval (ms)
+  const [autoSaveMs, setAutoSaveMs] = useState<number>(5000)
 
   // Watch lastSavedAt — flash "Saved" for 1500ms
   useEffect(() => {
@@ -40,6 +44,25 @@ export function MetadataBar({ entryId, editor }: MetadataBarProps) {
       editor.off("update", handler)
     }
   }, [editor])
+
+  // Read persisted interval on mount to sync the UI selector
+  useEffect(() => {
+    (async () => {
+      try {
+        const { getDb } = await import("../lib/db")
+        const db = await getDb()
+        const rows = await db.select<{ value: string }[]>(
+          "SELECT value FROM settings WHERE key = 'autosave_interval'"
+        )
+        if (rows.length > 0) {
+          const ms = parseInt(rows[0].value, 10)
+          if ([5000, 10000, 30000].includes(ms)) setAutoSaveMs(ms)
+        }
+      } catch {
+        // ignore — default 5000 is correct
+      }
+    })()
+  }, [])
 
   const entryDate = entry ? new Date(entry.created_at) : new Date()
   const entryMood = entry ? entry.mood : null
@@ -67,8 +90,8 @@ export function MetadataBar({ entryId, editor }: MetadataBarProps) {
         <MoodSelector mood={entryMood} onMoodChange={handleMoodChange} />
       </div>
 
-      {/* Right zone: word/char count or "Saved" indicator */}
-      <div className="flex flex-1 justify-end">
+      {/* Right zone: word/char count or "Saved" indicator + auto-save interval selector */}
+      <div className="flex flex-1 items-center justify-end gap-2">
         {showSaved ? (
           <span
             className="text-label"
@@ -84,6 +107,23 @@ export function MetadataBar({ entryId, editor }: MetadataBarProps) {
             {words} words &middot; {chars} chars
           </span>
         )}
+        <span className="text-label text-muted" style={{ fontSize: "12px" }}>&middot;</span>
+        <select
+          value={autoSaveMs}
+          onChange={async (e) => {
+            const ms = parseInt(e.target.value, 10)
+            setAutoSaveMs(ms)
+            await updateAutoSaveInterval(ms)
+          }}
+          className="cursor-pointer rounded border-none bg-transparent text-muted outline-none"
+          style={{ fontSize: "12px", lineHeight: "1.4" }}
+          aria-label="Auto-save interval"
+          title="Auto-save interval"
+        >
+          <option value={5000}>Save 5s</option>
+          <option value={10000}>Save 10s</option>
+          <option value={30000}>Save 30s</option>
+        </select>
       </div>
     </div>
   )
