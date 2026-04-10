@@ -1,4 +1,4 @@
-# Requirements: MemoryLane
+# Requirements: Chronicle AI
 
 **Defined:** 2026-04-09
 **Core Value:** A journaling app where you can eventually have AI understand your entries — and none of it ever touches the internet.
@@ -76,9 +76,9 @@
 
 ### AI Readiness (schema-level, Phase 2 foundation)
 
-- [ ] **AI-01**: Database schema includes an `embeddings` table from initial migration (empty in v1, populated in v2)
-- [ ] **AI-02**: All entry primary keys are UUID TEXT (not auto-increment integers)
-- [ ] **AI-03**: Entries table includes a `metadata` JSON column for future fields without schema migrations
+- [x] **AI-01**: Database schema includes an `embeddings` table from initial migration (empty in v1, populated in v2)
+- [x] **AI-02**: All entry primary keys are UUID TEXT (not auto-increment integers)
+- [x] **AI-03**: Entries table includes a `metadata` JSON column for future fields without schema migrations
 
 ## v2 Requirements
 
@@ -164,9 +164,9 @@
 | SETT-02 | Phase 5 | Pending |
 | SETT-03 | Phase 5 | Pending |
 | SETT-04 | Phase 1 | Complete |
-| AI-01 | Phase 1 | Pending |
-| AI-02 | Phase 1 | Pending |
-| AI-03 | Phase 1 | Pending |
+| AI-01 | Phase 1 | Complete |
+| AI-02 | Phase 1 | Complete |
+| AI-03 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 45 total

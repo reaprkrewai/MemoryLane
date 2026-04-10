@@ -8,7 +8,7 @@ export function TitleBar() {
         data-tauri-drag-region
         className="flex flex-1 items-center px-4"
       >
-        <span className="text-label text-muted">Chronicle</span>
+        <span className="text-label text-muted">Chronicle AI</span>
       </div>
       {/* Window controls sit OUTSIDE the drag region */}
       <div className="flex items-center">

@@ -4,7 +4,7 @@ let _db: Database | null = null;
 
 export async function getDb(): Promise<Database> {
   if (_db) return _db;
-  _db = await Database.load("sqlite:memorylane.db");
+  _db = await Database.load("sqlite:chronicle-ai.db");
   return _db;
 }
 

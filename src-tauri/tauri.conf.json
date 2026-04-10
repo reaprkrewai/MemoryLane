@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Chronicle",
+  "productName": "Chronicle AI",
   "version": "0.1.0",
-  "identifier": "com.chronicle.journal",
+  "identifier": "com.reviots.chronicle-ai",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Chronicle",
+        "title": "Chronicle AI",
         "width": 1200,
         "height": 800,
         "minWidth": 960,

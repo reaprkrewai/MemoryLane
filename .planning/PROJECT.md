@@ -1,8 +1,8 @@
-# MemoryLane
+# Chronicle AI
 
 ## What This Is
 
-MemoryLane is a privacy-first desktop journaling app built with Tauri (Rust + React). Everything stays local — no cloud, no network calls, no third-party services. It's a rock-solid journaling foundation designed to eventually support local LLM integration (Ollama/llama.cpp), letting users run AI over their private journal data without their thoughts ever leaving their device.
+Chronicle AI is a privacy-first desktop journaling app built with Tauri (Rust + React). Everything stays local — no cloud, no network calls, no third-party services. It's a rock-solid journaling foundation designed to eventually support local LLM integration (Ollama/llama.cpp), letting users run AI over their private journal data without their thoughts ever leaving their device.
 
 ## Core Value
 
@@ -72,7 +72,7 @@ A journaling app where you can eventually have AI understand your entries — an
 
 ## Context
 
-**The gap MemoryLane fills:** No existing journaling app (Day One, Obsidian, Diarium) lets users run AI over their journal data without sending content to external APIs. MemoryLane's Phase 1 MVP builds the foundation; Phase 2 adds local LLM (Ollama/llama.cpp) so users can query, summarize, and get insights from their journal privately.
+**The gap Chronicle AI fills:** No existing journaling app (Day One, Obsidian, Diarium) lets users run AI over their journal data without sending content to external APIs. Chronicle AI's Phase 1 MVP builds the foundation; Phase 2 adds local LLM (Ollama/llama.cpp) so users can query, summarize, and get insights from their journal privately.
 
 **Target audience:** Privacy-conscious journalers who want AI assistance without cloud exposure. Public release planned (App Store + website distribution).
 

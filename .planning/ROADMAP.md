@@ -1,4 +1,4 @@
-# Roadmap: MemoryLane
+# Roadmap: Chronicle AI
 
 **Milestone:** v1 MVP
 **Defined:** 2026-04-09

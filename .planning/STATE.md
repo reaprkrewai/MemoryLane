@@ -12,7 +12,7 @@ progress:
   percent: 100
 ---
 
-# Project State: MemoryLane
+# Project State: Chronicle AI
 
 ## Current Phase
 
