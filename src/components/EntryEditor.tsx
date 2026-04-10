@@ -73,18 +73,18 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
       {/* MetadataBar: date picker, mood selector, word/char count */}
       <MetadataBar entryId={entryId} editor={editor} />
 
-      {/* Editor content area */}
+      {/* Editor content area — scrollable middle section */}
       <div className="flex-1 overflow-y-auto bg-bg">
         <div className="mx-auto max-w-[680px] px-8 py-6">
           <div className="tiptap-editor">
             <EditorContent editor={editor} />
             {editor && <BubbleMenuBar editor={editor} />}
           </div>
-
-          {/* TagRow placeholder — Plan 03 */}
-          <div />
         </div>
       </div>
+
+      {/* TagRow: fixed at bottom of editor pane, below scroll area */}
+      <TagRow entryId={entryId} />
     </div>
   );
 }
