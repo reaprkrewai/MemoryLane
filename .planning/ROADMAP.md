@@ -57,7 +57,11 @@ Plans:
   3. User can expand any entry card to read the full text inline, and click it to open the editor
   4. User can view a monthly calendar where days with entries are shaded by intensity, navigate between months, and return to the current month with one click
   5. Clicking a date on the calendar filters the timeline to show only entries from that day
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — viewStore + entryStore pagination + view router (JournalView/Sidebar/MetadataBar Back button)
+- [ ] 03-02-PLAN.md — TimelineView infinite scroll, cards, day separators, expand-in-place
+- [ ] 03-03-PLAN.md — CalendarView heatmap with month navigation and date-filter integration
 **UI hint**: yes
 
 ### Phase 4: Search & Discovery
