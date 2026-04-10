@@ -35,7 +35,7 @@ Declared values (multiples of 4 only):
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| xs | 4px | Icon gaps, tag pill internal padding, bubble menu item gaps |
+| xs | 4px | Icon gaps, tag pill internal vertical padding, bubble menu item gaps |
 | sm | 8px | Sidebar entry list item padding, mood button padding, tag row gap |
 | md | 16px | Editor horizontal padding, metadata bar vertical padding, section margins |
 | lg | 24px | Editor content top/bottom padding, sidebar section gaps |
@@ -45,8 +45,8 @@ Declared values (multiples of 4 only):
 
 Exceptions:
 - Touch/click targets for mood buttons: minimum 36x36px (satisfying interaction requires adequate target)
-- Bubble menu: 6px gap between buttons (between xs and sm, acceptable for toolbar density)
-- Tag pills: 6px vertical / 10px horizontal internal padding (visually balanced pill shape)
+- Bubble menu: 4px gap between buttons (xs token — tight toolbar density)
+- Tag pills: 4px vertical / 12px horizontal internal padding (xs vertical, 3×xs horizontal — standard pill shape)
 
 ---
 
@@ -61,14 +61,14 @@ All sizes declared in tailwind.config.js `fontSize` extension — use these util
 | Heading | `text-heading` | 20px | 600 | 1.2 | Not used directly in Phase 2 editor; reserved for section headers |
 | Display | `text-display` | 28px | 600 | 1.15 | Not used in Phase 2 |
 
-Editor prose typography:
+Maximum 2 font weights in Phase 2 UI chrome: 400 (regular) and 600 (semibold).
+
+Editor prose typography (TipTap document-content styles — these are inside-document sizes and do NOT count toward the 4-size UI chrome constraint above):
 - TipTap editor body text: 14px / weight 400 / line-height 1.6 (slightly looser than UI body for readability)
 - H1 in editor: 20px / weight 600 / line-height 1.2 (maps to `text-heading`)
 - H2 in editor: 16px / weight 600 / line-height 1.3
 - Blockquote in editor: 14px / weight 400 / italic / left border 3px `var(--color-accent)` / color `var(--color-text-muted)`
 - Code inline: 13px / monospace / `bg-surface` background / 4px horizontal padding / 2px vertical padding
-
-Maximum 2 font weights in Phase 2 UI chrome: 400 (regular) and 600 (semibold).
 
 ---
 
@@ -94,6 +94,16 @@ Source: `src/styles/globals.css` — Chronicle custom tokens. Use Tailwind alias
 
 Muted text color `#6B7280` (light) / `#9CA3AF` (dark) — use for word count, char count, date label, tag usage count, placeholder text.
 Border color `#E5E3DF` (light) / `#2A2927` (dark) — use for metadata bar bottom border, tag row top border, bubble menu border.
+
+---
+
+## Focal Point Declaration
+
+Primary visual anchor: the editor writing surface (`bg-bg`, maximum width 680px, centered in the main content area). The blank writing surface draws the eye immediately on load — nothing competes with it in the center column.
+
+Secondary anchor: the amber "New Entry" button (`bg-accent`, full sidebar width) pinned at the top of the sidebar. It is the only element in the layout with a filled amber background, making it immediately discoverable without visual noise.
+
+All other UI elements (metadata bar, tag row, sidebar entry list, bubble menu) are visually subordinate — they use `bg-surface` or `bg-bg` backgrounds with muted text, appearing only when needed and never competing with the writing surface.
 
 ---
 
@@ -130,7 +140,7 @@ Cursor: default text cursor. No custom cursor styling.
 
 Appears on text selection. Positioned above the selection by 8px gap.
 
-Container: `bg-surface`, `border border-border`, `rounded-md`, `shadow-md`, `px-1 py-1`, flex row, gap 2px.
+Container: `bg-surface`, `border border-border`, `rounded-md`, `shadow-md`, `px-1 py-1`, flex row, gap 4px.
 
 Buttons: 7 total — Bold (B), Italic (I), H1, H2, Bullet List, Blockquote, plus Code (code inline added for practical completeness within EDIT-01 scope).
 
@@ -144,7 +154,7 @@ Container: sits directly below the editor content area, separated by `1px solid 
 
 Layout: horizontal flex wrap. Existing tag pills on the left, tag input field at the end of the row.
 
-**Tag pills:** Pill shape, `rounded-full`. Background: 15% opacity of the tag's assigned color (tinted background, not just a dot). Border: 1px solid the tag's assigned color at 40% opacity. Text: tag name in `text-label` (12px) / weight 400, color derived from tag color (darkened for contrast). Remove button: `×` appearing on hover at the right side of the pill, 14px, same color as text.
+**Tag pills:** Pill shape, `rounded-full`. Background: 15% opacity of the tag's assigned color (tinted background, not just a dot). Border: 1px solid the tag's assigned color at 40% opacity. Text: tag name in `text-label` (12px) / weight 400, color derived from tag color (darkened for contrast). Remove button: `×` appearing on hover at the right side of the pill, 14px, same color as text. Internal padding: 4px vertical / 12px horizontal.
 
 Tag assigned color tinting pattern: use CSS `color-mix(in srgb, {tag-color} 15%, transparent)` for bg, `color-mix(in srgb, {tag-color} 40%, transparent)` for border. This produces a readable, distinctive pill without overwhelming the editor surface.
 
