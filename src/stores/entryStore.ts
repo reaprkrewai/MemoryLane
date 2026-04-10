@@ -18,6 +18,12 @@ interface EntryState {
   isSaving: boolean;
   lastSavedAt: number | null;
 
+  // Phase 3: keyset pagination for timeline
+  allEntries: Entry[];
+  hasMore: boolean;
+  isLoadingPage: boolean;
+  pageSize: number;
+
   loadEntries: () => Promise<void>;
   selectEntry: (id: string) => Promise<void>;
   createEntry: () => Promise<string>;
@@ -31,6 +37,9 @@ interface EntryState {
   updateMood: (entryId: string, mood: string | null) => Promise<void>;
   updateCreatedAt: (entryId: string, timestamp: number) => Promise<void>;
   ensureFirstEntry: () => Promise<void>;
+  loadPage: (cursor?: number) => Promise<void>;
+  resetPagination: () => void;
+  prependToTimeline: (entry: Entry) => void;
   scheduleAutoSave: (
     entryId: string,
     content: string,
@@ -53,6 +62,10 @@ export const useEntryStore = create<EntryState>((set, get) => ({
   selectedEntryId: null,
   isSaving: false,
   lastSavedAt: null,
+  allEntries: [],
+  hasMore: true,
+  isLoadingPage: false,
+  pageSize: 20,
 
   loadEntries: async () => {
     const db = await getDb();
@@ -76,6 +89,14 @@ export const useEntryStore = create<EntryState>((set, get) => ({
     const newId = rows[0].id;
     await get().loadEntries();
     set({ selectedEntryId: newId });
+    // Phase 3: keep the paginated timeline in sync with newly created entries
+    const newRow = await db.select<Entry[]>(
+      "SELECT id, content, mood, word_count, char_count, created_at, updated_at, metadata FROM entries WHERE id = ?",
+      [newId]
+    );
+    if (newRow.length > 0) {
+      set((state) => ({ allEntries: [newRow[0], ...state.allEntries] }));
+    }
     return newId;
   },
 
@@ -83,6 +104,9 @@ export const useEntryStore = create<EntryState>((set, get) => ({
     const db = await getDb();
     await db.execute("DELETE FROM entries WHERE id = ?", [id]);
     await get().loadEntries();
+    set((state) => ({
+      allEntries: state.allEntries.filter((e) => e.id !== id),
+    }));
     const { entries, selectedEntryId } = get();
     if (selectedEntryId === id) {
       set({ selectedEntryId: entries.length > 0 ? entries[0].id : null });
@@ -110,6 +134,11 @@ export const useEntryStore = create<EntryState>((set, get) => ({
             ? { ...e, content, word_count: wordCount, char_count: charCount, updated_at: now }
             : e
         ),
+        allEntries: state.allEntries.map((e) =>
+          e.id === entryId
+            ? { ...e, content, word_count: wordCount, char_count: charCount, updated_at: now }
+            : e
+        ),
         isSaving: false,
         lastSavedAt: Date.now(),
       }));
@@ -130,6 +159,9 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       entries: state.entries.map((e) =>
         e.id === entryId ? { ...e, mood, updated_at: now } : e
       ),
+      allEntries: state.allEntries.map((e) =>
+        e.id === entryId ? { ...e, mood, updated_at: now } : e
+      ),
     }));
   },
 
@@ -141,6 +173,9 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       [timestamp, now, entryId]
     );
     await get().loadEntries();
+    // Reload the timeline page so the re-dated entry sorts correctly
+    await get().resetPagination();
+    await get().loadPage();
   },
 
   ensureFirstEntry: async () => {
@@ -149,6 +184,38 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       await createEntry();
     }
   },
+
+  loadPage: async (cursor?: number) => {
+    const { isLoadingPage } = get();
+    if (isLoadingPage) return; // guard against duplicate calls (Pitfall 2)
+    set({ isLoadingPage: true });
+    try {
+      const db = await getDb();
+      const limit = get().pageSize;
+      const rows = cursor
+        ? await db.select<Entry[]>(
+            "SELECT id, content, mood, word_count, char_count, created_at, updated_at, metadata FROM entries WHERE created_at < ? ORDER BY created_at DESC LIMIT ?",
+            [cursor, limit]
+          )
+        : await db.select<Entry[]>(
+            "SELECT id, content, mood, word_count, char_count, created_at, updated_at, metadata FROM entries ORDER BY created_at DESC LIMIT ?",
+            [limit]
+          );
+      set((state) => ({
+        allEntries: cursor ? [...state.allEntries, ...rows] : rows,
+        hasMore: rows.length === limit,
+        isLoadingPage: false,
+      }));
+    } catch (err) {
+      set({ isLoadingPage: false });
+      throw err;
+    }
+  },
+
+  resetPagination: () => set({ allEntries: [], hasMore: true, isLoadingPage: false }),
+
+  prependToTimeline: (entry: Entry) =>
+    set((state) => ({ allEntries: [entry, ...state.allEntries] })),
 
   scheduleAutoSave: (
     entryId: string,
