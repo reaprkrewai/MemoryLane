@@ -12,7 +12,10 @@ A journaling app where you can eventually have AI understand your entries — an
 
 ### Validated
 
-(None yet — ship to validate)
+**AI Readiness (schema-level) — Validated in Phase 1: Foundation**
+- [x] Schema structured to support future embeddings table without migration pain (AI-01)
+- [x] Entry content stored with UUID TEXT PKs and metadata JSON column (AI-02, AI-03)
+- [x] Zero network calls enforced at capability level — SETT-04 verified
 
 ### Active
 
@@ -115,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 after initialization*
+*Last updated: 2026-04-09 — Phase 1 (Foundation) complete*
