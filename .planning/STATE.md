@@ -2,21 +2,21 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-04-10T00:09:29.318Z"
+status: executing
+last_updated: "2026-04-10T12:26:06.917Z"
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 100
+  total_plans: 5
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State: Chronicle AI
 
 ## Current Phase
 
-Phase 1 — Foundation (In Progress)
+Phase 2 — Editor & Tags (In Progress)
 
 ## Project Reference
 
@@ -27,27 +27,27 @@ See: .planning/PROJECT.md
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 1 | Foundation | In Progress |
-| 2 | Editor & Tags | Not Started |
+| 1 | Foundation | Complete |
+| 2 | Editor & Tags | In Progress |
 | 3 | Timeline & Calendar | Not Started |
 | 4 | Search & Discovery | Not Started |
 | 5 | Media, Security & Settings | Not Started |
 
 ## Current Position
 
-Phase: 01 (foundation) — EXECUTING
-Plan: 1 of 2
+Phase: 02 (editor-tags) — EXECUTING
+Plan: 2 of 3
 
 - **Phase:** 2
-- **Plan:** Not started
-- **Status:** Ready to plan
-- **Progress:** [██████████] 100%
+- **Plan:** 02-01 complete, starting 02-02
+- **Status:** Executing Phase 02
+- **Progress:** [██████░░░░] 60%
 
 ## Performance Metrics
 
-- Phases complete: 0 / 5
-- Plans complete: 0 / ?
-- Requirements shipped: 0 / 45
+- Phases complete: 1 / 5
+- Plans complete: 3 / 5 (phase 1 + phase 2 plan 1)
+- Requirements shipped: EDIT-01, EDIT-02, EDIT-03, EDIT-06
 
 ## Accumulated Context
 
@@ -64,6 +64,10 @@ Plan: 1 of 2
 - [Phase 01-foundation]: Migration SQL inlined in db.ts — ?raw import unreliable for files outside src/
 - [Phase 01-foundation]: Multi-statement SQL splitter with BEGIN...END tracking handles FTS5 trigger bodies correctly
 - [Phase 01-foundation]: Window controls placed outside data-tauri-drag-region to prevent mousedown interception
+- [Phase 02-01]: TipTap v3 uses Floating UI for BubbleMenu (options.placement) not Tippy.js (tippyOptions) — plan docs referenced v2 API
+- [Phase 02-01]: editor.getMarkdown() is on Editor directly via module augmentation, not editor.storage.markdown.getMarkdown()
+- [Phase 02-01]: setContent in TipTap v3 takes (content, options) not (content, emitUpdate, parseOptions) — 3-arg form removed
+- [Phase 02-01]: saveContent saves on every editor update in Plan 01 — debounce deferred to Plan 02 as specified
 
 ### Todos
 
@@ -75,8 +79,8 @@ Plan: 1 of 2
 
 ## Session Continuity
 
-Last action: Completed 01-foundation-01-PLAN.md (2026-04-09)
-Next action: Run Plan 02 to implement app shell (TitleBar, Sidebar, AppShell, EmptyState) and SQLite DB initialization.
+Last action: Completed 02-01-PLAN.md (2026-04-10)
+Next action: Run Plan 02-02 to implement MetadataBar (date picker, mood selector, auto-save indicator) and debounced auto-save.
 
 ---
 *State initialized: 2026-04-09*
