@@ -35,6 +35,7 @@ Declared values (must be multiples of 4):
 |-------|-------|-------|
 | xs | 4px | Icon gaps, filter pill inner gaps, inline meta spacing |
 | sm | 8px | Gap between filter chips, search input icon padding |
+| xs-plus | 12px | DaySeparator and OTD banner vertical rhythm — inherited from Phase 3 (`py-3`) |
 | md | 16px | SearchView horizontal padding, filter section padding |
 | lg | 24px | Filter row bottom margin, On This Day section padding |
 | xl | 32px | Between SearchView header and results area |
@@ -44,7 +45,6 @@ Declared values (must be multiples of 4):
 Exceptions:
 - Search input height: 40px (standard shadcn input height — aligns to 8-point grid, not a true exception)
 - Filter chip touch target: minimum 32px height (compact but accessible)
-- On This Day banner: 12px vertical padding (matches DaySeparator rhythm established in Phase 3)
 
 ---
 
@@ -213,7 +213,7 @@ Appears at the top of the **TimelineView** scroll body (not in SearchView), abov
 ```
 
 - Container: `rounded-md border border-border bg-surface` with 3px amber left border (`border-l-[3px] border-l-accent`)
-- Padding: 12px vertical, 16px horizontal (`py-3 px-4`)
+- Padding: 12px vertical, 16px horizontal (`py-3 px-4`) — uses `xs-plus` (12px) token for vertical rhythm consistent with DaySeparator
 - Header row: "On This Day" in `text-heading` (20px semibold) at left; chevron toggle button (`ChevronDown` / `ChevronUp`, 16px, `text-muted`) at right. Button `aria-label`: `"Collapse On This Day"` / `"Expand On This Day"`.
 - Collapsed state: only the header row is visible (banner collapses to single row)
 - Expanded state (default): entry cards shown below the header row, each in a compact read-only card variant (see below)
@@ -361,6 +361,7 @@ No new shadcn components added in this phase beyond what is already installed. T
 | Empty state heading/body copy pattern | `src/components/EmptyState.tsx` + Phase 3 UI-SPEC |
 | Max-width 720px centered content column | Phase 3 UI-SPEC — Layout Contract |
 | Active sidebar item: 3px amber left border | Phase 3 UI-SPEC — Interaction States |
+| xs-plus 12px token — DaySeparator/OTD vertical rhythm | Phase 3 UI-SPEC + DaySeparator component |
 
 ---
 
