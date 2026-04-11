@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type ActiveView = "timeline" | "editor" | "calendar";
+export type ActiveView = "timeline" | "editor" | "calendar" | "search";
 export type NavigateSource = "timeline" | "sidebar" | null;
 
 interface ViewState {

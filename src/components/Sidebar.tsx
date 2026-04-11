@@ -17,6 +17,8 @@ export function Sidebar() {
   const activeId =
     activeView === "calendar"
       ? "calendar"
+      : activeView === "search"
+      ? "search"
       : activeView === "timeline" || activeView === "editor"
       ? "journal"
       : "journal";
@@ -26,8 +28,9 @@ export function Sidebar() {
       setView("timeline");
     } else if (id === "calendar") {
       setView("calendar");
+    } else if (id === "search") {
+      setView("search");
     }
-    // search + settings: no-op in Phase 3
   };
 
   // Per D-01: sidebar compact EntryList only appears when editor is active.

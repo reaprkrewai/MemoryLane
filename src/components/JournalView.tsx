@@ -4,6 +4,7 @@ import { useViewStore } from "../stores/viewStore";
 import { EntryEditor } from "./EntryEditor";
 import { TimelineView } from "./TimelineView";
 import { CalendarView } from "./CalendarView";
+import { SearchView } from "./SearchView";
 
 export function JournalView() {
   const activeView = useViewStore((s) => s.activeView);
@@ -20,6 +21,7 @@ export function JournalView() {
     void loadPage();
   }, [loadEntries, loadPage, resetPagination]);
 
+  if (activeView === "search") return <SearchView />;
   if (activeView === "calendar") return <CalendarView />;
   if (activeView === "editor" && selectedEntryId) return <EntryEditor entryId={selectedEntryId} />;
   return <TimelineView />;
