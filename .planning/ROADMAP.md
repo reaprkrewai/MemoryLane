@@ -12,7 +12,7 @@
 - [x] **Phase 2: Editor & Tags** — Full journal entry creation, editing, mood, auto-save, and tag management (completed 2026-04-10)
 - [x] **Phase 3: Timeline & Calendar** — Browsing all entries chronologically and by month (completed 2026-04-11)
 - [x] **Phase 4: Search & Discovery** — Full-text search, multi-filter, and On This Day (completed 2026-04-11)
-- [ ] **Phase 5: Media, Security & Settings** — Photo attachments, app lock, theme/font, and export
+- [ ] **Phase 5: Media, Security & Settings** — Photo attachments, app lock, theme/font, and export (ready to start)
 
 ---
 
@@ -73,7 +73,11 @@ Plans:
   2. User can filter entries by date range, one or more tags, and one or more moods simultaneously — filters compose correctly
   3. User can clear all active search terms and filters in a single action and return to the unfiltered timeline
   4. When the user opens the app on a date that has entries from prior years, an "On This Day" section or notification surfaces those entries
-**Plans**: TBD
+**Plans:** 3/3 plans complete
+Plans:
+- [x] 04-01-PLAN.md — searchStore + search data layer (composable filters, OTD query, tag batch fetch)
+- [x] 04-02-PLAN.md — SearchView + SearchFilterBar UI + highlight injection in TimelineCard
+- [x] 04-03-PLAN.md — OnThisDay component and TimelineView integration
 **UI hint**: yes
 
 ### Phase 5: Media, Security & Settings

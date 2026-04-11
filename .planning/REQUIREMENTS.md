@@ -42,17 +42,17 @@
 
 ### Search & Filter
 
-- [ ] **SRCH-01**: User can search all entry content by keyword using full-text search (FTS5)
-- [ ] **SRCH-02**: Matching text is highlighted in search results
-- [ ] **SRCH-03**: User can filter entries by date range (start date and end date)
-- [ ] **SRCH-04**: User can filter entries by one or more tags (multi-select)
-- [ ] **SRCH-05**: User can filter entries by one or more moods (multi-select)
-- [ ] **SRCH-06**: User can clear all active filters and search in one action
+- [x] **SRCH-01**: User can search all entry content by keyword using full-text search (FTS5)
+- [x] **SRCH-02**: Matching text is highlighted in search results
+- [x] **SRCH-03**: User can filter entries by date range (start date and end date)
+- [x] **SRCH-04**: User can filter entries by one or more tags (multi-select)
+- [x] **SRCH-05**: User can filter entries by one or more moods (multi-select)
+- [x] **SRCH-06**: User can clear all active filters and search in one action
 
 ### On This Day
 
-- [ ] **OTD-01**: App surfaces entries written on this calendar date in prior years
-- [ ] **OTD-02**: "On This Day" appears as a dedicated section or notification when past entries exist for today's date
+- [x] **OTD-01**: App surfaces entries written on this calendar date in prior years (implemented 2026-04-11 in 04-03-PLAN)
+- [x] **OTD-02**: "On This Day" appears as a dedicated section or notification when past entries exist for today's date (implemented 2026-04-11 in 04-03-PLAN)
 
 ### Security
 
@@ -145,14 +145,14 @@
 | CAL-02 | Phase 3 | Complete |
 | CAL-03 | Phase 3 | Complete |
 | CAL-04 | Phase 3 | Complete |
-| SRCH-01 | Phase 4 | Pending |
-| SRCH-02 | Phase 4 | Pending |
-| SRCH-03 | Phase 4 | Pending |
-| SRCH-04 | Phase 4 | Pending |
-| SRCH-05 | Phase 4 | Pending |
-| SRCH-06 | Phase 4 | Pending |
-| OTD-01 | Phase 4 | Pending |
-| OTD-02 | Phase 4 | Pending |
+| SRCH-01 | Phase 4 | Complete |
+| SRCH-02 | Phase 4 | Complete |
+| SRCH-03 | Phase 4 | Complete |
+| SRCH-04 | Phase 4 | Complete |
+| SRCH-05 | Phase 4 | Complete |
+| SRCH-06 | Phase 4 | Complete |
+| OTD-01 | Phase 4 | Complete |
+| OTD-02 | Phase 4 | Complete |
 | SEC-01 | Phase 5 | Pending |
 | SEC-02 | Phase 5 | Pending |
 | SEC-03 | Phase 5 | Pending |
