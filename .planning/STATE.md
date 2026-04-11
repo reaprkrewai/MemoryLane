@@ -2,21 +2,21 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-04-11T15:45:30.401Z"
+status: executing
+last_updated: "2026-04-11T22:14:28.983Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 10
-  completed_plans: 10
-  percent: 90
+  total_plans: 12
+  completed_plans: 11
+  percent: 92
 ---
 
 # Project State: Chronicle AI
 
 ## Current Phase
 
-Phase 3 — Timeline & Calendar (In Progress)
+Phase 4 — Search & Discovery (In Progress)
 
 ## Project Reference
 
@@ -29,19 +29,19 @@ See: .planning/PROJECT.md
 |-------|------|--------|
 | 1 | Foundation | Complete |
 | 2 | Editor & Tags | Complete |
-| 3 | Timeline & Calendar | In Progress (2/3 plans done) |
-| 4 | Search & Discovery | Not Started |
+| 3 | Timeline & Calendar | Complete |
+| 4 | Search & Discovery | In Progress (1/2 plans done) |
 | 5 | Media, Security & Settings | Not Started |
 
 ## Current Position
 
-Phase: 03 (timeline-calendar) — EXECUTING
-Plan: 2 of 3 complete
+Phase: 04 (search-discovery) — EXECUTING
+Plan: 2 of 2
 
 - **Phase:** 4
-- **Plan:** Not started
-- **Status:** Ready to plan
-- **Progress:** [█████████░] 90%
+- **Plan:** 1 complete, 1 remaining
+- **Status:** Executing Phase 04 — Plan 02 next
+- **Progress:** [█████████░] 92%
 
 ## Performance Metrics
 
@@ -82,6 +82,9 @@ Plan: 2 of 3 complete
 - [Phase 03-02]: Read-only TipTap editor instance per expanded card, useEditor with [expanded] dep for proper lifecycle
 - [Phase 03-02]: data-expand-control attribute used for click delegation — expand controls don't bubble to card click handler
 - [Phase 03-02]: Batch tag fetch via single SQL JOIN on allEntries change — avoids N+1 DB calls per card
+- [Phase 04]: Phrase-wrap FTS5 MATCH input to prevent SQLite parse errors on special chars
+- [Phase 04]: SearchView stub in Plan 01 — full implementation deferred to Plan 02 (Wave 2)
+- [Phase 04]: AND-semantics tag filter via HAVING COUNT(DISTINCT tag_id) — multi-tag means entries with ALL selected tags
 
 ### Todos
 
@@ -93,8 +96,8 @@ Plan: 2 of 3 complete
 
 ## Session Continuity
 
-Last action: Completed 03-02-PLAN.md (2026-04-11) — TimelineView full implementation with TimelineCard, DaySeparator, TagPillReadOnly
-Next action: Execute 03-03 — CalendarView heatmap implementation.
+Last action: Completed 04-01-PLAN.md (2026-04-11) — searchStore, viewStore 'search' type, uiStore OTD state, Sidebar + JournalView search routing
+Next action: Execute 04-02 — SearchView full implementation with SearchFilterBar, result cards, and OnThisDay banner.
 
 ---
 *State initialized: 2026-04-09*
