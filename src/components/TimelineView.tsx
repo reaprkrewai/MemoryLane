@@ -6,6 +6,7 @@ import { useViewStore } from "../stores/viewStore";
 import { TimelineCard } from "./TimelineCard";
 import { DaySeparator } from "./DaySeparator";
 import { EmptyState } from "./EmptyState";
+import { OnThisDay } from "./OnThisDay";
 import { getDb } from "../lib/db";
 
 interface EntryTagRow {
@@ -194,6 +195,8 @@ export function TimelineView() {
 
       {/* Body */}
       <div className="mx-auto w-full max-w-[720px] flex-1 px-4 py-6">
+        <OnThisDay />
+
         {isAllEmpty && <EmptyState />}
 
         {isFilteredEmpty && (
