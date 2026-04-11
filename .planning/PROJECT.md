@@ -29,18 +29,19 @@ A journaling app where you can eventually have AI understand your entries — an
 - [x] User can delete unused tags via trash icon in autocomplete dropdown — TAG-04
 - [x] User can configure auto-save interval (5s / 10s / 30s) — EDIT-05
 
+### Validated
+
+**Timeline & Calendar — Validated in Phase 3: Timeline & Calendar**
+- [x] User can view entries in reverse-chronological timeline with infinite scroll — TIME-01, TIME-02
+- [x] Each entry card shows date, mood, tags, word count, and 150-char preview — TIME-03, TIME-04
+- [x] User can expand/collapse full entry inline — TIME-05
+- [x] Visual separator between days — TIME-06
+- [x] Back to Journal button returns from editor to timeline — TIME-07
+- [x] User can view a monthly calendar heatmap (color intensity = entry count) — CAL-01, CAL-02
+- [x] Clicking a date filters the timeline to entries on that day — CAL-04
+- [x] Month/year navigation with "Today" shortcut — CAL-03
+
 ### Active
-
-**Timeline View**
-- [ ] User can view entries in reverse-chronological timeline with infinite scroll
-- [ ] Each entry card shows date, mood, tags, word count, and 150-char preview
-- [ ] User can expand/collapse full entry inline
-- [ ] Visual separator between days
-
-**Calendar View**
-- [ ] User can view a monthly calendar heatmap (color intensity = entry count)
-- [ ] Clicking a date filters the timeline to entries on that day
-- [ ] Month/year navigation with "Today" shortcut
 
 **Search & Filter**
 - [ ] Full-text search across all entry content (SQLite FTS5)
@@ -122,4 +123,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 — Phase 2 (Editor & Tags) complete*
+*Last updated: 2026-04-11 — Phase 3 (Timeline & Calendar) complete*
