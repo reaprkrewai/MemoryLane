@@ -6,6 +6,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
 import { useEffect } from "react";
+import React from "react";
 
 interface TimelineCardEntry {
   id: string;
@@ -27,6 +28,26 @@ interface TimelineCardProps {
   expanded: boolean;
   onToggleExpand: () => void;
   onOpen: () => void;
+  searchQuery?: string;
+}
+
+function injectHighlights(text: string, query: string): React.ReactNode[] {
+  if (!query.trim()) return [text];
+  const terms = query
+    .replace(/"/g, "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  if (terms.length === 0) return [text];
+  const pattern = new RegExp(`(${terms.join("|")})`, "gi");
+  const parts = text.split(pattern);
+  return parts.map((part, i) =>
+    pattern.test(part) ? (
+      <mark key={i} className="bg-accent/20 rounded-[2px] px-[2px]">{part}</mark>
+    ) : (
+      part
+    )
+  );
 }
 
 // Mood dot color map — matches UI-SPEC "Mood Indicator Color Map"
@@ -42,7 +63,7 @@ function moodDotClass(mood: string | null): string | null {
   }
 }
 
-export function TimelineCard({ entry, tags, expanded, onToggleExpand, onOpen }: TimelineCardProps) {
+export function TimelineCard({ entry, tags, expanded, onToggleExpand, onOpen, searchQuery }: TimelineCardProps) {
   const dotClass = moodDotClass(entry.mood);
   const dateLabel = format(new Date(entry.created_at), "MMM d, yyyy");
   const preview = truncatePreview(stripMarkdown(entry.content || ""), 150);
@@ -86,10 +107,10 @@ export function TimelineCard({ entry, tags, expanded, onToggleExpand, onOpen }: 
         <span className="text-label text-muted">{wordLabel}</span>
       </div>
 
-      {/* Row 2: preview text (150 chars plain) */}
+      {/* Row 2: preview text (150 chars plain, with optional highlight injection) */}
       {preview && (
         <p className="mt-2 text-body text-text">
-          {preview}
+          {searchQuery ? injectHighlights(preview, searchQuery) : preview}
         </p>
       )}
 
