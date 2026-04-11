@@ -1,4 +1,5 @@
 import { useEntryStore } from "../stores/entryStore";
+import { useViewStore } from "../stores/viewStore";
 import { EntryListItem } from "./EntryListItem";
 
 export function EntryList() {
@@ -26,7 +27,10 @@ export function EntryList() {
             key={entry.id}
             entry={entry}
             isSelected={entry.id === selectedEntryId}
-            onClick={() => selectEntry(entry.id)}
+            onClick={() => {
+                  void selectEntry(entry.id);
+                  useViewStore.getState().navigateToEditor("sidebar");
+                }}
           />
         ))}
       </div>

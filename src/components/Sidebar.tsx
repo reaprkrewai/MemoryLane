@@ -1,5 +1,6 @@
 import { BookOpen, CalendarDays, Search, Settings } from "lucide-react";
 import { EntryList } from "./EntryList";
+import { useViewStore } from "../stores/viewStore";
 
 const navItems = [
   { icon: BookOpen, label: "Journal", id: "journal" },
@@ -9,8 +10,29 @@ const navItems = [
 ] as const;
 
 export function Sidebar() {
-  // Phase 1: "journal" is always active; routing comes in Phase 2+
-  const activeId = "journal";
+  const activeView = useViewStore((s) => s.activeView);
+  const setView = useViewStore((s) => s.setView);
+
+  // Treat 'editor' as 'journal' for nav highlight — editor is reached from journal
+  const activeId =
+    activeView === "calendar"
+      ? "calendar"
+      : activeView === "timeline" || activeView === "editor"
+      ? "journal"
+      : "journal";
+
+  const handleNavClick = (id: string) => {
+    if (id === "journal") {
+      setView("timeline");
+    } else if (id === "calendar") {
+      setView("calendar");
+    }
+    // search + settings: no-op in Phase 3
+  };
+
+  // Per D-01: sidebar compact EntryList only appears when editor is active.
+  // Open question 1 resolution from RESEARCH.md.
+  const showEntryList = activeView === "editor";
 
   return (
     <nav className="flex w-60 flex-col border-r border-border bg-surface">
@@ -20,6 +42,7 @@ export function Sidebar() {
           return (
             <button
               key={item.id}
+              onClick={() => handleNavClick(item.id)}
               className={`flex items-center gap-3 px-4 py-2 text-body transition-colors w-full ${
                 isActive
                   ? "border-l-[3px] border-accent bg-bg font-semibold text-text"
@@ -33,13 +56,16 @@ export function Sidebar() {
         })}
       </div>
 
-      {/* Separator */}
-      <div className="border-b border-border" />
-
-      {/* Entry list — fills remaining vertical space */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <EntryList />
-      </div>
+      {showEntryList && (
+        <>
+          {/* Separator */}
+          <div className="border-b border-border" />
+          {/* Entry list — fills remaining vertical space */}
+          <div className="flex flex-1 flex-col overflow-hidden">
+            <EntryList />
+          </div>
+        </>
+      )}
     </nav>
   );
 }

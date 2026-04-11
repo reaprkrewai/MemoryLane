@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import type { Editor } from "@tiptap/react"
+import { ArrowLeft } from "lucide-react"
 import { useEntryStore } from "../stores/entryStore"
+import { useViewStore } from "../stores/viewStore"
 import { MoodSelector } from "./MoodSelector"
 import { DatePicker } from "./DatePicker"
 
@@ -15,6 +17,9 @@ export function MetadataBar({ entryId, editor }: MetadataBarProps) {
   const updateMood = useEntryStore((s) => s.updateMood)
   const updateCreatedAt = useEntryStore((s) => s.updateCreatedAt)
   const updateAutoSaveInterval = useEntryStore((s) => s.updateAutoSaveInterval)
+
+  const navigateSource = useViewStore((s) => s.navigateSource)
+  const navigateBack = useViewStore((s) => s.navigateBack)
 
   const entry = entries.find((e) => e.id === entryId)
 
@@ -80,8 +85,20 @@ export function MetadataBar({ entryId, editor }: MetadataBarProps) {
 
   return (
     <div className="flex h-12 items-center border-b border-border bg-surface px-4">
-      {/* Left zone: date picker */}
-      <div className="flex-1">
+      {/* Left zone: Back button (when opened from timeline) + date picker */}
+      <div className="flex flex-1 items-center gap-3">
+        {navigateSource === "timeline" && (
+          <button
+            type="button"
+            onClick={() => navigateBack()}
+            className="flex items-center gap-1 pl-2 text-label text-muted hover:text-text transition-colors"
+            style={{ fontSize: "12px", lineHeight: "1.4" }}
+            aria-label="Back to Journal"
+          >
+            <ArrowLeft size={14} />
+            <span>Back to Journal</span>
+          </button>
+        )}
         <DatePicker date={entryDate} onDateChange={handleDateChange} />
       </div>
 
