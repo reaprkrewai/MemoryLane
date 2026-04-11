@@ -25,20 +25,20 @@
 
 ### Timeline
 
-- [ ] **TIME-01**: User can view all entries in a reverse-chronological timeline
-- [ ] **TIME-02**: Timeline loads entries in pages of 20 using keyset pagination (no OFFSET)
-- [ ] **TIME-03**: Timeline loads more entries automatically as user scrolls toward the bottom (infinite scroll)
-- [ ] **TIME-04**: Each entry card shows: date, mood indicator, tags, word count, and 150-character text preview
-- [ ] **TIME-05**: User can expand an entry card to read the full entry inline
-- [ ] **TIME-06**: Visual separator appears between entries from different calendar days
-- [ ] **TIME-07**: User can click an entry to open it for editing
+- [x] **TIME-01**: User can view all entries in a reverse-chronological timeline
+- [x] **TIME-02**: Timeline loads entries in pages of 20 using keyset pagination (no OFFSET)
+- [x] **TIME-03**: Timeline loads more entries automatically as user scrolls toward the bottom (infinite scroll)
+- [x] **TIME-04**: Each entry card shows: date, mood indicator, tags, word count, and 150-character text preview
+- [x] **TIME-05**: User can expand an entry card to read the full entry inline
+- [x] **TIME-06**: Visual separator appears between entries from different calendar days
+- [x] **TIME-07**: User can click an entry to open it for editing
 
 ### Calendar
 
-- [ ] **CAL-01**: User can view a monthly calendar with a heatmap showing entry count per day (color intensity = more entries)
-- [ ] **CAL-02**: User can navigate to previous and next months
-- [ ] **CAL-03**: User can click "Today" to return to the current month
-- [ ] **CAL-04**: User can click a date on the calendar to filter the timeline to entries from that day
+- [x] **CAL-01**: User can view a monthly calendar with a heatmap showing entry count per day (color intensity = more entries)
+- [x] **CAL-02**: User can navigate to previous and next months
+- [x] **CAL-03**: User can click "Today" to return to the current month
+- [x] **CAL-04**: User can click a date on the calendar to filter the timeline to entries from that day
 
 ### Search & Filter
 
@@ -134,17 +134,17 @@
 | TAG-02 | Phase 2 | Complete |
 | TAG-03 | Phase 2 | Complete |
 | TAG-04 | Phase 2 | Complete |
-| TIME-01 | Phase 3 | Pending |
-| TIME-02 | Phase 3 | Pending |
-| TIME-03 | Phase 3 | Pending |
-| TIME-04 | Phase 3 | Pending |
-| TIME-05 | Phase 3 | Pending |
-| TIME-06 | Phase 3 | Pending |
-| TIME-07 | Phase 3 | Pending |
-| CAL-01 | Phase 3 | Pending |
-| CAL-02 | Phase 3 | Pending |
-| CAL-03 | Phase 3 | Pending |
-| CAL-04 | Phase 3 | Pending |
+| TIME-01 | Phase 3 | Complete |
+| TIME-02 | Phase 3 | Complete |
+| TIME-03 | Phase 3 | Complete |
+| TIME-04 | Phase 3 | Complete |
+| TIME-05 | Phase 3 | Complete |
+| TIME-06 | Phase 3 | Complete |
+| TIME-07 | Phase 3 | Complete |
+| CAL-01 | Phase 3 | Complete |
+| CAL-02 | Phase 3 | Complete |
+| CAL-03 | Phase 3 | Complete |
+| CAL-04 | Phase 3 | Complete |
 | SRCH-01 | Phase 4 | Pending |
 | SRCH-02 | Phase 4 | Pending |
 | SRCH-03 | Phase 4 | Pending |

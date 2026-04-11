@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-11T15:39:08.787Z"
+last_updated: "2026-04-11T15:40:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 2
@@ -16,7 +16,7 @@ progress:
 
 ## Current Phase
 
-Phase 2 — Editor & Tags (Complete)
+Phase 3 — Timeline & Calendar (In Progress)
 
 ## Project Reference
 
@@ -29,17 +29,17 @@ See: .planning/PROJECT.md
 |-------|------|--------|
 | 1 | Foundation | Complete |
 | 2 | Editor & Tags | Complete |
-| 3 | Timeline & Calendar | Not Started |
+| 3 | Timeline & Calendar | In Progress (2/3 plans done) |
 | 4 | Search & Discovery | Not Started |
 | 5 | Media, Security & Settings | Not Started |
 
 ## Current Position
 
 Phase: 03 (timeline-calendar) — EXECUTING
-Plan: 1 of 3
+Plan: 2 of 3 complete
 
 - **Phase:** 3
-- **Plan:** Not started
+- **Plan:** 03-02 complete; next: 03-03 (CalendarView)
 - **Status:** Executing Phase 03
 - **Progress:** [█████████░] 90%
 
@@ -78,6 +78,10 @@ Plan: 1 of 3
 - [Phase 02]: Native <select> used in MetadataBar for auto-save interval — no popover overlap, no new imports, fits 48px bar height
 - [Phase 03]: CalendarCell uses native disabled for zero-count days to prevent clicks and remove from tab order
 - [Phase 03]: isSelected prop on CalendarCell always false for now; future plan wires dateFilter from viewStore
+- [Phase 03-02]: TagPillReadOnly created separately from TagPill — no Popover side effects on timeline cards
+- [Phase 03-02]: Read-only TipTap editor instance per expanded card, useEditor with [expanded] dep for proper lifecycle
+- [Phase 03-02]: data-expand-control attribute used for click delegation — expand controls don't bubble to card click handler
+- [Phase 03-02]: Batch tag fetch via single SQL JOIN on allEntries change — avoids N+1 DB calls per card
 
 ### Todos
 
@@ -89,8 +93,8 @@ Plan: 1 of 3
 
 ## Session Continuity
 
-Last action: Completed 02-03-PLAN.md (2026-04-10) — TagRow, TagPill, TagInput, TagAutocomplete, DeleteEntryDialog
-Next action: Begin Phase 03 — Timeline & Calendar.
+Last action: Completed 03-02-PLAN.md (2026-04-11) — TimelineView full implementation with TimelineCard, DaySeparator, TagPillReadOnly
+Next action: Execute 03-03 — CalendarView heatmap implementation.
 
 ---
 *State initialized: 2026-04-09*

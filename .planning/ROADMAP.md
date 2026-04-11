@@ -10,7 +10,7 @@
 
 - [x] **Phase 1: Foundation** — Tauri project, SQLite schema, AI-ready data layer, offline guarantee (completed 2026-04-09)
 - [x] **Phase 2: Editor & Tags** — Full journal entry creation, editing, mood, auto-save, and tag management (completed 2026-04-10)
-- [ ] **Phase 3: Timeline & Calendar** — Browsing all entries chronologically and by month
+- [x] **Phase 3: Timeline & Calendar** — Browsing all entries chronologically and by month (completed 2026-04-11)
 - [ ] **Phase 4: Search & Discovery** — Full-text search, multi-filter, and On This Day
 - [ ] **Phase 5: Media, Security & Settings** — Photo attachments, app lock, theme/font, and export
 
@@ -57,10 +57,10 @@ Plans:
   3. User can expand any entry card to read the full text inline, and click it to open the editor
   4. User can view a monthly calendar where days with entries are shaded by intensity, navigate between months, and return to the current month with one click
   5. Clicking a date on the calendar filters the timeline to show only entries from that day
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 03-01-PLAN.md — viewStore + entryStore pagination + view router (JournalView/Sidebar/MetadataBar Back button)
-- [ ] 03-02-PLAN.md — TimelineView infinite scroll, cards, day separators, expand-in-place
+- [x] 03-02-PLAN.md — TimelineView infinite scroll, cards, day separators, expand-in-place
 - [x] 03-03-PLAN.md — CalendarView heatmap with month navigation and date-filter integration
 **UI hint**: yes
 
