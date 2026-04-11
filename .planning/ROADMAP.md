@@ -11,7 +11,7 @@
 - [x] **Phase 1: Foundation** — Tauri project, SQLite schema, AI-ready data layer, offline guarantee (completed 2026-04-09)
 - [x] **Phase 2: Editor & Tags** — Full journal entry creation, editing, mood, auto-save, and tag management (completed 2026-04-10)
 - [x] **Phase 3: Timeline & Calendar** — Browsing all entries chronologically and by month (completed 2026-04-11)
-- [ ] **Phase 4: Search & Discovery** — Full-text search, multi-filter, and On This Day
+- [x] **Phase 4: Search & Discovery** — Full-text search, multi-filter, and On This Day (completed 2026-04-11)
 - [ ] **Phase 5: Media, Security & Settings** — Photo attachments, app lock, theme/font, and export
 
 ---
