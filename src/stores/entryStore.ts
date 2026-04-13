@@ -1,6 +1,17 @@
 import { create } from "zustand";
 import { getDb } from "../lib/db";
 
+export interface Photo {
+  id: string;
+  entry_id: string;
+  photo_path: string;
+  thumbnail_path: string;
+  file_size: number | null;
+  mime_type: string;
+  display_order: number;
+  created_at: number;
+}
+
 interface Entry {
   id: string;
   content: string;
@@ -10,6 +21,7 @@ interface Entry {
   created_at: number;
   updated_at: number;
   metadata: string;
+  photos?: Photo[];
 }
 
 interface EntryState {
@@ -49,6 +61,12 @@ interface EntryState {
   flushAndClearTimers: () => Promise<void>;
   loadAutoSaveInterval: () => Promise<void>;
   updateAutoSaveInterval: (ms: number) => Promise<void>;
+
+  // Phase 5.2: Photo management
+  getPhotosForEntry: (entryId: string) => Promise<Photo[]>;
+  addPhotosToEntry: (entryId: string, photos: Photo[]) => void;
+  removePhotoFromEntry: (entryId: string, photoId: string) => void;
+  setEntryPhotos: (entryId: string, photos: Photo[]) => void;
 }
 
 // Module-level timer state — not in Zustand state (timers are not serializable)
@@ -283,5 +301,55 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       clearInterval(_intervalTimer);
       _intervalTimer = null;
     }
+  },
+
+  // Phase 5.2: Photo management
+  getPhotosForEntry: async (entryId: string) => {
+    const db = await getDb();
+    return db.select<Photo[]>(
+      "SELECT * FROM media_attachments WHERE entry_id = ? ORDER BY display_order ASC",
+      [entryId]
+    );
+  },
+
+  addPhotosToEntry: (entryId: string, photos: Photo[]) => {
+    set((state) => ({
+      allEntries: state.allEntries.map((e) =>
+        e.id === entryId
+          ? { ...e, photos: [...(e.photos ?? []), ...photos] }
+          : e
+      ),
+      entries: state.entries.map((e) =>
+        e.id === entryId
+          ? { ...e, photos: [...(e.photos ?? []), ...photos] }
+          : e
+      ),
+    }));
+  },
+
+  removePhotoFromEntry: (entryId: string, photoId: string) => {
+    set((state) => ({
+      allEntries: state.allEntries.map((e) =>
+        e.id === entryId
+          ? { ...e, photos: (e.photos ?? []).filter((p) => p.id !== photoId) }
+          : e
+      ),
+      entries: state.entries.map((e) =>
+        e.id === entryId
+          ? { ...e, photos: (e.photos ?? []).filter((p) => p.id !== photoId) }
+          : e
+      ),
+    }));
+  },
+
+  setEntryPhotos: (entryId: string, photos: Photo[]) => {
+    set((state) => ({
+      allEntries: state.allEntries.map((e) =>
+        e.id === entryId ? { ...e, photos } : e
+      ),
+      entries: state.entries.map((e) =>
+        e.id === entryId ? { ...e, photos } : e
+      ),
+    }));
   },
 }));

@@ -84,6 +84,20 @@ INSERT OR IGNORE INTO settings(key, value) VALUES
     ('theme',             '"system"'),
     ('font_size',         '"medium"'),
     ('autosave_interval', '5000');
+
+CREATE TABLE IF NOT EXISTS media_attachments (
+    id            TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    entry_id      TEXT NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
+    photo_path    TEXT NOT NULL,
+    thumbnail_path TEXT NOT NULL,
+    file_size     INTEGER,
+    mime_type     TEXT NOT NULL DEFAULT 'image/jpeg',
+    display_order INTEGER NOT NULL DEFAULT 0,
+    created_at    INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+);
+
+CREATE INDEX IF NOT EXISTS idx_media_attachments_entry ON media_attachments(entry_id);
+CREATE INDEX IF NOT EXISTS idx_media_attachments_order ON media_attachments(entry_id, display_order);
 `;
 
 /**
