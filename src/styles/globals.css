@@ -4,6 +4,9 @@
 
 @layer base {
   :root {
+    /* Font scale custom property — updated by uiStore.applyFontScale() */
+    --font-scale: 1;
+
     /* Chronicle design tokens */
     --color-bg: #FAFAF9;
     --color-surface: #F0EFED;
@@ -103,6 +106,33 @@
     background-color: var(--color-bg);
     color: var(--color-text);
   }
+}
+
+/* Font scale classes — applied to :root by uiStore.applyFontScale() */
+:root.font-small {
+  --font-scale: 0.875;
+  font-size: calc(16px * 0.875); /* 14px */
+}
+
+:root.font-medium {
+  --font-scale: 1;
+  font-size: 16px;
+}
+
+:root.font-large {
+  --font-scale: 1.125;
+  font-size: calc(16px * 1.125); /* 18px */
+}
+
+/* Light mode explicit class (dark is handled by Tailwind .dark) */
+:root.light {
+  --color-bg: #FAFAF9;
+  --color-surface: #F0EFED;
+  --color-accent: #F59E0B;
+  --color-text: #1C1B1A;
+  --color-text-muted: #6B7280;
+  --color-border: #E5E3DF;
+  --color-destructive: #DC2626;
 }
 
 /* TipTap editor prose styles */

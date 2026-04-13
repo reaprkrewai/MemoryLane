@@ -3,14 +3,35 @@ import { Loader2 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { AppShell } from "./components/AppShell";
 import { JournalView } from "./components/JournalView";
+import { SettingsView } from "./components/SettingsView";
 import { initializeDatabase } from "./lib/db";
-import { useUiStore } from "./stores/uiStore";
+import { useUiStore, applyTheme, applyFontScale } from "./stores/uiStore";
+import { useViewStore } from "./stores/viewStore";
 
 function App() {
   const isDbReady = useUiStore((s) => s.isDbReady);
   const dbError = useUiStore((s) => s.dbError);
   const setDbReady = useUiStore((s) => s.setDbReady);
   const setDbError = useUiStore((s) => s.setDbError);
+  const theme = useUiStore((s) => s.theme);
+  const fontSize = useUiStore((s) => s.fontSize);
+  const activeView = useViewStore((s) => s.activeView);
+
+  // Apply persisted theme and font scale on initial mount
+  useEffect(() => {
+    applyTheme(theme);
+    applyFontScale(fontSize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-apply whenever settings change
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  useEffect(() => {
+    applyFontScale(fontSize);
+  }, [fontSize]);
 
   useEffect(() => {
     initializeDatabase()
@@ -47,7 +68,8 @@ function App() {
             </p>
           </div>
         )}
-        {isDbReady && !dbError && <JournalView />}
+        {isDbReady && !dbError && activeView === "settings" && <SettingsView />}
+        {isDbReady && !dbError && activeView !== "settings" && <JournalView />}
       </AppShell>
       <Toaster position="bottom-right" />
     </>
