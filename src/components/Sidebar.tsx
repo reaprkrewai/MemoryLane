@@ -19,6 +19,8 @@ export function Sidebar() {
       ? "calendar"
       : activeView === "search"
       ? "search"
+      : activeView === "settings"
+      ? "settings"
       : activeView === "timeline" || activeView === "editor"
       ? "journal"
       : "journal";
@@ -30,6 +32,8 @@ export function Sidebar() {
       setView("calendar");
     } else if (id === "search") {
       setView("search");
+    } else if (id === "settings") {
+      setView("settings");
     }
   };
 
