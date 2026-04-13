@@ -69,8 +69,8 @@
 
 ### Settings & Export
 
-- [ ] **SETT-01**: User can toggle between light mode and dark mode
-- [ ] **SETT-02**: User can select a font size (small / medium / large)
+- [x] **SETT-01**: User can toggle between light mode and dark mode
+- [x] **SETT-02**: User can select a font size (small / medium / large)
 - [ ] **SETT-03**: User can export all journal data to a JSON file
 - [x] **SETT-04**: App works 100% offline — no network calls, no telemetry, no analytics
 
@@ -160,8 +160,8 @@
 | MEDIA-02 | Phase 5 | Pending |
 | MEDIA-03 | Phase 5 | Pending |
 | MEDIA-04 | Phase 5 | Pending |
-| SETT-01 | Phase 5 | Pending |
-| SETT-02 | Phase 5 | Pending |
+| SETT-01 | Phase 5 | Complete |
+| SETT-02 | Phase 5 | Complete |
 | SETT-03 | Phase 5 | Pending |
 | SETT-04 | Phase 1 | Complete |
 | AI-01 | Phase 1 | Complete |
