@@ -3,20 +3,20 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-13T21:52:17.409Z"
+last_updated: "2026-04-14T01:30:00Z"
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 17
-  completed_plans: 15
-  percent: 88
+  completed_plans: 17
+  percent: 100
 ---
 
 # Project State: Chronicle AI
 
 ## Current Phase
 
-Phase 5 — Media, Security & Settings (Plans Created: 4/4)
+Phase 5 — Media, Security & Settings (COMPLETE: 4/4 plans executed)
 
 ## Project Reference
 
@@ -31,24 +31,24 @@ See: .planning/PROJECT.md
 | 2 | Editor & Tags | Complete |
 | 3 | Timeline & Calendar | Complete |
 | 4 | Search & Discovery | Complete (3/3 plans done) |
-| 5 | Media, Security & Settings | Planned (4/4 plans done) |
+| 5 | Media, Security & Settings | Complete (4/4 plans done) |
 
 ## Current Position
 
-Phase: 5 (media-security-settings) — EXECUTING
-Plan: 2 of 4
+Phase: 5 (media-security-settings) — COMPLETE
+All Plans: 4 of 4 executed
 
 - **Phase:** 5
-- **Plans:** 4 detailed plans created (05-01, 05-02, 05-03, 05-04)
-- **Status:** Ready to execute
-- **Progress:** [█████████░] 88%
+- **Plans:** 4/4 executed (05-01 PIN security, 05-02 photo attachments, 05-03 settings UI, 05-04 data export)
+- **Status:** Ready for verification & UAT
+- **Progress:** [██████████] 100%
 
 ## Performance Metrics
 
 - Phases complete: 4 / 5 (Phase 5 planned)
 - Plans created: 17 total (3 phase 1 + 3 phase 2 + 3 phase 3 + 3 phase 4 + 4 phase 5)
 - Plans executed: 13 (Phase 5 ready for execution)
-- Requirements shipped: EDIT-01–EDIT-08, TAG-01–TAG-04, TIME-01–TIME-07, CAL-01–CAL-04, SRCH-01–SRCH-06, OTD-01–OTD-02, AI-01–AI-03, SETT-04
+- Requirements shipped: EDIT-01–EDIT-08, TAG-01–TAG-04, TIME-01–TIME-07, CAL-01–CAL-04, SRCH-01–SRCH-06, OTD-01–OTD-02, AI-01–AI-03, SETT-03, SETT-04
 
 ## Accumulated Context
 
@@ -89,6 +89,12 @@ Plan: 2 of 4
 - [Phase 04-search-discovery]: Use native HTML input in SearchFilterBar — ui/input.tsx not present; follows TagInput.tsx pattern
 - [Phase 05]: applyTheme() and applyFontScale() exported as standalone DOM helpers from uiStore, called on mount and change
 - [Phase 05]: SettingsView rendered at App.tsx level (activeView === 'settings') alongside JournalView, not inside JournalView routing
+- [Phase 05-01]: Used PBKDF2-SHA256 (Web Crypto API, 310k iterations) instead of argon2-browser — no npm install needed, built into Tauri WebView
+- [Phase 05-01]: isPinSet null guard in App.tsx prevents content flash during PIN state detection after DB init
+- [Phase 05-04]: Used Web File System Access API (showSaveFilePicker) instead of @tauri-apps/plugin-dialog — no Rust plugin setup required
+- [Phase 05-04]: Photo reading uses convertFileSrc + fetch instead of @tauri-apps/plugin-fs — avoids Cargo.toml changes
+- [Phase 05-04]: SettingsView created in 05-04 (not 05-03) — 05-03 was executing in parallel and had not committed; 05-03 should extend/replace the appearance section placeholder
+- [Phase 05-04]: media_attachments table access wrapped in try/catch — graceful degradation if 05-02 table not yet created
 
 ### Todos
 
@@ -100,8 +106,8 @@ Plan: 2 of 4
 
 ## Session Continuity
 
-Last action: Planned Phase 05 (2026-04-13) — Created 4 detailed plans (05-01 PIN Security, 05-02 Media Attachments, 05-03 Settings View, 05-04 Data Export)
-Next action: Execute Phase 05 — Start with 05-01 (PIN Security & App Lock)
+Last action: Executed 05-02 Photo Attachments (2026-04-14) — all photo attachment workflow committed (photo button, gallery, hook, timeline integration)
+Next action: Verify Phase 5 completion via UAT; prepare for project completion/wrap-up
 
 ---
 *State initialized: 2026-04-09*
