@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { getDb } from "../lib/db";
 import { semanticSearch } from "../utils/vectorSearchService";
+import { askQuestion } from "../utils/qaService";
+import { useAIStore } from "./aiStore";
 
 interface SearchEntry {
   id: string;
@@ -10,6 +12,11 @@ interface SearchEntry {
   created_at: number;
   updated_at: number;
   metadata: string;
+}
+
+interface QAResult {
+  answer: string;
+  citedEntryIds: string[];
 }
 
 interface SearchState {
@@ -23,6 +30,10 @@ interface SearchState {
   searchMode: "keyword" | "ai";
   searchError: string | null;
 
+  // Q&A state
+  qaResult: QAResult | null;
+  isAsking: boolean;
+
   setQuery: (q: string) => void;
   setStartDate: (ts: number | null) => void;
   setEndDate: (ts: number | null) => void;
@@ -31,6 +42,9 @@ interface SearchState {
   setSearchMode: (mode: "keyword" | "ai") => void;
   resetSearch: () => void;
   runSearch: () => Promise<void>;
+  setQAResult: (result: QAResult | null) => void;
+  clearQA: () => void;
+  runQA: (question: string) => Promise<void>;
 }
 
 export const useSearchStore = create<SearchState>((set, get) => ({
@@ -43,6 +57,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   isSearching: false,
   searchMode: "keyword",
   searchError: null,
+  qaResult: null,
+  isAsking: false,
 
   setQuery: (q) => set({ query: q }),
   setStartDate: (ts) => set({ startDate: ts }),
@@ -64,6 +80,10 @@ export const useSearchStore = create<SearchState>((set, get) => ({
 
   setSearchMode: (mode) => set({ searchMode: mode }),
 
+  setQAResult: (result) => set({ qaResult: result }),
+
+  clearQA: () => set({ qaResult: null, isAsking: false }),
+
   resetSearch: () =>
     set({
       query: "",
@@ -74,6 +94,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       results: [],
       isSearching: false,
       searchError: null,
+      qaResult: null,
+      isAsking: false,
     }),
 
   runSearch: async () => {
@@ -165,6 +187,30 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     } catch (error) {
       const message = error instanceof Error ? error.message : "Search failed";
       set({ isSearching: false, results: [], searchError: message });
+    }
+  },
+
+  runQA: async (question: string) => {
+    // Check if AI/LLM is available
+    const aiState = useAIStore.getState();
+    if (!aiState.llm) {
+      set({
+        qaResult: null,
+        isAsking: false,
+        searchError: "Q&A requires a local LLM. See settings to install Ollama.",
+      });
+      return;
+    }
+
+    set({ isAsking: true, searchError: null });
+
+    try {
+      // Call Q&A service
+      const result = await askQuestion(question);
+      set({ qaResult: result, isAsking: false });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to generate answer";
+      set({ isAsking: false, qaResult: null, searchError: message });
     }
   },
 }));
