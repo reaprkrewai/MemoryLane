@@ -12,7 +12,14 @@ const MOODS = [
   { value: "awful" as const, icon: Angry, label: "Awful" },
 ];
 
-export function SearchFilterBar() {
+interface SearchFilterBarProps {
+  searchMode?: "keyword" | "ai";
+  onModeChange?: (mode: "keyword" | "ai") => void;
+}
+
+export function SearchFilterBar({
+  searchMode = "keyword",
+}: SearchFilterBarProps) {
   const query = useSearchStore((s) => s.query);
   const startDate = useSearchStore((s) => s.startDate);
   const endDate = useSearchStore((s) => s.endDate);
@@ -90,7 +97,11 @@ export function SearchFilterBar() {
         <input
           value={query}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleQueryChange(e.target.value)}
-          placeholder="Search entries..."
+          placeholder={
+            searchMode === "ai"
+              ? "Ask a question or describe what you're looking for..."
+              : "Search by keyword..."
+          }
           className="w-full pl-9 pr-9 h-10 rounded-md border border-border bg-bg text-body text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 px-3 transition-colors"
           aria-label="Search entries"
         />

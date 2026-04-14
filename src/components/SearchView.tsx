@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import { useSearchStore } from "../stores/searchStore";
 import { useEntryStore } from "../stores/entryStore";
 import { useViewStore } from "../stores/viewStore";
 import { getDb } from "../lib/db";
+import { checkOllamaHealth } from "../lib/ollamaService";
 import { SearchFilterBar } from "./SearchFilterBar";
 import { TimelineCard } from "./TimelineCard";
 
@@ -46,10 +47,31 @@ export function SearchView() {
   const selectedMoods = useSearchStore((s) => s.selectedMoods);
   const results = useSearchStore((s) => s.results);
   const isSearching = useSearchStore((s) => s.isSearching);
+  const searchMode = useSearchStore((s) => s.searchMode);
+  const searchError = useSearchStore((s) => s.searchError);
+  const setSearchMode = useSearchStore((s) => s.setSearchMode);
   const resetSearch = useSearchStore((s) => s.resetSearch);
 
   const selectEntry = useEntryStore((s) => s.selectEntry);
   const navigateToEditor = useViewStore((s) => s.navigateToEditor);
+
+  // Ollama availability check
+  const [ollamaAvailable, setOllamaAvailable] = useState(false);
+  const [checkingOllama, setCheckingOllama] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const health = await checkOllamaHealth();
+      if (mounted) {
+        setOllamaAvailable(health.available && health.embedding);
+        setCheckingOllama(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Computed: any filter is active
   const hasActiveFilters =
@@ -108,32 +130,92 @@ export function SearchView() {
     setExpandedId(null);
   }, [results]);
 
+  const handleModeChange = (newMode: "keyword" | "ai") => {
+    setSearchMode(newMode);
+  };
+
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-bg">
       {/* Sticky header */}
       <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur-sm border-b border-border">
-        <div className="mx-auto flex max-w-[760px] items-center justify-between px-6 py-5">
-          <h1 className="text-2xl font-bold text-text">Search</h1>
-          {hasActiveFilters && (
+        <div className="mx-auto max-w-[760px] px-6 py-5">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold text-text">Search</h1>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={handleClearAll}
+                className="text-xs font-semibold text-text-muted hover:text-text transition-colors px-3 py-1.5 rounded-lg hover:bg-surface-secondary"
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+
+          {/* Search mode tabs */}
+          <div className="flex gap-1">
             <button
               type="button"
-              onClick={handleClearAll}
-              className="text-xs font-semibold text-text-muted hover:text-text transition-colors px-3 py-1.5 rounded-lg hover:bg-surface-secondary"
+              onClick={() => handleModeChange("keyword")}
+              className={[
+                "px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                searchMode === "keyword"
+                  ? "bg-accent/20 text-text border border-accent/50"
+                  : "text-text-muted hover:text-text hover:bg-surface",
+              ].join(" ")}
             >
-              Clear all
+              Keyword Search
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (ollamaAvailable) {
+                  handleModeChange("ai");
+                }
+              }}
+              disabled={!ollamaAvailable && !checkingOllama}
+              className={[
+                "px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2",
+                searchMode === "ai" && ollamaAvailable
+                  ? "bg-accent/20 text-text border border-accent/50"
+                  : ollamaAvailable
+                    ? "text-text-muted hover:text-text hover:bg-surface cursor-pointer"
+                    : "text-text-muted opacity-50 cursor-not-allowed",
+              ].join(" ")}
+              title={!ollamaAvailable ? "Ollama not available" : ""}
+            >
+              <Sparkles size={16} />
+              AI Search
+            </button>
+          </div>
+
+          {/* AI Search unavailable message */}
+          {searchMode === "ai" && !ollamaAvailable && (
+            <div className="mt-3 rounded-md bg-amber-500/10 border border-amber-500/30 px-3 py-2 text-sm text-amber-700 dark:text-amber-400">
+              AI features require Ollama. See settings to install.
+            </div>
           )}
         </div>
       </div>
 
       {/* Body */}
       <div className="mx-auto w-full max-w-[760px] flex-1 px-6 py-6">
-        <SearchFilterBar />
+        <SearchFilterBar
+          searchMode={searchMode}
+          onModeChange={handleModeChange}
+        />
+
+        {/* Error message */}
+        {searchError && (
+          <div className="mt-4 rounded-md bg-red-500/10 border border-red-500/30 px-3 py-2 text-sm text-red-700 dark:text-red-400">
+            {searchError}
+          </div>
+        )}
 
         {/* Result count */}
         {results.length > 0 && (
           <p className="mt-6 mb-4 text-xs font-semibold text-text-muted uppercase tracking-wider">
-            {results.length} result{results.length !== 1 ? "s" : ""}
+            {results.length} result{results.length !== 1 ? "s" : ""} {searchMode === "ai" ? "— Most relevant" : ""}
           </p>
         )}
 

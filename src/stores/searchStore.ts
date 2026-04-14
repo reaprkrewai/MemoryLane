@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { getDb } from "../lib/db";
+import { semanticSearch } from "../utils/vectorSearchService";
 
 interface SearchEntry {
   id: string;
@@ -19,12 +20,15 @@ interface SearchState {
   selectedMoods: string[];
   results: SearchEntry[];
   isSearching: boolean;
+  searchMode: "keyword" | "ai";
+  searchError: string | null;
 
   setQuery: (q: string) => void;
   setStartDate: (ts: number | null) => void;
   setEndDate: (ts: number | null) => void;
   toggleTag: (id: string) => void;
   toggleMood: (mood: string) => void;
+  setSearchMode: (mode: "keyword" | "ai") => void;
   resetSearch: () => void;
   runSearch: () => Promise<void>;
 }
@@ -37,6 +41,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   selectedMoods: [],
   results: [],
   isSearching: false,
+  searchMode: "keyword",
+  searchError: null,
 
   setQuery: (q) => set({ query: q }),
   setStartDate: (ts) => set({ startDate: ts }),
@@ -56,6 +62,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         : [...state.selectedMoods, mood],
     })),
 
+  setSearchMode: (mode) => set({ searchMode: mode }),
+
   resetSearch: () =>
     set({
       query: "",
@@ -65,10 +73,11 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       selectedMoods: [],
       results: [],
       isSearching: false,
+      searchError: null,
     }),
 
   runSearch: async () => {
-    const { query, startDate, endDate, selectedTagIds, selectedMoods } = get();
+    const { query, startDate, endDate, selectedTagIds, selectedMoods, searchMode } = get();
     const db = await getDb();
 
     const hasKeyword = query.trim().length > 0;
@@ -76,61 +85,86 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     const hasTags = selectedTagIds.length > 0;
     const hasMoods = selectedMoods.length > 0;
 
-    // Empty state: no results until user interacts
-    if (!hasKeyword && !hasDates && !hasTags && !hasMoods) {
-      set({ results: [], isSearching: false });
-      return;
-    }
-
-    set({ isSearching: true });
-
-    const conditions: string[] = [];
-    const params: unknown[] = [];
-
-    let fromClause: string;
-
-    if (hasKeyword) {
-      // Phrase-wrap to prevent FTS5 parse errors on special chars (RESEARCH.md Pitfall 2)
-      const ftsQuery = `"${query.trim().replace(/"/g, '""')}"`;
-      fromClause = `entries e JOIN entries_fts ON e.rowid = entries_fts.rowid`;
-      conditions.push(`entries_fts MATCH ?`);
-      params.push(ftsQuery);
+    // Empty state logic
+    if (searchMode === "ai") {
+      // AI search requires query text (semantic search needs meaning to match)
+      if (!hasKeyword) {
+        set({ results: [], isSearching: false, searchError: null });
+        return;
+      }
     } else {
-      fromClause = `entries e`;
+      // Keyword search can work with just filters
+      if (!hasKeyword && !hasDates && !hasTags && !hasMoods) {
+        set({ results: [], isSearching: false, searchError: null });
+        return;
+      }
     }
 
-    if (startDate !== null) {
-      conditions.push(`e.created_at >= ?`);
-      params.push(startDate);
-    }
-    if (endDate !== null) {
-      // Include the full end day: +86400000ms (Pitfall 3: entries.created_at is ms epoch)
-      conditions.push(`e.created_at < ?`);
-      params.push(endDate + 86400000);
-    }
-    if (hasMoods) {
-      const placeholders = selectedMoods.map(() => "?").join(", ");
-      conditions.push(`e.mood IN (${placeholders})`);
-      params.push(...selectedMoods);
-    }
-    if (hasTags) {
-      const placeholders = selectedTagIds.map(() => "?").join(", ");
-      // AND semantics: all selected tags must be present (RESEARCH.md Pitfall 5)
-      conditions.push(
-        `e.id IN (SELECT entry_id FROM entry_tags WHERE tag_id IN (${placeholders}) GROUP BY entry_id HAVING COUNT(DISTINCT tag_id) = ?)`
-      );
-      params.push(...selectedTagIds, selectedTagIds.length);
-    }
-
-    const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-    const sql = `SELECT e.id, e.content, e.mood, e.word_count, e.created_at, e.updated_at, e.metadata
-                 FROM ${fromClause} ${where} ORDER BY e.created_at DESC`;
+    set({ isSearching: true, searchError: null });
 
     try {
-      const rows = await db.select<SearchEntry[]>(sql, params);
-      set({ results: rows, isSearching: false });
-    } catch {
-      set({ isSearching: false });
+      if (searchMode === "ai") {
+        // AI/Semantic search route
+        const results = await semanticSearch(query, {
+          dateRange: startDate !== null && endDate !== null
+            ? {
+                start: startDate,
+                end: endDate + 86400000, // Include full end day
+              }
+            : undefined,
+          tags: selectedTagIds.length > 0 ? selectedTagIds : undefined,
+          moods: selectedMoods.length > 0 ? selectedMoods : undefined,
+          limit: 20,
+        });
+        set({ results, isSearching: false });
+      } else {
+        // Keyword search route (Phase 4 FTS5)
+        const conditions: string[] = [];
+        const params: unknown[] = [];
+
+        let fromClause: string;
+
+        if (hasKeyword) {
+          // Phrase-wrap to prevent FTS5 parse errors on special chars
+          const ftsQuery = `"${query.trim().replace(/"/g, '""')}"`;
+          fromClause = `entries e JOIN entries_fts ON e.rowid = entries_fts.rowid`;
+          conditions.push(`entries_fts MATCH ?`);
+          params.push(ftsQuery);
+        } else {
+          fromClause = `entries e`;
+        }
+
+        if (startDate !== null) {
+          conditions.push(`e.created_at >= ?`);
+          params.push(startDate);
+        }
+        if (endDate !== null) {
+          conditions.push(`e.created_at < ?`);
+          params.push(endDate + 86400000);
+        }
+        if (hasMoods) {
+          const placeholders = selectedMoods.map(() => "?").join(", ");
+          conditions.push(`e.mood IN (${placeholders})`);
+          params.push(...selectedMoods);
+        }
+        if (hasTags) {
+          const placeholders = selectedTagIds.map(() => "?").join(", ");
+          conditions.push(
+            `e.id IN (SELECT entry_id FROM entry_tags WHERE tag_id IN (${placeholders}) GROUP BY entry_id HAVING COUNT(DISTINCT tag_id) = ?)`
+          );
+          params.push(...selectedTagIds, selectedTagIds.length);
+        }
+
+        const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+        const sql = `SELECT e.id, e.content, e.mood, e.word_count, e.created_at, e.updated_at, e.metadata
+                     FROM ${fromClause} ${where} ORDER BY e.created_at DESC`;
+
+        const rows = await db.select<SearchEntry[]>(sql, params);
+        set({ results: rows, isSearching: false });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Search failed";
+      set({ isSearching: false, results: [], searchError: message });
     }
   },
 }));
