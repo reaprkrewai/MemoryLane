@@ -103,23 +103,23 @@ export function CalendarView() {
 
   return (
     <div className="h-full overflow-y-auto bg-bg">
-      <div className="mx-auto max-w-[640px] px-6 py-6">
+      <div className="mx-auto max-w-2xl px-8 py-8">
         {/* Header: prev / month label / next / Today */}
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="mb-8 flex items-center justify-between border-b border-border pb-6">
+          <div className="flex items-center gap-4">
             <button
               type="button"
               onClick={handlePrev}
-              className="p-2 text-muted hover:text-text transition-colors"
+              className="rounded-lg p-2 text-text-secondary hover:text-text hover:bg-surface-secondary transition-colors"
               aria-label="Previous month"
             >
               <ChevronLeft size={20} />
             </button>
-            <h1 className="text-heading font-semibold text-text">{monthLabel}</h1>
+            <h1 className="text-2xl font-bold text-text min-w-[200px]">{monthLabel}</h1>
             <button
               type="button"
               onClick={handleNext}
-              className="p-2 text-muted hover:text-text transition-colors"
+              className="rounded-lg p-2 text-text-secondary hover:text-text hover:bg-surface-secondary transition-colors"
               aria-label="Next month"
             >
               <ChevronRight size={20} />
@@ -128,7 +128,7 @@ export function CalendarView() {
           <button
             type="button"
             onClick={handleToday}
-            className="h-8 rounded-md px-3 text-label text-muted hover:bg-surface hover:text-text transition-colors"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-secondary hover:text-text transition-colors"
             aria-label="Return to current month"
           >
             Today
@@ -136,11 +136,11 @@ export function CalendarView() {
         </div>
 
         {/* Day-of-week labels */}
-        <div className="grid grid-cols-7 gap-1 pb-2">
+        <div className="grid grid-cols-7 gap-2 pb-4 mb-2">
           {DAY_LABELS.map((label) => (
             <div
               key={label}
-              className="text-center text-label text-muted"
+              className="text-center text-xs font-semibold text-text-secondary uppercase tracking-wide"
             >
               {label}
             </div>
@@ -148,7 +148,7 @@ export function CalendarView() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-2">
           {cells.map((date, idx) => {
             const inMonth = isSameMonth(date, currentMonth);
             const ymd = toLocalYmd(date);

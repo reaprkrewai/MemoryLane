@@ -210,40 +210,35 @@ export function TimelineView() {
       className="flex h-full flex-col overflow-y-auto bg-bg"
     >
       {/* Sticky header row */}
-      <div className="sticky top-0 z-10 border-b border-border bg-bg">
-        <div className="mx-auto flex max-w-[720px] items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-heading font-semibold text-text">Journal</h1>
+      <div className="sticky top-0 z-10 border-b border-border bg-bg/95 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-[760px] items-center justify-between px-6 py-5">
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-bold text-text">Journal</h1>
             {dateFilter && (
               <button
                 type="button"
                 onClick={clearDateFilter}
-                className="text-label text-muted hover:text-text"
+                className="mt-1 text-xs text-text-muted hover:text-text transition-colors flex items-center gap-1"
               >
-                Showing {format(new Date(dateFilter + "T00:00:00"), "MMM d, yyyy")} &middot; Clear
+                <span className="font-semibold">{format(new Date(dateFilter + "T00:00:00"), "MMM d, yyyy")}</span>
+                <span>—</span>
+                <span className="underline">Clear filter</span>
               </button>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => void handleNewEntry()}
-            className="h-9 rounded-md bg-accent px-3 text-body font-semibold text-stone-900 transition-all duration-150 hover:bg-[#D97706] active:scale-[0.97]"
-          >
-            + New Entry
-          </button>
         </div>
       </div>
 
       {/* Body */}
-      <div className="mx-auto w-full max-w-[720px] flex-1 px-4 py-6">
+      <div className="mx-auto w-full max-w-[760px] flex-1 px-6 py-6">
         <OnThisDay />
 
         {isAllEmpty && <EmptyState />}
 
         {isFilteredEmpty && (
-          <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-            <h2 className="text-heading text-text">Nothing here yet</h2>
-            <p className="text-body text-muted">
+          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+            <h2 className="text-xl font-bold text-text">Nothing here yet</h2>
+            <p className="text-sm text-text-secondary max-w-sm">
               No entries for {format(new Date(dateFilter! + "T00:00:00"), "MMM d, yyyy")}. Select a different date or write something new.
             </p>
           </div>

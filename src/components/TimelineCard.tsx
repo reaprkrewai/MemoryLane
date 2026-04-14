@@ -99,65 +99,76 @@ export function TimelineCard({ entry, tags, photos = [], expanded, onToggleExpan
         if (target.closest("[data-expand-control]")) return;
         onOpen();
       }}
-      className="group mb-3 cursor-pointer rounded-md border border-border bg-surface px-4 py-3 transition-colors hover:bg-bg/60 hover:border-l-2 hover:border-l-accent"
+      className="group mb-4 cursor-pointer rounded-xl border border-border bg-surface transition-all duration-200 hover:border-accent/40 hover:shadow-md"
     >
-      {/* Row 1: mood dot + date (left) + word count (right) */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {dotClass && <span className={`block h-2 w-2 rounded-full ${dotClass}`} />}
-          <span className="text-label text-muted">{dateLabel}</span>
-        </div>
-        <span className="text-label text-muted">{wordLabel}</span>
-      </div>
-
-      {/* Row 2: preview text (150 chars plain, with optional highlight injection) */}
-      {preview && (
-        <p className="mt-2 text-body text-text">
-          {searchQuery ? injectHighlights(preview, searchQuery) : preview}
-        </p>
-      )}
-
-      {/* Row 2b: photo thumbnail strip (lazy-loaded) */}
-      {photos.length > 0 && (
-        <PhotoGallery photos={photos} mode="thumbnail-strip" />
-      )}
-
-      {/* Row 3: tags (left) + expand chevron (right) */}
-      <div className="mt-3 flex items-center justify-between">
-        <div className="flex flex-wrap items-center gap-1">
-          {visibleTags.map((t) => (
-            <TagPillReadOnly key={t.id} tag={t} />
-          ))}
-          {overflow > 0 && (
-            <span className="text-label text-muted">+{overflow}</span>
+      {/* Header: mood indicator + date (left) + word count (right) */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border/50">
+        <div className="flex items-center gap-3">
+          {dotClass && (
+            <div className={`flex h-3 w-3 rounded-full ${dotClass} shadow-sm`} />
           )}
+          <span className="text-xs font-semibold text-text-secondary uppercase tracking-wide">
+            {dateLabel}
+          </span>
         </div>
-        <button
-          type="button"
-          data-expand-control=""
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleExpand();
-          }}
-          className="flex items-center p-1 text-muted hover:text-text transition-colors"
-          aria-label={expanded ? "Collapse entry" : "Expand entry"}
-        >
-          {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        </button>
+        <span className="text-xs font-medium text-text-muted">{wordLabel}</span>
       </div>
 
-      {/* Expanded: full markdown rendered inline */}
+      {/* Body: preview text and metadata */}
+      <div className="px-5 py-4">
+        {/* Preview text with optional search highlights */}
+        {preview && (
+          <p className="text-sm leading-relaxed text-text line-clamp-3">
+            {searchQuery ? injectHighlights(preview, searchQuery) : preview}
+          </p>
+        )}
+
+        {/* Photo thumbnail strip (lazy-loaded) */}
+        {photos.length > 0 && (
+          <div className="mt-3">
+            <PhotoGallery photos={photos} mode="thumbnail-strip" />
+          </div>
+        )}
+
+        {/* Tags and expand control */}
+        <div className="mt-4 flex items-center justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            {visibleTags.map((t) => (
+              <TagPillReadOnly key={t.id} tag={t} />
+            ))}
+            {overflow > 0 && (
+              <span className="text-xs text-text-muted font-medium">+{overflow}</span>
+            )}
+          </div>
+          <button
+            type="button"
+            data-expand-control=""
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleExpand();
+            }}
+            className="ml-2 rounded-md p-1.5 text-text-muted transition-colors hover:text-text hover:bg-surface-secondary"
+            aria-label={expanded ? "Collapse entry" : "Expand entry"}
+          >
+            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Expanded: full content */}
       {expanded && (
         <div
-          className="mt-3 border-t border-border pt-3"
+          className="border-t border-border/50 bg-surface-secondary/40 px-5 py-4"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="tiptap-editor">
+          <div className="tiptap-editor mb-4">
             <EditorContent editor={editor} />
           </div>
           {/* Full photo gallery in expanded view */}
           {photos.length > 0 && (
-            <PhotoGallery photos={photos} mode="expanded-grid" />
+            <div className="mb-4">
+              <PhotoGallery photos={photos} mode="expanded-grid" />
+            </div>
           )}
           <button
             type="button"
@@ -166,7 +177,7 @@ export function TimelineCard({ entry, tags, photos = [], expanded, onToggleExpan
               e.stopPropagation();
               onToggleExpand();
             }}
-            className="mt-2 text-label text-muted hover:text-text transition-colors"
+            className="text-xs font-semibold text-text-muted uppercase tracking-wide transition-colors hover:text-text"
             aria-label="Collapse entry"
           >
             Collapse

@@ -2,18 +2,18 @@ import { Minus, Square, X } from "lucide-react";
 
 export function TitleBar() {
   return (
-    <div className="flex h-10 select-none bg-surface">
+    <div className="flex h-12 select-none border-b border-border bg-surface">
       {/* Drag region is a pure spacer — no interactive elements inside */}
       <div
         data-tauri-drag-region
-        className="flex flex-1 items-center px-4"
+        className="flex flex-1 items-center px-6"
       >
-        <span className="text-label text-muted">Chronicle AI</span>
+        <span className="text-sm font-semibold text-text-secondary">Chronicle</span>
       </div>
       {/* Window controls sit OUTSIDE the drag region */}
-      <div className="flex items-center">
+      <div className="flex items-center gap-0.5 pr-2">
         <button
-          className="inline-flex h-10 w-12 items-center justify-center text-muted hover:bg-border/50"
+          className="inline-flex h-8 w-10 items-center justify-center rounded text-text-muted transition-colors hover:text-text hover:bg-surface-secondary"
           onClick={() => {
             import("@tauri-apps/api/window").then((m) =>
               m.getCurrentWindow().minimize()
@@ -24,7 +24,7 @@ export function TitleBar() {
           <Minus size={16} />
         </button>
         <button
-          className="inline-flex h-10 w-12 items-center justify-center text-muted hover:bg-border/50"
+          className="inline-flex h-8 w-10 items-center justify-center rounded text-text-muted transition-colors hover:text-text hover:bg-surface-secondary"
           onClick={() => {
             import("@tauri-apps/api/window").then((m) =>
               m.getCurrentWindow().toggleMaximize()
@@ -35,7 +35,7 @@ export function TitleBar() {
           <Square size={14} />
         </button>
         <button
-          className="inline-flex h-10 w-12 items-center justify-center text-muted hover:bg-destructive hover:text-white"
+          className="inline-flex h-8 w-10 items-center justify-center rounded text-text-muted transition-colors hover:text-destructive hover:bg-destructive/10"
           onClick={() => {
             import("@tauri-apps/api/window").then((m) =>
               m.getCurrentWindow().close()

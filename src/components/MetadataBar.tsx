@@ -84,21 +84,21 @@ export function MetadataBar({ entryId, editor }: MetadataBarProps) {
   }
 
   return (
-    <div className="flex h-12 items-center border-b border-border bg-surface px-4">
+    <div className="flex h-14 items-center border-b border-border bg-surface px-6 gap-4">
       {/* Left zone: Back button (when opened from timeline) + date picker */}
-      <div className="flex flex-1 items-center gap-3">
+      <div className="flex flex-1 items-center gap-4">
         {navigateSource === "timeline" && (
           <button
             type="button"
             onClick={() => navigateBack()}
-            className="flex items-center gap-1 pl-2 text-label text-muted hover:text-text transition-colors"
-            style={{ fontSize: "12px", lineHeight: "1.4" }}
+            className="flex items-center gap-2 text-sm text-text-secondary hover:text-text transition-colors rounded-md px-2 py-1.5 hover:bg-surface-secondary"
             aria-label="Back to Journal"
           >
-            <ArrowLeft size={14} />
-            <span>Back to Journal</span>
+            <ArrowLeft size={16} />
+            <span>Back</span>
           </button>
         )}
+        <div className="h-6 border-r border-border" />
         <DatePicker date={entryDate} onDateChange={handleDateChange} />
       </div>
 
@@ -108,23 +108,17 @@ export function MetadataBar({ entryId, editor }: MetadataBarProps) {
       </div>
 
       {/* Right zone: word/char count or "Saved" indicator + auto-save interval selector */}
-      <div className="flex flex-1 items-center justify-end gap-2">
+      <div className="flex flex-1 items-center justify-end gap-4">
         {showSaved ? (
-          <span
-            className="text-label"
-            style={{ fontSize: "12px", lineHeight: "1.4", color: "var(--color-accent)" }}
-          >
-            Saved
+          <span className="text-sm font-medium text-accent animate-pulse">
+            ✓ Saved
           </span>
         ) : (
-          <span
-            className="text-label text-muted"
-            style={{ fontSize: "12px", lineHeight: "1.4" }}
-          >
-            {words} words &middot; {chars} chars
+          <span className="text-xs text-text-muted whitespace-nowrap">
+            {words} <span className="text-text-muted/60">w</span> · {chars} <span className="text-text-muted/60">c</span>
           </span>
         )}
-        <span className="text-label text-muted" style={{ fontSize: "12px" }}>&middot;</span>
+        <span className="text-text-muted/20">·</span>
         <select
           value={autoSaveMs}
           onChange={async (e) => {
@@ -132,14 +126,13 @@ export function MetadataBar({ entryId, editor }: MetadataBarProps) {
             setAutoSaveMs(ms)
             await updateAutoSaveInterval(ms)
           }}
-          className="cursor-pointer rounded border-none bg-transparent text-muted outline-none"
-          style={{ fontSize: "12px", lineHeight: "1.4" }}
+          className="cursor-pointer rounded-md border border-border bg-surface-secondary text-text-secondary text-xs px-2 py-1.5 transition-colors hover:text-text hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-accent/50"
           aria-label="Auto-save interval"
           title="Auto-save interval"
         >
-          <option value={5000}>Save 5s</option>
-          <option value={10000}>Save 10s</option>
-          <option value={30000}>Save 30s</option>
+          <option value={5000}>Every 5s</option>
+          <option value={10000}>Every 10s</option>
+          <option value={30000}>Every 30s</option>
         </select>
       </div>
     </div>

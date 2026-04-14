@@ -5,10 +5,10 @@ interface TagPillReadOnlyProps {
 export function TagPillReadOnly({ tag }: TagPillReadOnlyProps) {
   return (
     <span
-      className="inline-flex items-center rounded-full border px-3 py-[4px] text-label"
+      className="inline-flex items-center rounded-lg border px-2.5 py-1 text-xs font-medium"
       style={{
-        backgroundColor: `color-mix(in srgb, ${tag.color} 15%, transparent)`,
-        borderColor: `color-mix(in srgb, ${tag.color} 40%, transparent)`,
+        backgroundColor: `color-mix(in srgb, ${tag.color} 12%, transparent)`,
+        borderColor: `color-mix(in srgb, ${tag.color} 35%, transparent)`,
         color: "var(--color-text)",
       }}
     >

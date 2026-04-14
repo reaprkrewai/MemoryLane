@@ -1,6 +1,7 @@
-import { BookOpen, CalendarDays, Search, Settings } from "lucide-react";
+import { BookOpen, CalendarDays, Search, Settings, Plus } from "lucide-react";
 import { EntryList } from "./EntryList";
 import { useViewStore } from "../stores/viewStore";
+import { useEntryStore } from "../stores/entryStore";
 
 const navItems = [
   { icon: BookOpen, label: "Journal", id: "journal" },
@@ -12,6 +13,9 @@ const navItems = [
 export function Sidebar() {
   const activeView = useViewStore((s) => s.activeView);
   const setView = useViewStore((s) => s.setView);
+  const navigateToEditor = useViewStore((s) => s.navigateToEditor);
+  const createEntry = useEntryStore((s) => s.createEntry);
+  const selectEntry = useEntryStore((s) => s.selectEntry);
 
   // Treat 'editor' as 'journal' for nav highlight — editor is reached from journal
   const activeId =
@@ -37,26 +41,52 @@ export function Sidebar() {
     }
   };
 
+  const handleNewEntry = async () => {
+    const newId = await createEntry();
+    await selectEntry(newId);
+    navigateToEditor("timeline");
+  };
+
   // Per D-01: sidebar compact EntryList only appears when editor is active.
   // Open question 1 resolution from RESEARCH.md.
   const showEntryList = activeView === "editor";
 
   return (
-    <nav className="flex w-60 flex-col border-r border-border bg-surface">
-      <div className="py-4">
+    <nav className="flex w-64 flex-col border-r border-border bg-surface">
+      {/* Header with app name and new entry button */}
+      <div className="space-y-4 border-b border-border px-5 py-5">
+        <div>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+            Chronicle
+          </h2>
+        </div>
+        <button
+          onClick={() => void handleNewEntry()}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-amber-950 transition-all duration-150 hover:bg-amber-600 active:scale-95"
+        >
+          <Plus size={18} />
+          <span>New Entry</span>
+        </button>
+      </div>
+
+      {/* Navigation items */}
+      <div className="space-y-1 px-3 py-4">
         {navItems.map((item) => {
           const isActive = item.id === activeId;
           return (
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
-              className={`flex items-center gap-3 px-4 py-2 text-body transition-colors w-full ${
+              className={`group flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-150 ${
                 isActive
-                  ? "border-l-[3px] border-accent bg-bg font-semibold text-text"
-                  : "border-l-[3px] border-transparent text-muted hover:bg-bg/50 hover:text-text"
+                  ? "bg-accent/10 text-accent"
+                  : "text-text-secondary hover:text-text hover:bg-surface-secondary"
               }`}
             >
-              <item.icon size={20} />
+              <item.icon
+                size={18}
+                className={isActive ? "text-accent" : "text-text-secondary group-hover:text-text"}
+              />
               <span>{item.label}</span>
             </button>
           );
@@ -66,7 +96,7 @@ export function Sidebar() {
       {showEntryList && (
         <>
           {/* Separator */}
-          <div className="border-b border-border" />
+          <div className="border-t border-border" />
           {/* Entry list — fills remaining vertical space */}
           <div className="flex flex-1 flex-col overflow-hidden">
             <EntryList />

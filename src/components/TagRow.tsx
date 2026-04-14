@@ -43,7 +43,7 @@ export function TagRow({ entryId }: TagRowProps) {
   };
 
   return (
-    <div className="relative flex flex-wrap items-center gap-2 border-t border-border bg-bg px-8 py-3">
+    <div className="relative mx-auto max-w-[760px] flex flex-wrap items-center gap-2 border-t border-border bg-bg px-0 py-4 ml-8 mr-8">
       {entryTags.map((tag) => (
         <TagPill
           key={tag.id}

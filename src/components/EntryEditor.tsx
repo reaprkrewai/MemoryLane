@@ -85,9 +85,9 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
       {/* MetadataBar: date picker, mood selector, word/char count */}
       <MetadataBar entryId={entryId} editor={editor} />
 
-      {/* Editor content area — scrollable middle section */}
+      {/* Editor content area — scrollable middle section with premium spacing */}
       <div className="flex-1 overflow-y-auto bg-bg">
-        <div className="mx-auto max-w-[680px] px-8 py-6">
+        <div className="mx-auto max-w-[760px] px-8 py-8">
           <div className="tiptap-editor">
             <EditorContent editor={editor} />
             {editor && <BubbleMenuBar editor={editor} />}
@@ -99,8 +99,8 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
       <TagRow entryId={entryId} />
 
       {/* Photo attachment: below TagRow */}
-      <div className="border-t border-border bg-bg px-4 py-2">
-        <div className="mx-auto max-w-[680px]">
+      <div className="border-t border-border bg-bg px-6 py-4">
+        <div className="mx-auto max-w-[760px]">
           <div className="flex items-center justify-between">
             <PhotoAttachmentButton
               entryId={entryId}
@@ -108,11 +108,13 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
             />
           </div>
           {currentPhotos.length > 0 && (
-            <PhotoGallery
-              photos={currentPhotos}
-              mode="editor"
-              onRemove={removePhoto}
-            />
+            <div className="mt-4">
+              <PhotoGallery
+                photos={currentPhotos}
+                mode="editor"
+                onRemove={removePhoto}
+              />
+            </div>
           )}
         </div>
       </div>

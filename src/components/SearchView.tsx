@@ -16,20 +16,24 @@ interface EntryTagRow {
 
 function PreSearchState() {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-      <Search size={32} className="text-muted" />
-      <h2 className="text-display font-semibold text-text">Search your journal</h2>
-      <p className="text-body text-muted">Type a keyword or use the filters above.</p>
+    <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
+      <div className="rounded-full bg-accent/10 p-4">
+        <Search size={32} className="text-accent" />
+      </div>
+      <h2 className="text-xl font-bold text-text">Search your journal</h2>
+      <p className="text-sm text-text-secondary max-w-sm">Type a keyword or use the filters above to find entries.</p>
     </div>
   );
 }
 
 function NoResultsState() {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-      <Search size={32} className="text-muted" />
-      <h2 className="text-display font-semibold text-text">No entries found</h2>
-      <p className="text-body text-muted">Try different keywords or fewer filters.</p>
+    <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
+      <div className="rounded-full bg-accent/10 p-4">
+        <Search size={32} className="text-accent" />
+      </div>
+      <h2 className="text-xl font-bold text-text">No entries found</h2>
+      <p className="text-sm text-text-secondary max-w-sm">Try different keywords or fewer filters.</p>
     </div>
   );
 }
@@ -107,14 +111,14 @@ export function SearchView() {
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-bg">
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 bg-bg border-b border-border">
-        <div className="mx-auto flex max-w-[720px] items-center justify-between px-4 py-4">
-          <h1 className="text-heading font-semibold text-text">Search</h1>
+      <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur-sm border-b border-border">
+        <div className="mx-auto flex max-w-[760px] items-center justify-between px-6 py-5">
+          <h1 className="text-2xl font-bold text-text">Search</h1>
           {hasActiveFilters && (
             <button
               type="button"
               onClick={handleClearAll}
-              className="text-label text-muted underline underline-offset-2 hover:text-text transition-colors"
+              className="text-xs font-semibold text-text-muted hover:text-text transition-colors px-3 py-1.5 rounded-lg hover:bg-surface-secondary"
             >
               Clear all
             </button>
@@ -123,12 +127,12 @@ export function SearchView() {
       </div>
 
       {/* Body */}
-      <div className="mx-auto w-full max-w-[720px] flex-1 px-4 py-6">
+      <div className="mx-auto w-full max-w-[760px] flex-1 px-6 py-6">
         <SearchFilterBar />
 
         {/* Result count */}
         {results.length > 0 && (
-          <p className="mt-4 mb-2 text-label text-muted">
+          <p className="mt-6 mb-4 text-xs font-semibold text-text-muted uppercase tracking-wider">
             {results.length} result{results.length !== 1 ? "s" : ""}
           </p>
         )}

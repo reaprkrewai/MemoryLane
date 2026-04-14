@@ -33,11 +33,11 @@ export function CalendarCell({
 }: CalendarCellProps) {
   const dayNumber = format(date, "d");
 
-  // Out-of-month days: dim, not clickable (UI-SPEC: "Days from previous/next month: text-muted/40, not clickable")
+  // Out-of-month days: dim, not clickable
   if (!inCurrentMonth) {
     return (
       <div
-        className="flex min-h-[40px] items-start p-1 text-label text-muted/40 select-none"
+        className="flex h-14 items-center justify-center text-sm text-text-muted/30 select-none rounded-lg"
         aria-hidden="true"
       >
         {dayNumber}
@@ -50,9 +50,9 @@ export function CalendarCell({
 
   // Selected ring takes precedence; hover ring only when clickable
   const interactiveClasses = isSelected
-    ? "ring-2 ring-accent"
+    ? "ring-2 ring-accent ring-offset-2 ring-offset-bg"
     : isClickable
-    ? "hover:ring-1 hover:ring-accent/40 cursor-pointer"
+    ? "hover:shadow-md cursor-pointer"
     : "cursor-default";
 
   return (
@@ -62,14 +62,14 @@ export function CalendarCell({
         if (isClickable) onClick();
       }}
       disabled={!isClickable}
-      className={`flex min-h-[40px] items-start p-1 text-label text-text rounded-md transition-shadow ${intensity} ${interactiveClasses}`}
+      className={`flex h-14 items-center justify-center text-sm font-semibold text-text rounded-lg transition-all ${intensity} ${interactiveClasses}`}
       aria-label={`${format(date, "MMMM d, yyyy")}, ${count} ${count === 1 ? "entry" : "entries"}`}
       title={count === 0 ? "No entries on this day" : undefined}
     >
       <span
         className={
           isTodayCell
-            ? "inline-flex h-5 w-5 items-center justify-center rounded-full bg-accent/20"
+            ? "inline-flex h-6 w-6 items-center justify-center rounded-full bg-accent text-amber-950 font-bold"
             : ""
         }
       >

@@ -27,7 +27,7 @@ export function MoodSelector({ mood, onMoodChange }: MoodSelectorProps) {
 
   return (
     <TooltipProvider>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 bg-surface-secondary rounded-lg p-1">
         {MOODS.map(({ value, icon: Icon, label }) => {
           const isSelected = mood === value
           return (
@@ -37,22 +37,22 @@ export function MoodSelector({ mood, onMoodChange }: MoodSelectorProps) {
                   type="button"
                   onClick={() => handleClick(value)}
                   className={[
-                    "flex h-9 w-9 items-center justify-center rounded-md",
+                    "flex h-8 w-8 items-center justify-center rounded-md",
                     "transition-all duration-150",
                     isSelected
-                      ? "scale-[1.0] bg-amber-50 dark:bg-amber-950/20"
-                      : "bg-transparent",
+                      ? "bg-accent/20"
+                      : "hover:bg-surface",
                   ].join(" ")}
                   aria-label={label}
                   aria-pressed={isSelected}
                 >
                   <Icon
-                    size={18}
+                    size={16}
                     className={[
                       "transition-colors duration-150",
                       isSelected
                         ? "text-accent"
-                        : "text-muted hover:text-text",
+                        : "text-text-secondary hover:text-text",
                     ].join(" ")}
                     style={
                       isSelected

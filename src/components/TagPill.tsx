@@ -25,10 +25,11 @@ export function TagPill({ tag, onRemove, onColorChange }: TagPillProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div
-          className="group inline-flex cursor-pointer items-center gap-1 rounded-full border py-[4px] pl-3 pr-2 transition-colors"
+          className="group inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all hover:shadow-sm"
           style={{
-            backgroundColor: `color-mix(in srgb, ${tag.color} 15%, transparent)`,
-            borderColor: `color-mix(in srgb, ${tag.color} 40%, transparent)`,
+            backgroundColor: `color-mix(in srgb, ${tag.color} 12%, transparent)`,
+            borderColor: `color-mix(in srgb, ${tag.color} 35%, transparent)`,
+            color: "var(--color-text)",
           }}
           role="button"
           tabIndex={0}
@@ -39,16 +40,12 @@ export function TagPill({ tag, onRemove, onColorChange }: TagPillProps) {
             }
           }}
         >
-          <span
-            className="text-label select-none"
-            style={{ color: "var(--color-text)" }}
-          >
+          <span className="select-none">
             {tag.name}
           </span>
           <button
             type="button"
-            className="opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive"
-            style={{ color: "var(--color-text)" }}
+            className="opacity-0 transition-opacity group-hover:opacity-100 flex items-center justify-center p-0.5 rounded hover:text-destructive"
             onClick={(e) => {
               e.stopPropagation();
               onRemove();
@@ -59,22 +56,23 @@ export function TagPill({ tag, onRemove, onColorChange }: TagPillProps) {
           </button>
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-2" onClick={(e) => e.stopPropagation()}>
-        <div className="grid grid-cols-4 gap-1">
+      <PopoverContent className="w-auto p-3" onClick={(e) => e.stopPropagation()}>
+        <div className="grid grid-cols-5 gap-2">
           {TAG_COLORS.map((color) => (
             <button
               key={color}
               type="button"
-              className="relative flex h-5 w-5 items-center justify-center rounded-full transition-transform hover:scale-110"
+              className="relative flex h-6 w-6 items-center justify-center rounded-md transition-transform hover:scale-110"
               style={{ backgroundColor: color }}
               onClick={() => handleColorSelect(color)}
               aria-label={`Select color ${color}`}
             >
               {tag.color === color && (
                 <Check
-                  size={12}
+                  size={14}
                   style={{
                     color: "#ffffff",
+                    strokeWidth: 3,
                   }}
                 />
               )}

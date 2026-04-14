@@ -18,10 +18,10 @@ function OptionButton({ label, selected, onClick }: OptionButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 text-label rounded-md border transition-colors font-medium ${
+      className={`px-4 py-2 text-sm rounded-lg border font-medium transition-all ${
         selected
-          ? "bg-accent text-[#1C1B1A] border-accent"
-          : "bg-transparent text-muted border-border hover:border-accent/50 hover:text-text"
+          ? "bg-accent text-amber-950 border-accent shadow-sm"
+          : "bg-transparent text-text-secondary border-border hover:border-accent/40 hover:text-text hover:bg-surface-secondary"
       }`}
     >
       {label}
@@ -37,9 +37,11 @@ interface SectionHeaderProps {
 
 function SectionHeader({ icon, title }: SectionHeaderProps) {
   return (
-    <div className="flex items-center gap-2 mb-1">
-      <span className="text-accent">{icon}</span>
-      <h2 className="text-body font-semibold text-text">{title}</h2>
+    <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-accent/10">
+        <span className="text-accent">{icon}</span>
+      </div>
+      <h2 className="text-sm font-bold uppercase tracking-wider text-text">{title}</h2>
     </div>
   );
 }
@@ -229,23 +231,23 @@ export function SettingsView() {
     <div className="flex flex-col h-full overflow-auto bg-bg">
       {/* Page header */}
       <div className="px-8 py-6 border-b border-border">
-        <h1 className="text-display text-text">Settings</h1>
-        <p className="text-body text-muted mt-1">
-          Customize your Chronicle AI experience
+        <h1 className="text-2xl font-bold text-text">Settings</h1>
+        <p className="text-sm text-text-secondary mt-2">
+          Customize your Chronicle experience
         </p>
       </div>
 
       {/* Settings content */}
-      <div className="flex-1 px-8 py-6 max-w-2xl w-full mx-auto">
-        <div className="flex flex-col gap-8">
+      <div className="flex-1 px-8 py-8 max-w-3xl w-full mx-auto">
+        <div className="flex flex-col gap-10">
           <AppearanceSection />
           <SecuritySection />
           <DataSection />
         </div>
 
         {/* Version footer */}
-        <div className="mt-12 pt-6 border-t border-border">
-          <div className="flex items-center justify-between text-label text-muted">
+        <div className="mt-16 pt-8 border-t border-border/50">
+          <div className="flex items-center justify-between text-xs text-text-muted">
             <span>Chronicle AI</span>
             <span>v1.0.0 · 2026-04-13</span>
           </div>
