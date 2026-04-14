@@ -12,7 +12,8 @@
 - [x] **Phase 2: Editor & Tags** — Full journal entry creation, editing, mood, auto-save, and tag management (completed 2026-04-10)
 - [x] **Phase 3: Timeline & Calendar** — Browsing all entries chronologically and by month (completed 2026-04-11)
 - [x] **Phase 4: Search & Discovery** — Full-text search, multi-filter, and On This Day (completed 2026-04-11)
-- [ ] **Phase 5: Media, Security & Settings** — Photo attachments, app lock, theme/font, and export (ready to start)
+- [x] **Phase 5: Media, Security & Settings** — Photo attachments, app lock, theme/font, and export (completed 2026-04-14)
+- [ ] **Phase 6: AI Features** — Semantic search, Q&A, and Ollama setup (ready to execute)
 
 ---
 
@@ -44,7 +45,11 @@ Plans:
   3. User can assign a mood (great / good / okay / bad / awful) and set a custom date/time on any entry
   4. Live word count and character count update in real time as the user types, and the entry auto-saves without manual action
   5. User can create a tag inline while writing, see autocomplete suggestions with usage counts, assign a color from 8 presets, and delete tags that have no entries
-**Plans**: TBD
+**Plans**: 3/3 plans complete
+Plans:
+- [x] 02-01-PLAN.md — TipTap editor integration, Markdown storage, content auto-save
+- [x] 02-02-PLAN.md — Entry editing, delete, metadata bar (word/char count, mood selector, date/time picker)
+- [x] 02-03-PLAN.md — Tag creation, autocomplete, color picker, inline tag management
 **UI hint**: yes
 
 ### Phase 3: Timeline & Calendar
@@ -89,7 +94,30 @@ Plans:
   2. User can set a PIN or password; the app requires it before any content is visible, and auto-locks after a configurable idle period
   3. User can toggle light/dark mode and change font size (small / medium / large) — preferences persist across app restarts
   4. User can export all journal data to a single JSON file that contains entries, tags, moods, and metadata
-**Plans**: TBD
+**Plans:** 4/4 plans complete
+Plans:
+- [x] 05-01-PLAN.md — PIN security, app lock, idle timeout
+- [x] 05-02-PLAN.md — Photo attachments, storage in app data directory
+- [x] 05-03-PLAN.md — Settings UI (theme, font size, auto-save interval)
+- [x] 05-04-PLAN.md — Data export to JSON, settings persistence
+**UI hint**: yes
+
+### Phase 6: AI Features (Semantic Search + Q&A)
+**Goal**: Users can find entries by meaning and ask natural language questions about their journal, powered by a local LLM (Ollama) running on their device. All inference stays local — zero network calls, zero data leaves the device.
+**Depends on**: Phase 5
+**Requirements**: LLMAI-02, LLMAI-03, LLMAI-04
+**Success Criteria** (what must be TRUE):
+  1. User can search by meaning ("find entries about career anxiety") and get results ranked by semantic similarity, not keyword matches — results are significantly better than keyword search for semantic queries
+  2. User can ask natural language questions ("when did I last feel stressed?") and receive AI-generated answers grounded in relevant entries
+  3. If Ollama is running on localhost:11434 → semantic search + Q&A are available; if not running → search gracefully falls back to keyword-only, Q&A disabled with helpful message
+  4. On first semantic search attempt without Ollama, a guided setup wizard appears with clear, non-technical instructions for installing Ollama and the embedding model
+  5. All inference is local (vector embeddings, LLM completion) — no entries, embeddings, or questions ever leave the device
+**Plans:** 4/4 plans created
+Plans:
+- [ ] 06-01-PLAN.md — Ollama service client, embedding generation, AI state store
+- [ ] 06-02-PLAN.md — Vector search UI, semantic similarity ranking, graceful fallback
+- [ ] 06-03-PLAN.md — Q&A engine with RAG pipeline, citation extraction, answer grounding
+- [ ] 06-04-PLAN.md — Ollama setup wizard, settings integration, health check UI
 **UI hint**: yes
 
 ---
@@ -107,6 +135,7 @@ Plans:
 | 3 — Timeline & Calendar | TIME-01, TIME-02, TIME-03, TIME-04, TIME-05, TIME-06, TIME-07, CAL-01, CAL-02, CAL-03, CAL-04 |
 | 4 — Search & Discovery | SRCH-01, SRCH-02, SRCH-03, SRCH-04, SRCH-05, SRCH-06, OTD-01, OTD-02 |
 | 5 — Media, Security & Settings | MEDIA-01, MEDIA-02, MEDIA-03, MEDIA-04, SEC-01, SEC-02, SEC-03, SETT-01, SETT-02, SETT-03 |
+| 6 — AI Features | LLMAI-02, LLMAI-03, LLMAI-04 |
 
 ---
 
@@ -114,11 +143,13 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/2 | Planned | - |
-| 2. Editor & Tags | 0/? | Not started | - |
-| 3. Timeline & Calendar | 0/? | Not started | - |
-| 4. Search & Discovery | 0/? | Not started | - |
-| 5. Media, Security & Settings | 0/? | Not started | - |
+| 1. Foundation | 2/2 | Complete | 2026-04-09 |
+| 2. Editor & Tags | 3/3 | Complete | 2026-04-10 |
+| 3. Timeline & Calendar | 3/3 | Complete | 2026-04-11 |
+| 4. Search & Discovery | 3/3 | Complete | 2026-04-11 |
+| 5. Media, Security & Settings | 4/4 | Complete | 2026-04-14 |
+| 6. AI Features | 0/4 | Planned | — |
 
 ---
-*Roadmap defined: 2026-04-09*
+
+*Roadmap updated: 2026-04-14 — Phase 6 planning complete*
