@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { useEntryStore } from "../stores/entryStore";
+import { useEntryStore, Photo } from "../stores/entryStore";
 import { useViewStore } from "../stores/viewStore";
 import { TimelineCard } from "./TimelineCard";
 import { DaySeparator } from "./DaySeparator";
@@ -14,6 +14,10 @@ interface EntryTagRow {
   id: string;
   name: string;
   color: string;
+}
+
+interface EntryPhotoRow extends Photo {
+  entry_id: string;
 }
 
 export function TimelineView() {
@@ -38,6 +42,9 @@ export function TimelineView() {
 
   // Tags for currently-loaded entries: Record<entryId, Tag[]>
   const [entryTags, setEntryTags] = useState<Record<string, EntryTagRow[]>>({});
+
+  // Photos for currently-loaded entries: Record<entryId, Photo[]>
+  const [entryPhotos, setEntryPhotos] = useState<Record<string, EntryPhotoRow[]>>({});
 
   // Batch-fetch tags whenever allEntries changes (N+1 avoidance per RESEARCH.md Open Q 2)
   useEffect(() => {
@@ -67,6 +74,40 @@ export function TimelineView() {
         setEntryTags(grouped);
       } catch {
         // Non-fatal: cards will render with empty tag arrays
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [allEntries]);
+
+  // Batch-fetch photos whenever allEntries changes
+  useEffect(() => {
+    if (allEntries.length === 0) {
+      setEntryPhotos({});
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const db = await getDb();
+        const ids = allEntries.map((e) => e.id);
+        const placeholders = ids.map(() => "?").join(",");
+        const rows = await db.select<EntryPhotoRow[]>(
+          `SELECT * FROM media_attachments
+           WHERE entry_id IN (${placeholders})
+           ORDER BY entry_id, display_order ASC`,
+          ids
+        );
+        if (cancelled) return;
+        const grouped: Record<string, EntryPhotoRow[]> = {};
+        for (const row of rows) {
+          if (!grouped[row.entry_id]) grouped[row.entry_id] = [];
+          grouped[row.entry_id].push(row);
+        }
+        setEntryPhotos(grouped);
+      } catch {
+        // Non-fatal: cards will render with empty photo arrays
       }
     })();
     return () => {
@@ -217,6 +258,7 @@ export function TimelineView() {
                   key={entry.id}
                   entry={entry}
                   tags={entryTags[entry.id] ?? []}
+                  photos={entryPhotos[entry.id] ?? []}
                   expanded={expandedEntryId === entry.id}
                   onToggleExpand={() => handleToggleExpand(entry.id)}
                   onOpen={() => void handleOpenEntry(entry.id)}

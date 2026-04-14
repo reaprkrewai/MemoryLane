@@ -7,6 +7,8 @@ import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
 import { useEffect } from "react";
 import React from "react";
+import { Photo } from "../stores/entryStore";
+import { PhotoGallery } from "./PhotoGallery";
 
 interface TimelineCardEntry {
   id: string;
@@ -25,6 +27,7 @@ interface TimelineCardTag {
 interface TimelineCardProps {
   entry: TimelineCardEntry;
   tags: TimelineCardTag[];
+  photos?: Photo[];
   expanded: boolean;
   onToggleExpand: () => void;
   onOpen: () => void;
@@ -63,7 +66,7 @@ function moodDotClass(mood: string | null): string | null {
   }
 }
 
-export function TimelineCard({ entry, tags, expanded, onToggleExpand, onOpen, searchQuery }: TimelineCardProps) {
+export function TimelineCard({ entry, tags, photos = [], expanded, onToggleExpand, onOpen, searchQuery }: TimelineCardProps) {
   const dotClass = moodDotClass(entry.mood);
   const dateLabel = format(new Date(entry.created_at), "MMM d, yyyy");
   const preview = truncatePreview(stripMarkdown(entry.content || ""), 150);
@@ -114,6 +117,11 @@ export function TimelineCard({ entry, tags, expanded, onToggleExpand, onOpen, se
         </p>
       )}
 
+      {/* Row 2b: photo thumbnail strip (lazy-loaded) */}
+      {photos.length > 0 && (
+        <PhotoGallery photos={photos} mode="thumbnail-strip" />
+      )}
+
       {/* Row 3: tags (left) + expand chevron (right) */}
       <div className="mt-3 flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-1">
@@ -147,6 +155,10 @@ export function TimelineCard({ entry, tags, expanded, onToggleExpand, onOpen, se
           <div className="tiptap-editor">
             <EditorContent editor={editor} />
           </div>
+          {/* Full photo gallery in expanded view */}
+          {photos.length > 0 && (
+            <PhotoGallery photos={photos} mode="expanded-grid" />
+          )}
           <button
             type="button"
             data-expand-control=""
