@@ -8,6 +8,9 @@ import { useEntryStore } from "../stores/entryStore";
 import { BubbleMenuBar } from "./BubbleMenuBar";
 import { MetadataBar } from "./MetadataBar";
 import { TagRow } from "./TagRow";
+import { PhotoAttachmentButton } from "./PhotoAttachmentButton";
+import { PhotoGallery } from "./PhotoGallery";
+import { usePhotoManagement } from "../hooks/usePhotoManagement";
 import { toast } from "sonner";
 
 interface EntryEditorProps {
@@ -19,6 +22,8 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
   const scheduleAutoSave = useEntryStore((s) => s.scheduleAutoSave);
   const flushAndClearTimers = useEntryStore((s) => s.flushAndClearTimers);
   const loadAutoSaveInterval = useEntryStore((s) => s.loadAutoSaveInterval);
+
+  const { loadPhotos, removePhoto, currentPhotos } = usePhotoManagement(entryId);
 
   const editor = useEditor({
     extensions: [
@@ -46,6 +51,13 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
       // Non-fatal: fall back to default 5s
     });
   }, []);
+
+  // Load photos for this entry on mount / when entryId changes
+  useEffect(() => {
+    loadPhotos().catch(() => {
+      // Non-fatal: photos section will just be empty
+    });
+  }, [entryId]);
 
   // Flush pending saves on unmount
   useEffect(() => {
@@ -85,6 +97,25 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
 
       {/* TagRow: fixed at bottom of editor pane, below scroll area */}
       <TagRow entryId={entryId} />
+
+      {/* Photo attachment: below TagRow */}
+      <div className="border-t border-border bg-bg px-4 py-2">
+        <div className="mx-auto max-w-[680px]">
+          <div className="flex items-center justify-between">
+            <PhotoAttachmentButton
+              entryId={entryId}
+              currentPhotoCount={currentPhotos.length}
+            />
+          </div>
+          {currentPhotos.length > 0 && (
+            <PhotoGallery
+              photos={currentPhotos}
+              mode="editor"
+              onRemove={removePhoto}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
