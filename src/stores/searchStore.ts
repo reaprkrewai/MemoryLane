@@ -4,7 +4,7 @@ import { semanticSearch } from "../utils/vectorSearchService";
 import { askQuestion } from "../utils/qaService";
 import { useAIStore } from "./aiStore";
 
-interface SearchEntry {
+export interface SearchEntry {
   id: string;
   content: string;
   mood: string | null;

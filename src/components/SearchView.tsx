@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Sparkles } from "lucide-react";
+import { Search, Sparkles, Loader2, AlertCircle } from "lucide-react";
 import { useSearchStore } from "../stores/searchStore";
 import { useEntryStore } from "../stores/entryStore";
 import { useViewStore } from "../stores/viewStore";
@@ -7,12 +7,81 @@ import { getDb } from "../lib/db";
 import { checkOllamaHealth } from "../lib/ollamaService";
 import { SearchFilterBar } from "./SearchFilterBar";
 import { TimelineCard } from "./TimelineCard";
+import type { SearchEntry } from "../stores/searchStore";
 
 interface EntryTagRow {
   entry_id: string;
   id: string;
   name: string;
   color: string;
+}
+
+interface QAResultCardProps {
+  answer: string;
+  citedEntryIds: string[];
+  entries: SearchEntry[];
+  onCitationClick: (entryId: string) => void;
+}
+
+/**
+ * Display Q&A result with answer text and clickable citation links.
+ * Shows sources list with entry dates.
+ * If answer has no citations, shows "Answer not grounded in entries" message.
+ */
+function QAResultCard({
+  answer,
+  citedEntryIds,
+  entries,
+  onCitationClick,
+}: QAResultCardProps) {
+  return (
+    <div className="rounded-lg border border-border bg-surface-secondary p-5 mb-6">
+      {/* Answer section */}
+      <div className="mb-5">
+        <h3 className="font-semibold text-text mb-2 flex items-center gap-2">
+          <Sparkles size={16} className="text-accent" />
+          AI Generated Answer
+        </h3>
+        <p className="text-text-secondary whitespace-pre-wrap text-sm leading-relaxed">
+          {answer}
+        </p>
+      </div>
+
+      {/* Sources section */}
+      <div className="border-t border-border pt-4">
+        <h4 className="font-semibold text-text mb-2 text-sm">Sources</h4>
+        {citedEntryIds.length === 0 ? (
+          <p className="text-xs text-text-muted italic">
+            Answer not grounded in entries
+          </p>
+        ) : (
+          <ul className="space-y-1">
+            {citedEntryIds.map((entryId) => {
+              const entry = entries.find((e) => e.id === entryId);
+              if (!entry) return null;
+
+              const date = new Date(entry.created_at).toLocaleDateString(
+                "en-US",
+                { month: "short", day: "numeric", year: "numeric" }
+              );
+
+              return (
+                <li key={entryId}>
+                  <button
+                    type="button"
+                    onClick={() => onCitationClick(entryId)}
+                    className="text-xs text-accent hover:underline transition-colors"
+                  >
+                    Entry from {date}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function PreSearchState() {
@@ -51,6 +120,10 @@ export function SearchView() {
   const searchError = useSearchStore((s) => s.searchError);
   const setSearchMode = useSearchStore((s) => s.setSearchMode);
   const resetSearch = useSearchStore((s) => s.resetSearch);
+  const qaResult = useSearchStore((s) => s.qaResult);
+  const isAsking = useSearchStore((s) => s.isAsking);
+  const runQA = useSearchStore((s) => s.runQA);
+  const setQuery = useSearchStore((s) => s.setQuery);
 
   const selectEntry = useEntryStore((s) => s.selectEntry);
   const navigateToEditor = useViewStore((s) => s.navigateToEditor);
@@ -84,6 +157,9 @@ export function SearchView() {
   const handleClearAll = () => {
     resetSearch();
   };
+
+  // Q&A input for AI mode
+  const [qaInput, setQAInput] = useState("");
 
   // Only one card expanded at a time
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -132,6 +208,22 @@ export function SearchView() {
 
   const handleModeChange = (newMode: "keyword" | "ai") => {
     setSearchMode(newMode);
+  };
+
+  const handleAskQuestion = async () => {
+    const trimmedQuestion = qaInput.trim();
+    if (trimmedQuestion.length === 0) return;
+
+    // Update query so it appears in the state
+    setQuery(trimmedQuestion);
+    await runQA(trimmedQuestion);
+    setQAInput("");
+  };
+
+  const handleCitationClick = (entryId: string) => {
+    void selectEntry(entryId).then(() => {
+      navigateToEditor("timeline");
+    });
   };
 
   return (
@@ -200,15 +292,72 @@ export function SearchView() {
 
       {/* Body */}
       <div className="mx-auto w-full max-w-[760px] flex-1 px-6 py-6">
-        <SearchFilterBar
-          searchMode={searchMode}
-          onModeChange={handleModeChange}
-        />
+        {searchMode === "ai" ? (
+          <>
+            {/* AI Search input */}
+            <div className="mb-6">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Ask a question about your journal..."
+                  value={qaInput}
+                  onChange={(e) => setQAInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey && qaInput.trim().length > 0) {
+                      void handleAskQuestion();
+                    }
+                  }}
+                  disabled={isAsking}
+                  className="flex-1 rounded-lg border border-border bg-surface px-4 py-2 text-sm text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50"
+                />
+                <button
+                  type="button"
+                  onClick={() => void handleAskQuestion()}
+                  disabled={isAsking || qaInput.trim().length === 0}
+                  className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                >
+                  {isAsking ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={16} />
+                      Ask
+                    </>
+                  )}
+                </button>
+              </div>
+              {isAsking && (
+                <p className="mt-2 text-xs text-text-muted">
+                  Generating answer...
+                </p>
+              )}
+            </div>
+
+            {/* Q&A Result */}
+            {qaResult && !isAsking && (
+              <QAResultCard
+                answer={qaResult.answer}
+                citedEntryIds={qaResult.citedEntryIds}
+                entries={results}
+                onCitationClick={handleCitationClick}
+              />
+            )}
+          </>
+        ) : (
+          <SearchFilterBar
+            searchMode={searchMode}
+            onModeChange={handleModeChange}
+          />
+        )}
 
         {/* Error message */}
         {searchError && (
-          <div className="mt-4 rounded-md bg-red-500/10 border border-red-500/30 px-3 py-2 text-sm text-red-700 dark:text-red-400">
-            {searchError}
+          <div className="mt-4 rounded-md bg-red-500/10 border border-red-500/30 px-3 py-2 text-sm text-red-700 dark:text-red-400 flex gap-2 items-start">
+            <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+            <span>{searchError}</span>
           </div>
         )}
 
