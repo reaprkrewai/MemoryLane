@@ -24,23 +24,29 @@ interface UIState {
   dbError: string | null;
   onThisDayCollapsed: boolean;
 
+  // PIN/Security state (tri-state: null = unknown, true = set, false = not set)
+  isPinSet: boolean | null;
+  isLocked: boolean;
+  lastActivityTime: number;
+
   // Settings state
   theme: "light" | "dark";
   fontSize: "small" | "medium" | "large";
   idleTimeout: 1 | 5 | 15 | 30 | "never";
-  lastActivityTime: number;
-  isLocked: boolean;
 
   setDbReady: (ready: boolean) => void;
   setDbError: (err: string) => void;
   setOnThisDayCollapsed: (v: boolean) => void;
 
+  // PIN/Security setters
+  setIsPinSet: (set: boolean | null) => void;
+  setIsLocked: (locked: boolean) => void;
+  setLastActivityTime: () => void;
+
   // Settings setters
   setTheme: (theme: "light" | "dark") => void;
   setFontSize: (size: "small" | "medium" | "large") => void;
   setIdleTimeout: (timeout: 1 | 5 | 15 | 30 | "never") => void;
-  setLastActivityTime: () => void;
-  setIsLocked: (locked: boolean) => void;
 }
 
 function getStoredTheme(): "light" | "dark" {
@@ -68,15 +74,21 @@ export const useUiStore = create<UIState>((set) => ({
   dbError: null,
   onThisDayCollapsed: false,
 
+  isPinSet: null, // tri-state: null = unknown, true = set, false = not set
+  isLocked: false,
+  lastActivityTime: Date.now(),
+
   theme: getStoredTheme(),
   fontSize: getStoredFontSize(),
   idleTimeout: getStoredIdleTimeout(),
-  lastActivityTime: Date.now(),
-  isLocked: false,
 
   setDbReady: (ready) => set({ isDbReady: ready }),
   setDbError: (err) => set({ dbError: err }),
   setOnThisDayCollapsed: (v) => set({ onThisDayCollapsed: v }),
+
+  setIsPinSet: (isPinSet) => set({ isPinSet }),
+  setIsLocked: (locked) => set({ isLocked: locked }),
+  setLastActivityTime: () => set({ lastActivityTime: Date.now() }),
 
   setTheme: (theme) => {
     set({ theme });
@@ -92,6 +104,4 @@ export const useUiStore = create<UIState>((set) => ({
     set({ idleTimeout: timeout });
     localStorage.setItem("idleTimeout", String(timeout));
   },
-  setLastActivityTime: () => set({ lastActivityTime: Date.now() }),
-  setIsLocked: (locked) => set({ isLocked: locked }),
 }));

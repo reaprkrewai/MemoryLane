@@ -1,6 +1,10 @@
-import { Palette, Shield, Database, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { Palette, Shield, Database, ChevronRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useUiStore } from "../stores/uiStore";
+import { useDataExport } from "../hooks/useDataExport";
+import { useExportFile } from "../hooks/useExportFile";
+import { createExportZip } from "../utils/zipUtils";
 import { SettingRow } from "./SettingRow";
 
 // --- Shared option button ---
@@ -142,6 +146,52 @@ function SecuritySection() {
 
 // --- Data Section ---
 function DataSection() {
+  const [isExporting, setIsExporting] = useState(false);
+  const { collect } = useDataExport();
+  const { save } = useExportFile();
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    const loadingToastId = toast.loading("Preparing export...");
+
+    try {
+      // Collect data
+      toast.loading("Collecting entries and photos...", { id: loadingToastId });
+      const data = await collect();
+
+      // Create ZIP
+      toast.loading(`Creating ZIP file (${data.entries.length} entries)...`, {
+        id: loadingToastId,
+      });
+      const { blob, includedPhotos, skippedPhotos } = await createExportZip(data);
+
+      // Save file
+      toast.loading("Saving file...", { id: loadingToastId });
+      const fileName = await save(blob);
+
+      if (fileName) {
+        toast.dismiss(loadingToastId);
+        const photoInfo =
+          includedPhotos > 0
+            ? ` · ${includedPhotos} photos included`
+            : skippedPhotos > 0
+              ? ` · ${skippedPhotos} photos skipped`
+              : "";
+        toast.success(`Exported to ${fileName}${photoInfo}`);
+      } else {
+        toast.dismiss(loadingToastId);
+        toast.info("Export cancelled");
+      }
+    } catch (err) {
+      toast.dismiss(loadingToastId);
+      const message = err instanceof Error ? err.message : "Export failed";
+      console.error("Export error:", err);
+      toast.error(message);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <section>
       <SectionHeader icon={<Database size={16} />} title="Data" />
@@ -151,11 +201,21 @@ function DataSection() {
           description="Download all your entries as a backup"
         >
           <button
-            onClick={() => toast.info("Export feature coming in a future update")}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-label rounded-md border border-border text-muted hover:border-accent/50 hover:text-text transition-colors font-medium"
+            onClick={handleExport}
+            disabled={isExporting}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-label rounded-md border border-border text-muted hover:border-accent/50 hover:text-text transition-colors font-medium disabled:opacity-50"
           >
-            Export Data
-            <ChevronRight size={14} />
+            {isExporting ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                Exporting...
+              </>
+            ) : (
+              <>
+                Export Data
+                <ChevronRight size={14} />
+              </>
+            )}
           </button>
         </SettingRow>
       </div>

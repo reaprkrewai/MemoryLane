@@ -98,6 +98,14 @@ CREATE TABLE IF NOT EXISTS media_attachments (
 
 CREATE INDEX IF NOT EXISTS idx_media_attachments_entry ON media_attachments(entry_id);
 CREATE INDEX IF NOT EXISTS idx_media_attachments_order ON media_attachments(entry_id, display_order);
+
+CREATE TABLE IF NOT EXISTS app_lock (
+    id          TEXT PRIMARY KEY DEFAULT '1',
+    pin_hash    TEXT NOT NULL,
+    pin_salt    TEXT NOT NULL,
+    created_at  INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000),
+    updated_at  INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+);
 `;
 
 /**
@@ -162,4 +170,36 @@ export async function initializeDatabase(): Promise<void> {
       tables.map((t) => t.name).join(", ")
     );
   }
+}
+
+// PIN/Security operations
+export interface AppLockRecord {
+  id: string;
+  pin_hash: string;
+  pin_salt: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export async function getAppLock(): Promise<AppLockRecord | null> {
+  const db = await getDb();
+  const result = await db.select<AppLockRecord[]>(
+    "SELECT * FROM app_lock WHERE id = '1'"
+  );
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function setAppLock(pin_hash: string, pin_salt: string): Promise<void> {
+  const db = await getDb();
+  const now = Date.now();
+  await db.execute(
+    `INSERT OR REPLACE INTO app_lock (id, pin_hash, pin_salt, created_at, updated_at)
+     VALUES ('1', ?, ?, ?, ?)`,
+    [pin_hash, pin_salt, now, now]
+  );
+}
+
+export async function clearAppLock(): Promise<void> {
+  const db = await getDb();
+  await db.execute("DELETE FROM app_lock WHERE id = '1'");
 }
