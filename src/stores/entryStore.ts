@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { getDb } from "../lib/db";
+import { generateEmbeddingAsync } from "../utils/embeddingService";
 
 export interface Photo {
   id: string;
@@ -160,6 +161,8 @@ export const useEntryStore = create<EntryState>((set, get) => ({
         isSaving: false,
         lastSavedAt: Date.now(),
       }));
+      // Trigger async embedding generation (fire-and-forget)
+      generateEmbeddingAsync(entryId, content);
     } catch (err) {
       set({ isSaving: false });
       throw err;

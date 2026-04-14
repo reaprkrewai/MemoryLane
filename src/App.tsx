@@ -9,6 +9,8 @@ import { PinEntryScreen } from "./components/PinEntryScreen";
 import { initializeDatabase, getAppLock } from "./lib/db";
 import { useUiStore, applyTheme, applyFontScale } from "./stores/uiStore";
 import { useViewStore } from "./stores/viewStore";
+import { useAIStore } from "./stores/aiStore";
+import { checkOllamaHealth } from "./lib/ollamaService";
 import { useIdleTimeout } from "./hooks/useIdleTimeout";
 
 function App() {
@@ -65,6 +67,21 @@ function App() {
 
     initApp();
   }, [setDbReady, setDbError, setIsPinSet, setIsLocked]);
+
+  // Check Ollama availability on app mount (async, non-blocking)
+  useEffect(() => {
+    const initAI = async () => {
+      const health = await checkOllamaHealth();
+      useAIStore.setState({
+        available: health.available,
+        embedding: health.embedding,
+        llm: health.llm,
+        status: health.available ? "ready" : "unavailable",
+      });
+    };
+
+    initAI();
+  }, []);
 
   // Set up idle timeout monitoring
   useIdleTimeout();
