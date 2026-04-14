@@ -3,10 +3,12 @@ import { Search, Sparkles, Loader2, AlertCircle } from "lucide-react";
 import { useSearchStore } from "../stores/searchStore";
 import { useEntryStore } from "../stores/entryStore";
 import { useViewStore } from "../stores/viewStore";
+import { useAIStore } from "../stores/aiStore";
 import { getDb } from "../lib/db";
 import { checkOllamaHealth } from "../lib/ollamaService";
 import { SearchFilterBar } from "./SearchFilterBar";
 import { TimelineCard } from "./TimelineCard";
+import { OllamaSetupWizard } from "./OllamaSetupWizard";
 import type { SearchEntry } from "../stores/searchStore";
 
 interface EntryTagRow {
@@ -128,6 +130,12 @@ export function SearchView() {
   const selectEntry = useEntryStore((s) => s.selectEntry);
   const navigateToEditor = useViewStore((s) => s.navigateToEditor);
 
+  // AI store
+  const aiAvailable = useAIStore((s) => s.available);
+  const skipSetupWizard = useAIStore((s) => s.skipSetupWizard);
+  const showSetupWizard = useAIStore((s) => s.showSetupWizard);
+  const setShowSetupWizard = useAIStore((s) => s.setShowSetupWizard);
+
   // Ollama availability check
   const [ollamaAvailable, setOllamaAvailable] = useState(false);
   const [checkingOllama, setCheckingOllama] = useState(true);
@@ -207,6 +215,11 @@ export function SearchView() {
   }, [results]);
 
   const handleModeChange = (newMode: "keyword" | "ai") => {
+    // If trying to switch to AI mode and Ollama not available, show setup wizard
+    if (newMode === "ai" && !aiAvailable && !skipSetupWizard) {
+      setShowSetupWizard(true);
+      return;
+    }
     setSearchMode(newMode);
   };
 
@@ -398,6 +411,12 @@ export function SearchView() {
           <NoResultsState />
         )}
       </div>
+
+      {/* Setup Wizard Modal */}
+      <OllamaSetupWizard
+        isOpen={showSetupWizard}
+        onClose={() => setShowSetupWizard(false)}
+      />
     </div>
   );
 }

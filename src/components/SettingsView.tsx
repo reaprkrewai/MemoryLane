@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { Palette, Shield, Database, ChevronRight, Loader2 } from "lucide-react";
+import { Palette, Shield, Database, ChevronRight, Loader2, Sparkles, Check, Circle } from "lucide-react";
 import { toast } from "sonner";
 import { useUiStore } from "../stores/uiStore";
+import { useAIStore } from "../stores/aiStore";
 import { useDataExport } from "../hooks/useDataExport";
 import { useExportFile } from "../hooks/useExportFile";
+import { checkOllamaHealth } from "../lib/ollamaService";
 import { createExportZip } from "../utils/zipUtils";
 import { SettingRow } from "./SettingRow";
+import { OllamaSetupWizard } from "./OllamaSetupWizard";
+import { PRESETS } from "../lib/paletteData";
 
 // --- Shared option button ---
 interface OptionButtonProps {
@@ -46,12 +50,117 @@ function SectionHeader({ icon, title }: SectionHeaderProps) {
   );
 }
 
+// --- Palette Swatch ---
+function PaletteSwatch({
+  palette,
+  selected,
+  theme,
+  onClick,
+}: {
+  palette: (typeof PRESETS)[number];
+  selected: boolean;
+  theme: "light" | "dark";
+  onClick: () => void;
+}) {
+  const color = theme === "dark" ? palette.dark.accent : palette.light.accent;
+  return (
+    <button
+      onClick={onClick}
+      title={palette.label}
+      aria-label={`${palette.label} accent color${selected ? " (active)" : ""}`}
+      className={`relative h-7 w-7 rounded-full border-2 transition-all flex-shrink-0 ${
+        selected
+          ? "border-text shadow-sm scale-110"
+          : "border-transparent hover:scale-105 hover:border-border"
+      }`}
+      style={{ backgroundColor: color }}
+    >
+      {selected && (
+        <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path
+              d="M1.5 5l2.5 2.5 4.5-4.5"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      )}
+    </button>
+  );
+}
+
+// --- Custom Color Swatch ---
+function CustomColorSwatch({
+  selected,
+  currentHex,
+  onSelect,
+  onChange,
+}: {
+  selected: boolean;
+  currentHex: string;
+  onSelect: () => void;
+  onChange: (hex: string) => void;
+}) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <button
+        onClick={onSelect}
+        title="Custom color"
+        aria-label={`Custom accent color${selected ? " (active)" : ""}`}
+        className={`relative h-7 w-7 rounded-full border-2 overflow-hidden transition-all flex-shrink-0 ${
+          selected
+            ? "border-text shadow-sm scale-110"
+            : "border-dashed border-border hover:scale-105 hover:border-text-secondary"
+        }`}
+        style={{ backgroundColor: selected ? currentHex : "transparent" }}
+      >
+        {/* Transparent native color picker layered on top */}
+        <input
+          type="color"
+          value={currentHex}
+          onChange={(e) => onChange(e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          aria-hidden="true"
+        />
+        {!selected && (
+          <span className="absolute inset-0 flex items-center justify-center text-text-muted text-xs pointer-events-none">
+            +
+          </span>
+        )}
+        {selected && (
+          <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <path
+                d="M1.5 5l2.5 2.5 4.5-4.5"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        )}
+      </button>
+      {selected && (
+        <span className="text-label font-mono text-muted">{currentHex.toUpperCase()}</span>
+      )}
+    </div>
+  );
+}
+
 // --- Appearance Section ---
 function AppearanceSection() {
   const theme = useUiStore((s) => s.theme);
   const setTheme = useUiStore((s) => s.setTheme);
   const fontSize = useUiStore((s) => s.fontSize);
   const setFontSize = useUiStore((s) => s.setFontSize);
+  const paletteId = useUiStore((s) => s.paletteId);
+  const customAccentHex = useUiStore((s) => s.customAccentHex);
+  const setPalette = useUiStore((s) => s.setPalette);
 
   return (
     <section>
@@ -68,6 +177,27 @@ function AppearanceSection() {
               label="Dark"
               selected={theme === "dark"}
               onClick={() => setTheme("dark")}
+            />
+          </div>
+        </SettingRow>
+        <div className="border-t border-border/50" />
+        <SettingRow label="Accent Color" description="Highlight color used throughout the app">
+          <div className="flex items-center gap-1.5">
+            {PRESETS.map((preset) => (
+              <PaletteSwatch
+                key={preset.id}
+                palette={preset}
+                selected={paletteId === preset.id}
+                theme={theme}
+                onClick={() => setPalette(preset.id)}
+              />
+            ))}
+            <div className="h-4 w-px bg-border mx-0.5" aria-hidden="true" />
+            <CustomColorSwatch
+              selected={paletteId === "custom"}
+              currentHex={customAccentHex}
+              onSelect={() => setPalette("custom", customAccentHex)}
+              onChange={(hex) => setPalette("custom", hex)}
             />
           </div>
         </SettingRow>
@@ -140,6 +270,157 @@ function SecuritySection() {
             Change PIN
             <ChevronRight size={14} />
           </button>
+        </SettingRow>
+      </div>
+    </section>
+  );
+}
+
+// --- AI Features Section ---
+function AIFeaturesSection() {
+  const available = useAIStore((s) => s.available);
+  const embedding = useAIStore((s) => s.embedding);
+  const llm = useAIStore((s) => s.llm);
+  const status = useAIStore((s) => s.status);
+  const [isChecking, setIsChecking] = useState(false);
+
+  const handleCheckAgain = async () => {
+    setIsChecking(true);
+    try {
+      const health = await checkOllamaHealth();
+      useAIStore.setState({
+        available: health.available,
+        embedding: health.embedding,
+        llm: health.llm,
+        status: health.available ? "ready" : "unavailable",
+      });
+      if (health.available) {
+        toast.success("AI features enabled!");
+      } else {
+        toast.error("Ollama not detected. Please check your installation.");
+      }
+    } catch (err) {
+      toast.error("Failed to check Ollama status");
+      console.error("Health check error:", err);
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  const handleSetupGuide = () => {
+    useAIStore.setState({ showSetupWizard: true });
+  };
+
+  return (
+    <section>
+      <SectionHeader icon={<Sparkles size={16} />} title="AI Features" />
+      <div className="border-t border-border">
+        {/* Status display */}
+        <SettingRow
+          label="Status"
+          description="AI features availability"
+        >
+          <div className="flex items-center gap-2">
+            {status === "checking" ? (
+              <>
+                <Loader2 size={16} className="text-text-muted animate-spin" />
+                <span className="text-sm text-text-muted">Checking...</span>
+              </>
+            ) : available ? (
+              <>
+                <Check size={16} className="text-green-600" />
+                <span className="text-sm text-text">Available</span>
+              </>
+            ) : (
+              <>
+                <Circle size={16} className="text-text-muted" />
+                <span className="text-sm text-text-muted">Offline</span>
+              </>
+            )}
+          </div>
+        </SettingRow>
+
+        <div className="border-t border-border/50" />
+
+        {/* Embedding model status */}
+        <SettingRow
+          label="Embedding model"
+          description="nomic-embed-text for semantic search"
+        >
+          <div className="flex items-center gap-2">
+            {embedding ? (
+              <>
+                <Check size={16} className="text-green-600" />
+                <span className="text-sm text-text">Found</span>
+              </>
+            ) : (
+              <>
+                <Circle size={16} className="text-text-muted" />
+                <span className="text-sm text-text-muted">Missing</span>
+              </>
+            )}
+          </div>
+        </SettingRow>
+
+        <div className="border-t border-border/50" />
+
+        {/* LLM model status */}
+        <SettingRow
+          label="LLM model"
+          description="llama2:7b for Q&A"
+        >
+          <div className="flex items-center gap-2">
+            {llm ? (
+              <>
+                <Check size={16} className="text-green-600" />
+                <span className="text-sm text-text">Found</span>
+              </>
+            ) : (
+              <>
+                <Circle size={16} className="text-text-muted" />
+                <span className="text-sm text-text-muted">Missing</span>
+              </>
+            )}
+          </div>
+        </SettingRow>
+
+        <div className="border-t border-border/50" />
+
+        {/* Why local AI explanation */}
+        <div className="px-6 py-4 bg-surface-secondary/50 rounded-lg border border-border/50">
+          <p className="text-sm text-text-secondary leading-relaxed">
+            <strong>Why local AI?</strong> All journal entries stay on your device.
+            Nothing is sent to the cloud. Your privacy is protected.
+          </p>
+        </div>
+
+        <div className="border-t border-border/50 mt-4" />
+
+        {/* Action buttons */}
+        <SettingRow label="Setup" description="Configure AI features">
+          <div className="flex gap-2 flex-wrap justify-end">
+            <button
+              onClick={handleCheckAgain}
+              disabled={isChecking || status === "checking"}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-label rounded-md border border-border text-muted hover:border-accent/50 hover:text-text transition-colors font-medium disabled:opacity-50"
+            >
+              {isChecking ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Checking...
+                </>
+              ) : (
+                "Check Again"
+              )}
+            </button>
+            <button
+              onClick={handleSetupGuide}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-label rounded-md border border-border text-muted hover:border-accent/50 hover:text-text transition-colors font-medium"
+            >
+              Setup Guide
+              <ChevronRight size={14} />
+            </button>
+          </div>
         </SettingRow>
       </div>
     </section>
@@ -227,6 +508,9 @@ function DataSection() {
 
 // --- Main Settings View ---
 export function SettingsView() {
+  const showSetupWizard = useAIStore((s) => s.showSetupWizard);
+  const setShowSetupWizard = useAIStore((s) => s.setShowSetupWizard);
+
   return (
     <div className="flex flex-col h-full overflow-auto bg-bg">
       {/* Page header */}
@@ -242,6 +526,7 @@ export function SettingsView() {
         <div className="flex flex-col gap-10">
           <AppearanceSection />
           <SecuritySection />
+          <AIFeaturesSection />
           <DataSection />
         </div>
 
@@ -253,6 +538,12 @@ export function SettingsView() {
           </div>
         </div>
       </div>
+
+      {/* Setup Wizard Modal */}
+      <OllamaSetupWizard
+        isOpen={showSetupWizard}
+        onClose={() => setShowSetupWizard(false)}
+      />
     </div>
   );
 }

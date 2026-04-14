@@ -25,7 +25,6 @@ export function TimelineView() {
   const hasMore = useEntryStore((s) => s.hasMore);
   const isLoadingPage = useEntryStore((s) => s.isLoadingPage);
   const loadPage = useEntryStore((s) => s.loadPage);
-  const createEntry = useEntryStore((s) => s.createEntry);
   const selectEntry = useEntryStore((s) => s.selectEntry);
 
   const navigateToEditor = useViewStore((s) => s.navigateToEditor);
@@ -180,12 +179,6 @@ export function TimelineView() {
     }
     return out;
   }, [filteredEntries]);
-
-  const handleNewEntry = async () => {
-    const newId = await createEntry();
-    await selectEntry(newId);
-    navigateToEditor("timeline");
-  };
 
   const handleOpenEntry = async (entryId: string) => {
     await selectEntry(entryId);

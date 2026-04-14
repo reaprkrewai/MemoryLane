@@ -14,6 +14,10 @@ interface AIState {
   // Status during checking/loading
   status: "checking" | "ready" | "unavailable";
 
+  // Setup wizard state
+  showSetupWizard: boolean; // Whether to show the setup wizard modal
+  skipSetupWizard: boolean; // Whether user has skipped wizard for this session
+
   // Actions
   setAIStatus(health: {
     available: boolean;
@@ -21,6 +25,8 @@ interface AIState {
     llm: boolean;
   }): void;
   setStatus(status: "checking" | "ready" | "unavailable"): void;
+  setShowSetupWizard(show: boolean): void;
+  setSkipSetupWizard(skip: boolean): void;
 }
 
 export const useAIStore = create<AIState>((set) => ({
@@ -29,6 +35,8 @@ export const useAIStore = create<AIState>((set) => ({
   embedding: false,
   llm: false,
   status: "checking",
+  showSetupWizard: false,
+  skipSetupWizard: false,
 
   setAIStatus: (health) =>
     set({
@@ -39,4 +47,8 @@ export const useAIStore = create<AIState>((set) => ({
     }),
 
   setStatus: (status) => set({ status }),
+
+  setShowSetupWizard: (show) => set({ showSetupWizard: show }),
+
+  setSkipSetupWizard: (skip) => set({ skipSetupWizard: skip }),
 }));
