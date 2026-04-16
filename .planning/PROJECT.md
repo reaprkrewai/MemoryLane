@@ -8,6 +8,36 @@ Chronicle AI is a privacy-first desktop journaling app built with Tauri (Rust + 
 
 A journaling app where you can eventually have AI understand your entries — and none of it ever touches the internet.
 
+## Current Milestone: v1.1 Daily Driver
+
+**Goal:** Turn Chronicle AI from a working MVP into a habit-forming daily driver — land users on a rich home dashboard, smooth every interaction, and make AI assist quietly while writing.
+
+**Target features:**
+
+*Home Dashboard (Overview view)*
+- Stat cards: streak, total entries, entries this month
+- Mood trends visualization over time
+- On This Day — memories from this date in prior years
+- Recent entries feed
+- Quick-write FAB (floating action button)
+- Writing prompts widget
+- AI insights summary panel
+
+*UX Polish*
+- First-run onboarding flow
+- Animations + microinteractions pass
+
+*AI*
+- Auto-tagging suggestions (local LLM suggests tags for new entries)
+
+*Tag Management*
+- Color picker per tag (preset palette)
+
+**Key context:**
+- Same privacy / local-only constraints as v1.0 — zero network calls, Ollama-only AI
+- WIP scaffolding for OverviewView + widget components already committed as starting point (commit `b9af497`)
+- Inter + Fraunces fonts already wired via @fontsource
+
 ## Requirements
 
 ### Validated
@@ -41,39 +71,44 @@ A journaling app where you can eventually have AI understand your entries — an
 - [x] Clicking a date filters the timeline to entries on that day — CAL-04
 - [x] Month/year navigation with "Today" shortcut — CAL-03
 
+### Validated
+
+**Search & Discovery — Validated in Phase 4: Search & Discovery**
+- [x] Full-text search across all entry content (SQLite FTS5) — SRCH-01
+- [x] Filter by date range, tags (multi-select), mood (multi-select) — SRCH-02, SRCH-03, SRCH-04
+- [x] Matching text highlighted in search results — SRCH-05
+- [x] Clear all filters in one action — SRCH-06
+- [x] On This Day resurfaces entries from prior years — OTD-01, OTD-02
+
+### Validated
+
+**Media, Security & Settings — Validated in Phase 5**
+- [x] User can attach photos to entries — MEDIA-01 through MEDIA-04
+- [x] App lock via PIN (PBKDF2-SHA256) — SEC-01, SEC-02, SEC-03
+- [x] Light/dark theme + font scale settings — SETT-01, SETT-02
+- [x] Auto-save interval configurable (5s / 10s / 30s) — SETT-03 / EDIT-05
+- [x] Export all data to JSON backup — SETT-04
+
+### Validated
+
+**AI Features — Validated in Phase 6: AI Features**
+- [x] Semantic search over entries via local embeddings (Ollama) — LLMAI-02
+- [x] Natural-language Q&A with RAG + citations over journal — LLMAI-03
+- [x] Ollama setup wizard + settings page live status — LLMAI-04
+- [x] All inference is local — no entries, embeddings, or questions ever leave the device
+
 ### Active
 
-**Search & Filter**
-- [ ] Full-text search across all entry content (SQLite FTS5)
-- [ ] Filter by date range, tags (multi-select), mood (multi-select)
-- [ ] Matching text highlighted in search results
-- [ ] Clear all filters in one action
-
-**Tag Management**
-- [ ] Tags created inline while writing (on-the-fly)
-- [ ] Tag color picker (8 preset colors)
-- [ ] Tag usage count shown in autocomplete
-- [ ] User can delete unused tags
-
-**Settings**
-- [ ] Light / dark mode toggle
-- [ ] Font size: small / medium / large
-- [ ] Auto-save interval: 5s / 10s / 30s
-- [ ] Export all data to JSON backup
-
-**AI Readiness (schema-level)**
-- [ ] Entry content stored as clean Markdown (AI-parseable)
-- [ ] Schema structured to support future embeddings table without migration pain
+**v1.1 Daily Driver requirements** — see `.planning/REQUIREMENTS.md` for REQ-IDs and details.
 
 ### Out of Scope
 
 - Cloud sync — privacy constraint; local-only forever
-- Mobile apps — Phase 2; desktop experience first
-- AI features (chat, summarization, insights) — Phase 2; local LLM via Ollama
-- Photo/file attachments — Phase 2
-- Location/weather metadata — Phase 2
+- Mobile apps — future major milestone; desktop experience first
 - External AI APIs (OpenAI, Anthropic) — never; conflicts with privacy guarantee
 - Multi-device sync — requires cloud; out of scope by design
+- Video and audio attachments — v1 scope is photos only
+- Cloud LLM fallbacks — all inference stays local, even if Ollama unavailable
 
 ## Context
 
@@ -123,4 +158,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-11 — Phase 3 (Timeline & Calendar) complete*
+*Last updated: 2026-04-16 — v1.0 MVP complete (6 phases shipped); v1.1 Daily Driver milestone started*
