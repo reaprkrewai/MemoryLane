@@ -6,7 +6,8 @@
  */
 
 import { getDb } from "../lib/db";
-import { checkOllamaHealth, queryEmbedding } from "../lib/ollamaService";
+import * as hybridAI from "../lib/hybridAIService";
+import { useAIStore } from "../stores/aiStore";
 
 interface SearchEntry {
   id: string;
@@ -170,11 +171,11 @@ async function keywordSearchFallback(
 /**
  * Perform semantic search on entries using vector similarity.
  *
- * 1. Check if Ollama is available
+ * 1. Check if AI backend is available
  * 2. If not, fall back to keyword search
- * 3. Generate query vector using nomic-embed-text
+ * 3. Generate query vector using active backend (embedded or Ollama)
  * 4. Apply metadata filters (date, tags, moods)
- * 5. Retrieve embeddings from database
+ * 5. Retrieve embeddings from database for the active model
  * 6. Compute cosine similarity for each entry
  * 7. Return top K results sorted by similarity
  */
@@ -182,8 +183,8 @@ export async function semanticSearch(
   query: string,
   options?: VectorSearchOptions
 ): Promise<SearchEntry[]> {
-  // Check Ollama availability
-  const health = await checkOllamaHealth();
+  // Check AI availability
+  const health = await hybridAI.checkAIHealth();
   if (!health.available || !health.embedding) {
     // Graceful fallback to keyword search
     return keywordSearchFallback(query, options);
@@ -193,8 +194,12 @@ export async function semanticSearch(
   const limit = options?.limit ?? 10;
 
   try {
-    // Generate query embedding
-    const queryVector = await queryEmbedding(query);
+    // Get the active model name for filtering embeddings
+    const backend = useAIStore.getState().aiBackend;
+    const modelName = backend === "embedded" ? "phi3-mini-q4" : "nomic-embed-text";
+
+    // Generate query embedding via hybrid service
+    const queryVector = await hybridAI.generateEmbedding(query);
     const normalizedQuery = normalizeVector(queryVector);
 
     // Build metadata filter
@@ -204,16 +209,20 @@ export async function semanticSearch(
       options?.moods
     );
 
-    // Query embeddings with metadata filters
+    // Query embeddings with metadata filters AND model match
+    const modelFilterClause = clause
+      ? `${clause} AND emb.model = ?`
+      : "WHERE emb.model = ?";
+
     const sql = `
       SELECT e.id, e.content, e.mood, e.word_count, e.created_at, e.updated_at, e.metadata, emb.vector
       FROM embeddings emb
       JOIN entries e ON emb.entry_id = e.id
-      ${clause}
+      ${modelFilterClause}
       ORDER BY e.created_at DESC
     `;
 
-    const rows = await db.select<EmbeddingRow[]>(sql, params);
+    const rows = await db.select<EmbeddingRow[]>(sql, [...params, modelName]);
 
     // Compute similarity scores for each entry
     const scored: ScoredResult[] = rows.map(row => {

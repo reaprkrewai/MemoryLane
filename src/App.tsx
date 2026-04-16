@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { Toaster, toast } from "sonner";
+import { invoke } from "@tauri-apps/api/core";
 import { AppShell } from "./components/AppShell";
 import { JournalView } from "./components/JournalView";
 import { SettingsView } from "./components/SettingsView";
@@ -10,7 +11,8 @@ import { initializeDatabase, getAppLock } from "./lib/db";
 import { useUiStore, applyTheme, applyFontScale } from "./stores/uiStore";
 import { useViewStore } from "./stores/viewStore";
 import { useAIStore } from "./stores/aiStore";
-import { checkOllamaHealth } from "./lib/ollamaService";
+import * as hybridAI from "./lib/hybridAIService";
+import { loadAIBackendPreference } from "./utils/aiSettingsService";
 import { useIdleTimeout } from "./hooks/useIdleTimeout";
 
 function App() {
@@ -68,16 +70,56 @@ function App() {
     initApp();
   }, [setDbReady, setDbError, setIsPinSet, setIsLocked]);
 
-  // Check Ollama availability on app mount (async, non-blocking)
+  // Initialize AI backend and check availability on app mount
   useEffect(() => {
     const initAI = async () => {
-      const health = await checkOllamaHealth();
-      useAIStore.setState({
-        available: health.available,
-        embedding: health.embedding,
-        llm: health.llm,
-        status: health.available ? "ready" : "unavailable",
-      });
+      try {
+        // Load persisted backend preference
+        const backend = await loadAIBackendPreference();
+        useAIStore.setState({ aiBackend: backend });
+
+        // If embedded backend, initialize the server
+        if (backend === "embedded") {
+          try {
+            // Get the embedded server status
+            const status = await invoke<{
+              binary_exists: boolean;
+              model_exists: boolean;
+              server_running: boolean;
+              server_healthy: boolean;
+            }>("get_embedded_status");
+
+            if (status.model_exists && !status.server_running) {
+              // Model is downloaded but server not running, start it
+              await invoke("start_embedded_ai");
+            } else if (status.model_exists) {
+              useAIStore.setState({ embeddedStatus: "running" });
+            } else {
+              useAIStore.setState({ embeddedStatus: "not-downloaded" });
+            }
+          } catch (err) {
+            console.error("Failed to initialize embedded AI:", err);
+            useAIStore.setState({ embeddedStatus: "error" });
+          }
+        }
+
+        // Check hybrid AI health
+        const health = await hybridAI.checkAIHealth();
+        useAIStore.setState({
+          available: health.available,
+          embedding: health.embedding,
+          llm: health.llm,
+          status: health.available ? "ready" : "unavailable",
+        });
+      } catch (err) {
+        console.error("Failed to initialize AI:", err);
+        useAIStore.setState({
+          available: false,
+          embedding: false,
+          llm: false,
+          status: "unavailable",
+        });
+      }
     };
 
     initAI();

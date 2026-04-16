@@ -1,4 +1,10 @@
 import { create } from "zustand";
+import {
+  applyPalette,
+  getStoredPaletteId,
+  getStoredCustomHex,
+  type PaletteId,
+} from "../lib/paletteData";
 
 // --- Theme helpers ---
 export function applyTheme(theme: "light" | "dark") {
@@ -33,6 +39,8 @@ interface UIState {
   theme: "light" | "dark";
   fontSize: "small" | "medium" | "large";
   idleTimeout: 1 | 5 | 15 | 30 | "never";
+  paletteId: PaletteId;
+  customAccentHex: string;
 
   setDbReady: (ready: boolean) => void;
   setDbError: (err: string) => void;
@@ -47,6 +55,7 @@ interface UIState {
   setTheme: (theme: "light" | "dark") => void;
   setFontSize: (size: "small" | "medium" | "large") => void;
   setIdleTimeout: (timeout: 1 | 5 | 15 | 30 | "never") => void;
+  setPalette: (id: PaletteId, customHex?: string) => void;
 }
 
 function getStoredTheme(): "light" | "dark" {
@@ -69,7 +78,7 @@ function getStoredIdleTimeout(): 1 | 5 | 15 | 30 | "never" {
   return 5;
 }
 
-export const useUiStore = create<UIState>((set) => ({
+export const useUiStore = create<UIState>((set, get) => ({
   isDbReady: false,
   dbError: null,
   onThisDayCollapsed: false,
@@ -81,6 +90,8 @@ export const useUiStore = create<UIState>((set) => ({
   theme: getStoredTheme(),
   fontSize: getStoredFontSize(),
   idleTimeout: getStoredIdleTimeout(),
+  paletteId: getStoredPaletteId(),
+  customAccentHex: getStoredCustomHex(),
 
   setDbReady: (ready) => set({ isDbReady: ready }),
   setDbError: (err) => set({ dbError: err }),
@@ -94,6 +105,13 @@ export const useUiStore = create<UIState>((set) => ({
     set({ theme });
     localStorage.setItem("theme", theme);
     applyTheme(theme);
+    // Re-apply palette for new mode (accent colors differ between light/dark)
+    const { paletteId, customAccentHex } = get();
+    applyPalette(
+      paletteId,
+      theme,
+      paletteId === "custom" ? customAccentHex : undefined
+    );
   },
   setFontSize: (size) => {
     set({ fontSize: size });
@@ -103,5 +121,15 @@ export const useUiStore = create<UIState>((set) => ({
   setIdleTimeout: (timeout) => {
     set({ idleTimeout: timeout });
     localStorage.setItem("idleTimeout", String(timeout));
+  },
+  setPalette: (id, customHex) => {
+    const resolvedHex = customHex ?? get().customAccentHex;
+    set({
+      paletteId: id,
+      ...(customHex !== undefined ? { customAccentHex: customHex } : {}),
+    });
+    localStorage.setItem("paletteId", id);
+    if (customHex !== undefined) localStorage.setItem("customAccentHex", customHex);
+    applyPalette(id, get().theme, id === "custom" ? resolvedHex : undefined);
   },
 }));

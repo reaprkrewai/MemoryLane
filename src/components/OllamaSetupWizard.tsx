@@ -108,26 +108,43 @@ export function OllamaSetupWizard({ isOpen, onClose }: OllamaSetupWizardProps) {
                 Your AI stays private
               </h2>
               <p className="text-text-secondary text-sm leading-relaxed">
-                Ollama runs AI models locally on your computer. All your journal
-                entries stay on your device — no cloud, no tracking, no data
-                leaving your computer.
+                Chronicle AI offers two ways to use AI — both keeping your data
+                private. Choose the option that works best for you.
               </p>
             </div>
 
             <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
               <p className="text-sm text-text">
-                <strong>Why local AI?</strong> We believe your personal thoughts
-                are yours alone. That's why Chronicle AI processes everything
-                right here on your device.
+                <strong>Option 1: Built-in AI (Recommended)</strong>
               </p>
+              <p className="text-xs text-text-secondary mt-2">
+                AI runs directly in Chronicle with no setup. Download the model
+                once (~2GB) and everything works offline.
+              </p>
+              <button
+                onClick={() => {
+                  useAIStore.setState({ aiBackend: "embedded" });
+                  handleClose();
+                }}
+                className="mt-3 w-full px-3 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors font-medium text-sm"
+              >
+                Use Built-in AI
+              </button>
             </div>
 
-            <div>
+            <div className="bg-surface-secondary border border-border rounded-lg p-4">
+              <p className="text-sm text-text">
+                <strong>Option 2: External Ollama</strong>
+              </p>
+              <p className="text-xs text-text-secondary mt-2">
+                Run your own Ollama installation for more control and flexibility.
+                Great for power users.
+              </p>
               <a
                 href="https://ollama.com/download"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors font-medium text-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 mt-3 bg-accent/10 text-accent hover:bg-accent/20 border border-accent/30 rounded-lg transition-colors font-medium text-sm"
               >
                 Download Ollama
                 <ExternalLink size={14} />

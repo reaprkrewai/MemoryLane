@@ -10,10 +10,7 @@
  */
 
 import { semanticSearch } from "./vectorSearchService";
-import {
-  checkOllamaHealth,
-  askQuestion as askQuestionOllama,
-} from "../lib/ollamaService";
+import * as hybridAI from "../lib/hybridAIService";
 
 interface RetrievedEntry {
   id: string;
@@ -87,11 +84,11 @@ function buildContextString(entries: RetrievedEntry[]): string {
  * Ask a natural language question about journal entries.
  * Implements full RAG pipeline:
  *
- * 1. Check LLM availability via Ollama health check
+ * 1. Check LLM availability via hybrid AI health check (embedded or Ollama)
  * 2. If unavailable, return helpful error message
  * 3. Retrieve top K similar entries using semantic search (K=5-10)
  * 4. Build augmented prompt with entry context
- * 5. Send to Ollama LLM with system + user prompts
+ * 5. Send to active LLM backend with system + user prompts
  * 6. Parse response for [Entry ID] citations
  * 7. Return { answer, citedEntryIds }
  *
@@ -105,12 +102,12 @@ export async function askQuestion(
   retrievedEntries?: RetrievedEntry[]
 ): Promise<QAResult> {
   // Step 1: Check LLM availability
-  const health = await checkOllamaHealth();
+  const health = await hybridAI.checkAIHealth();
 
   if (!health.available || !health.llm) {
     return {
       answer:
-        "Q&A requires a local LLM model. Please install Ollama and pull llama2:7b to use this feature. Visit ollama.com/download for setup instructions.",
+        "Q&A requires an AI model to be running. Please download the built-in AI model in Settings, or set up Ollama at ollama.com.",
       citedEntryIds: [],
     };
   }
@@ -145,12 +142,13 @@ export async function askQuestion(
   // Step 4: Build augmented prompt
   const contextString = buildContextString(entries);
 
-  // Step 5: Call LLM
+  // Step 5: Call LLM via hybrid service
   try {
-    const llmResult = await askQuestionOllama(question, contextString);
+    const llmResult = await hybridAI.askQuestion(question, contextString);
 
     // Step 6: Parse citations from response
-    const citedEntryIds = parseCitations(llmResult.answer);
+    // Note: hybridAIService already parses citations and returns them
+    const citedEntryIds = llmResult.citations;
 
     // Step 7: Return result
     return {

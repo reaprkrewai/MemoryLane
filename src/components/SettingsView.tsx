@@ -5,10 +5,12 @@ import { useUiStore } from "../stores/uiStore";
 import { useAIStore } from "../stores/aiStore";
 import { useDataExport } from "../hooks/useDataExport";
 import { useExportFile } from "../hooks/useExportFile";
-import { checkOllamaHealth } from "../lib/ollamaService";
+import * as hybridAI from "../lib/hybridAIService";
+import { saveAIBackendPreference } from "../utils/aiSettingsService";
 import { createExportZip } from "../utils/zipUtils";
 import { SettingRow } from "./SettingRow";
 import { OllamaSetupWizard } from "./OllamaSetupWizard";
+import { EmbeddedAISetup } from "./EmbeddedAISetup";
 import { PRESETS } from "../lib/paletteData";
 
 // --- Shared option button ---
@@ -278,6 +280,8 @@ function SecuritySection() {
 
 // --- AI Features Section ---
 function AIFeaturesSection() {
+  const aiBackend = useAIStore((s) => s.aiBackend);
+  const setAiBackend = useAIStore((s) => s.setAIBackend);
   const available = useAIStore((s) => s.available);
   const embedding = useAIStore((s) => s.embedding);
   const llm = useAIStore((s) => s.llm);
@@ -287,7 +291,7 @@ function AIFeaturesSection() {
   const handleCheckAgain = async () => {
     setIsChecking(true);
     try {
-      const health = await checkOllamaHealth();
+      const health = await hybridAI.checkAIHealth();
       useAIStore.setState({
         available: health.available,
         embedding: health.embedding,
@@ -297,10 +301,10 @@ function AIFeaturesSection() {
       if (health.available) {
         toast.success("AI features enabled!");
       } else {
-        toast.error("Ollama not detected. Please check your installation.");
+        toast.error("AI backend not detected. Please check your setup.");
       }
     } catch (err) {
-      toast.error("Failed to check Ollama status");
+      toast.error("Failed to check AI status");
       console.error("Health check error:", err);
     } finally {
       setIsChecking(false);
@@ -311,80 +315,152 @@ function AIFeaturesSection() {
     useAIStore.setState({ showSetupWizard: true });
   };
 
+  const handleBackendChange = async (newBackend: "embedded" | "ollama") => {
+    setAiBackend(newBackend);
+
+    // Persist the preference to database
+    await saveAIBackendPreference(newBackend);
+
+    toast.info("Backend changed. Re-indexing will happen automatically on next use.");
+  };
+
   return (
     <section>
       <SectionHeader icon={<Sparkles size={16} />} title="AI Features" />
       <div className="border-t border-border">
-        {/* Status display */}
+        {/* Backend selector */}
         <SettingRow
-          label="Status"
-          description="AI features availability"
+          label="AI Backend"
+          description="Choose where AI models run"
         >
-          <div className="flex items-center gap-2">
-            {status === "checking" ? (
-              <>
-                <Loader2 size={16} className="text-text-muted animate-spin" />
-                <span className="text-sm text-text-muted">Checking...</span>
-              </>
-            ) : available ? (
-              <>
-                <Check size={16} className="text-green-600" />
-                <span className="text-sm text-text">Available</span>
-              </>
-            ) : (
-              <>
-                <Circle size={16} className="text-text-muted" />
-                <span className="text-sm text-text-muted">Offline</span>
-              </>
-            )}
+          <div className="flex gap-2">
+            <OptionButton
+              label="Built-in AI"
+              selected={aiBackend === "embedded"}
+              onClick={() => handleBackendChange("embedded")}
+            />
+            <OptionButton
+              label="External Ollama"
+              selected={aiBackend === "ollama"}
+              onClick={() => handleBackendChange("ollama")}
+            />
           </div>
         </SettingRow>
 
         <div className="border-t border-border/50" />
 
-        {/* Embedding model status */}
-        <SettingRow
-          label="Embedding model"
-          description="nomic-embed-text for semantic search"
-        >
-          <div className="flex items-center gap-2">
-            {embedding ? (
-              <>
-                <Check size={16} className="text-green-600" />
-                <span className="text-sm text-text">Found</span>
-              </>
-            ) : (
-              <>
-                <Circle size={16} className="text-text-muted" />
-                <span className="text-sm text-text-muted">Missing</span>
-              </>
-            )}
-          </div>
-        </SettingRow>
+        {/* Embedded AI section */}
+        {aiBackend === "embedded" && (
+          <>
+            {/* Download model UI */}
+            <EmbeddedAISetup />
 
-        <div className="border-t border-border/50" />
+            <div className="border-t border-border/50" />
 
-        {/* LLM model status */}
-        <SettingRow
-          label="LLM model"
-          description="llama2:7b for Q&A"
-        >
-          <div className="flex items-center gap-2">
-            {llm ? (
-              <>
-                <Check size={16} className="text-green-600" />
-                <span className="text-sm text-text">Found</span>
-              </>
-            ) : (
-              <>
-                <Circle size={16} className="text-text-muted" />
-                <span className="text-sm text-text-muted">Missing</span>
-              </>
-            )}
-          </div>
-        </SettingRow>
+            {/* Status display */}
+            <SettingRow
+              label="Status"
+              description="Embedded AI server status"
+            >
+              <div className="flex items-center gap-2">
+                {status === "checking" ? (
+                  <>
+                    <Loader2 size={16} className="text-text-muted animate-spin" />
+                    <span className="text-sm text-text-muted">Checking...</span>
+                  </>
+                ) : available ? (
+                  <>
+                    <Check size={16} className="text-green-600" />
+                    <span className="text-sm text-text">Running</span>
+                  </>
+                ) : (
+                  <>
+                    <Circle size={16} className="text-text-muted" />
+                    <span className="text-sm text-text-muted">Not Running</span>
+                  </>
+                )}
+              </div>
+            </SettingRow>
 
-        <div className="border-t border-border/50" />
+            <div className="border-t border-border/50" />
+          </>
+        )}
+
+        {/* Ollama section */}
+        {aiBackend === "ollama" && (
+          <>
+            {/* Status display */}
+            <SettingRow
+              label="Status"
+              description="Ollama connection status"
+            >
+              <div className="flex items-center gap-2">
+                {status === "checking" ? (
+                  <>
+                    <Loader2 size={16} className="text-text-muted animate-spin" />
+                    <span className="text-sm text-text-muted">Checking...</span>
+                  </>
+                ) : available ? (
+                  <>
+                    <Check size={16} className="text-green-600" />
+                    <span className="text-sm text-text">Available</span>
+                  </>
+                ) : (
+                  <>
+                    <Circle size={16} className="text-text-muted" />
+                    <span className="text-sm text-text-muted">Offline</span>
+                  </>
+                )}
+              </div>
+            </SettingRow>
+
+            <div className="border-t border-border/50" />
+
+            {/* Embedding model status */}
+            <SettingRow
+              label="Embedding model"
+              description="nomic-embed-text for semantic search"
+            >
+              <div className="flex items-center gap-2">
+                {embedding ? (
+                  <>
+                    <Check size={16} className="text-green-600" />
+                    <span className="text-sm text-text">Found</span>
+                  </>
+                ) : (
+                  <>
+                    <Circle size={16} className="text-text-muted" />
+                    <span className="text-sm text-text-muted">Missing</span>
+                  </>
+                )}
+              </div>
+            </SettingRow>
+
+            <div className="border-t border-border/50" />
+
+            {/* LLM model status */}
+            <SettingRow
+              label="LLM model"
+              description="llama2:7b for Q&A"
+            >
+              <div className="flex items-center gap-2">
+                {llm ? (
+                  <>
+                    <Check size={16} className="text-green-600" />
+                    <span className="text-sm text-text">Found</span>
+                  </>
+                ) : (
+                  <>
+                    <Circle size={16} className="text-text-muted" />
+                    <span className="text-sm text-text-muted">Missing</span>
+                  </>
+                )}
+              </div>
+            </SettingRow>
+
+            <div className="border-t border-border/50" />
+          </>
+        )}
 
         {/* Why local AI explanation */}
         <div className="px-6 py-4 bg-surface-secondary/50 rounded-lg border border-border/50">
@@ -397,7 +473,7 @@ function AIFeaturesSection() {
         <div className="border-t border-border/50 mt-4" />
 
         {/* Action buttons */}
-        <SettingRow label="Setup" description="Configure AI features">
+        <SettingRow label="Actions" description="Check status or configure">
           <div className="flex gap-2 flex-wrap justify-end">
             <button
               onClick={handleCheckAgain}
@@ -410,16 +486,18 @@ function AIFeaturesSection() {
                   Checking...
                 </>
               ) : (
-                "Check Again"
+                "Check Status"
               )}
             </button>
-            <button
-              onClick={handleSetupGuide}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-label rounded-md border border-border text-muted hover:border-accent/50 hover:text-text transition-colors font-medium"
-            >
-              Setup Guide
-              <ChevronRight size={14} />
-            </button>
+            {aiBackend === "ollama" && (
+              <button
+                onClick={handleSetupGuide}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-label rounded-md border border-border text-muted hover:border-accent/50 hover:text-text transition-colors font-medium"
+              >
+                Setup Guide
+                <ChevronRight size={14} />
+              </button>
+            )}
           </div>
         </SettingRow>
       </div>
