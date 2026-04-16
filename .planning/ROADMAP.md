@@ -13,7 +13,7 @@
 - [x] **Phase 3: Timeline & Calendar** — Browsing all entries chronologically and by month (completed 2026-04-11)
 - [x] **Phase 4: Search & Discovery** — Full-text search, multi-filter, and On This Day (completed 2026-04-11)
 - [x] **Phase 5: Media, Security & Settings** — Photo attachments, app lock, theme/font, and export (completed 2026-04-14)
-- [ ] **Phase 6: AI Features** — Semantic search, Q&A, and Ollama setup (ready to execute)
+- [x] **Phase 6: AI Features** — Semantic search, Q&A, and Ollama setup (completed 2026-04-14)
 
 ---
 
@@ -112,12 +112,12 @@ Plans:
   3. If Ollama is running on localhost:11434 → semantic search + Q&A are available; if not running → search gracefully falls back to keyword-only, Q&A disabled with helpful message
   4. On first semantic search attempt without Ollama, a guided setup wizard appears with clear, non-technical instructions for installing Ollama and the embedding model
   5. All inference is local (vector embeddings, LLM completion) — no entries, embeddings, or questions ever leave the device
-**Plans:** 4/4 plans created
+**Plans:** 4/4 plans complete
 Plans:
-- [ ] 06-01-PLAN.md — Ollama service client, embedding generation, AI state store
-- [ ] 06-02-PLAN.md — Vector search UI, semantic similarity ranking, graceful fallback
-- [ ] 06-03-PLAN.md — Q&A engine with RAG pipeline, citation extraction, answer grounding
-- [ ] 06-04-PLAN.md — Ollama setup wizard, settings integration, health check UI
+- [x] 06-01-PLAN.md — Ollama service client, embedding generation, AI state store
+- [x] 06-02-PLAN.md — Vector search UI, semantic similarity ranking, graceful fallback
+- [x] 06-03-PLAN.md — Q&A engine with RAG pipeline, citation extraction, answer grounding
+- [x] 06-04-PLAN.md — Ollama setup wizard, settings integration, health check UI
 **UI hint**: yes
 
 ---
@@ -148,8 +148,8 @@ Plans:
 | 3. Timeline & Calendar | 3/3 | Complete | 2026-04-11 |
 | 4. Search & Discovery | 3/3 | Complete | 2026-04-11 |
 | 5. Media, Security & Settings | 4/4 | Complete | 2026-04-14 |
-| 6. AI Features | 0/4 | Planned | — |
+| 6. AI Features | 4/4 | Complete | 2026-04-14 |
 
 ---
 
-*Roadmap updated: 2026-04-14 — Phase 6 planning complete*
+*Roadmap updated: 2026-04-16 — Phase 6 execution complete (v1 MVP done)*

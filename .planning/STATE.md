@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: executing
-last_updated: "2026-04-14T01:30:00Z"
+milestone_name: v1 MVP
+status: complete
+last_updated: "2026-04-16T00:00:00Z"
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 17
-  completed_plans: 17
+  total_phases: 6
+  completed_phases: 6
+  total_plans: 21
+  completed_plans: 21
   percent: 100
 ---
 
@@ -16,7 +16,7 @@ progress:
 
 ## Current Phase
 
-Phase 5 — Media, Security & Settings (COMPLETE: 4/4 plans executed + gap remediation)
+Phase 6 — AI Features (COMPLETE: 4/4 plans executed + UAT passed) — v1 MVP complete
 
 ## Project Reference
 
@@ -32,23 +32,25 @@ See: .planning/PROJECT.md
 | 3 | Timeline & Calendar | Complete |
 | 4 | Search & Discovery | Complete (3/3 plans done) |
 | 5 | Media, Security & Settings | Complete (4/4 plans done) |
+| 6 | AI Features | Complete (4/4 plans done + UAT passed) |
 
 ## Current Position
 
-Phase: 5 (media-security-settings) — COMPLETE
+Phase: 6 (ai-features-semantic-search-q-a) — COMPLETE
 All Plans: 4 of 4 executed
+Milestone v1 MVP: COMPLETE — all 6 phases shipped
 
-- **Phase:** 5
-- **Plans:** 4/4 executed (05-01 PIN security, 05-02 photo attachments, 05-03 settings UI, 05-04 data export)
-- **Status:** Ready for verification & UAT
+- **Phase:** 6
+- **Plans:** 4/4 executed (06-01 Ollama client + embeddings, 06-02 vector search UI, 06-03 Q&A RAG engine, 06-04 setup wizard + settings)
+- **Status:** UAT passed (06-UAT.md: all 6 test areas PASS, no blocking issues)
 - **Progress:** [██████████] 100%
 
 ## Performance Metrics
 
-- Phases complete: 4 / 5 (Phase 5 planned)
-- Plans created: 17 total (3 phase 1 + 3 phase 2 + 3 phase 3 + 3 phase 4 + 4 phase 5)
-- Plans executed: 13 (Phase 5 ready for execution)
-- Requirements shipped: EDIT-01–EDIT-08, TAG-01–TAG-04, TIME-01–TIME-07, CAL-01–CAL-04, SRCH-01–SRCH-06, OTD-01–OTD-02, AI-01–AI-03, SETT-03, SETT-04
+- Phases complete: 6 / 6 (v1 MVP done)
+- Plans created: 21 total (2 phase 1 + 3 phase 2 + 3 phase 3 + 3 phase 4 + 4 phase 5 + 4 phase 6)
+- Plans executed: 21
+- Requirements shipped: EDIT-01–EDIT-08, TAG-01–TAG-04, TIME-01–TIME-07, CAL-01–CAL-04, SRCH-01–SRCH-06, OTD-01–OTD-02, AI-01–AI-03, MEDIA-01–MEDIA-04, SEC-01–SEC-03, SETT-01–SETT-04, LLMAI-02–LLMAI-04
 
 ## Accumulated Context
 
@@ -95,25 +97,42 @@ All Plans: 4 of 4 executed
 - [Phase 05-04]: Photo reading uses convertFileSrc + fetch instead of @tauri-apps/plugin-fs — avoids Cargo.toml changes
 - [Phase 05-04]: SettingsView created in 05-04 (not 05-03) — 05-03 was executing in parallel and had not committed; 05-03 should extend/replace the appearance section placeholder
 - [Phase 05-04]: media_attachments table access wrapped in try/catch — graceful degradation if 05-02 table not yet created
+- [Phase 06-01]: Ollama health check uses 3-second timeout to prevent hanging; runs async at app startup, non-blocking
+- [Phase 06-01]: Vector storage uses L2-normalized embeddings; cosine similarity via dot product of normalized vectors
+- [Phase 06-02]: Search mode toggle (keyword vs AI) routes in searchStore — metadata filters applied before semantic search
+- [Phase 06-02]: Graceful fallback to keyword search when Ollama unavailable — no errors surfaced to user
+- [Phase 06-03]: RAG pipeline retrieves top-K similar entries before LLM call; system prompt enforces answer grounding
+- [Phase 06-03]: Citation extraction uses UUID regex on [Entry ID] format; deduplicated before display
+- [Phase 06-04]: Setup wizard triggered on AI mode selection when Ollama unavailable (not blocking, user-initiated)
+- [Phase 06-04]: Settings page AIFeaturesSection shows live status with "Check Again" button for non-blocking re-detection
 
 ### Todos
 
-- (none yet)
+- (none — v1 MVP shipped)
 
 ### Blockers
 
-- (none yet)
+- (none)
+
+### Known UX Issue (non-blocking, post-v1)
+
+- Built-in AI download fails with os error 216 ("not compatible with Windows version") — llama-server.exe from ggml-org/llama.cpp/b3920 release may be corrupted on download or require VC++ Redistributables. Workaround: use External Ollama backend. See src-tauri/src/llama.rs:221 for binary URL.
 
 ## Session Continuity
 
-Last action: Gap Remediation Execution (2026-04-14)
-- Implemented 05-01 (PIN Security): pinCrypto.ts, PinSetupScreen, PinEntryScreen, useIdleTimeout hook, app_lock DB table, App.tsx 6-state integration
-- Implemented 05-04 (Data Export): useDataExport hook, zipUtils, useExportFile, SettingsView integration, jszip dependency
-- All 11 Phase 5 requirements now fully implemented
-- UAT completed: 11/11 requirements verified ✅
-- Commit: 40f6ea6
+Last action: Phase 6 AI Features execution complete (2026-04-14)
+- Implemented 06-01 (Ollama infrastructure): ollamaService, embedding generation, aiStore with health checks
+- Implemented 06-02 (Vector search UI): semantic ranking, mode toggle, keyword fallback
+- Implemented 06-03 (Q&A engine): RAG pipeline, citation extraction, QAResultCard
+- Implemented 06-04 (Setup wizard): 3-step OllamaSetupWizard, SettingsView integration
+- UAT completed: 6/6 test areas PASS (06-UAT.md)
+- Commits: 0ecd624 (06-01), 0ce34d3 (06-02), 81ebb89/fa61c7a/76c1783 (06-03), 6fe8ebc (06-04), 6b1ee1a (UAT)
 
-Next action: Project completion/wrap-up preparation
+Next action: Archive milestone v1.0 (/gsd-complete-milestone) or begin v1.1 planning
+
+---
+
+*Milestone v1 MVP complete: 6 phases, 21 plans, 45 requirements shipped. Ready for archival.*
 
 ---
 *State initialized: 2026-04-09*
