@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type ActiveView = "timeline" | "editor" | "calendar" | "search" | "settings";
+export type ActiveView = "overview" | "timeline" | "editor" | "calendar" | "search" | "settings";
 export type NavigateSource = "timeline" | "sidebar" | null;
 
 interface ViewState {
@@ -17,7 +17,7 @@ interface ViewState {
 }
 
 export const useViewStore = create<ViewState>((set) => ({
-  activeView: "timeline",
+  activeView: "overview",
   navigateSource: null,
   dateFilter: null,
   timelineScrollY: 0,

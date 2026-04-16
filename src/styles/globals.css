@@ -64,26 +64,47 @@
   }
 
   .dark {
-    /* Premium Dark Mode Palette - Warm, not harsh */
-    --color-bg: #0F0E0D;
-    --color-surface: #1A1815;
-    --color-surface-secondary: #252320;
-    --color-accent: #F59E0B;
-    --color-accent-soft: #78350F;
-    --color-text: #F5F3F0;
-    --color-text-secondary: #D1D5DB;
-    --color-text-muted: #9CA3AF;
-    --color-border: #2D2A27;
-    --color-border-subtle: #3F3B37;
-    --color-success: #10B981;
-    --color-warning: #F59E0B;
-    --color-destructive: #FF6B6B;
+    /* Chronicle Night — purple/violet brand (v1.1 overhaul) */
+    --color-bg: #0A0A0D;
+    --color-surface: #141418;
+    --color-surface-secondary: #1A1A22;
+    --color-surface-elevated: #22222D;
 
-    /* Dark mode shadows — softer than light */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.5);
-    --shadow-elevated: 0 20px 40px rgba(0, 0, 0, 0.6);
+    /* Primary brand — violet with warm undertone */
+    --color-primary: #8B7FFF;
+    --color-primary-glow: #7C6DFF;
+    --color-primary-soft: rgba(139, 127, 255, 0.12);
+    --color-primary-border: rgba(139, 127, 255, 0.24);
+
+    /* Back-compat: existing components reading --color-accent get the new brand */
+    --color-accent: #8B7FFF;
+    --color-accent-soft: rgba(139, 127, 255, 0.14);
+
+    --color-text: #F5F4FA;
+    --color-text-secondary: rgba(245, 244, 250, 0.68);
+    --color-text-muted: rgba(245, 244, 250, 0.44);
+    --color-border: #24242E;
+    --color-border-subtle: #1E1E27;
+    --color-success: #34D399;
+    --color-warning: #F5A623;
+    --color-destructive: #FF7A7A;
+
+    /* Stat tile accents — tuned for dark violet context */
+    --stat-blue: #5EA2FF;
+    --stat-blue-soft: rgba(94, 162, 255, 0.14);
+    --stat-violet: #B4A6FF;
+    --stat-violet-soft: rgba(180, 166, 255, 0.14);
+    --stat-amber: #F5B041;
+    --stat-amber-soft: rgba(245, 176, 65, 0.14);
+    --stat-emerald: #4ADE9B;
+    --stat-emerald-soft: rgba(74, 222, 155, 0.14);
+
+    /* Dark mode shadows — softer than light, with violet tint on elevated */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.6);
+    --shadow-elevated: 0 20px 40px rgba(0, 0, 0, 0.7);
+    --shadow-glow: 0 8px 32px rgba(124, 109, 255, 0.24);
 
     /* shadcn/ui dark tokens */
     --background: oklch(0.141 0.004 60);
@@ -128,7 +149,7 @@
     scroll-behavior: smooth;
   }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
     font-feature-settings: "ss01", "cv11";
     background-color: var(--color-bg);
     color: var(--color-text);
@@ -136,6 +157,44 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
+
+  /* Subtle ambient glow in top-right of dark mode — barely perceptible atmosphere */
+  .dark body::before {
+    content: "";
+    position: fixed;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(124, 109, 255, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* Display serif — distinctive, warm, editorial. Used for greetings + stat numerals. */
+.font-display {
+  font-family: "Fraunces", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-feature-settings: "ss01", "lnum", "tnum";
+}
+
+.font-display-italic {
+  font-family: "Fraunces", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-style: italic;
+  font-feature-settings: "ss01", "lnum";
+}
+
+/* Tabular numerals for stat readouts — aligned columns at a glance */
+.font-tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum", "lnum";
+}
+
+/* Small caps utility for stat labels */
+.text-small-caps {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.14em;
+  font-weight: 500;
 }
 
 /* Font scale classes — applied to :root by uiStore.applyFontScale() */
