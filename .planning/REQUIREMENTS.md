@@ -234,12 +234,56 @@ Requirements for milestone v1.1. Goal: turn the working MVP into a habit-forming
 | AI-01 | Phase 1 | Complete |
 | AI-02 | Phase 1 | Complete |
 | AI-03 | Phase 1 | Complete |
+| FOUND-01 | Phase 7 | Pending |
+| FOUND-02 | Phase 7 | Pending |
+| FOUND-03 | Phase 7 | Pending |
+| FOUND-04 | Phase 7 | Pending |
+| DASH-01 | Phase 8 | Pending |
+| DASH-02 | Phase 8 | Pending |
+| DASH-03 | Phase 8 | Pending |
+| DASH-04 | Phase 8 | Pending |
+| DASH-05 | Phase 8 | Pending |
+| DASH-06 | Phase 8 | Pending |
+| DASH-07 | Phase 8 | Pending |
+| DASH-08 | Phase 8 | Pending |
+| DASH-09 | Phase 8 | Pending |
+| DASH-10 | Phase 8 | Pending |
+| DASH-11 | Phase 8 | Pending |
+| DASH-12 | Phase 8 | Pending |
+| DASH-13 | Phase 8 | Pending |
+| DASH-14 | Phase 8 | Pending |
+| ONBRD-01 | Phase 9 | Pending |
+| ONBRD-02 | Phase 9 | Pending |
+| ONBRD-03 | Phase 9 | Pending |
+| ONBRD-04 | Phase 9 | Pending |
+| ONBRD-05 | Phase 9 | Pending |
+| ONBRD-06 | Phase 9 | Pending |
+| ONBRD-07 | Phase 9 | Pending |
+| AUTOTAG-01 | Phase 10 | Pending |
+| AUTOTAG-02 | Phase 10 | Pending |
+| AUTOTAG-03 | Phase 10 | Pending |
+| AUTOTAG-04 | Phase 10 | Pending |
+| AUTOTAG-05 | Phase 10 | Pending |
+| AUTOTAG-06 | Phase 10 | Pending |
+| AUTOTAG-07 | Phase 10 | Pending |
+| ANIM-01 | Phase 11 | Pending |
+| ANIM-02 | Phase 11 | Pending |
+| ANIM-03 | Phase 11 | Pending |
+| ANIM-04 | Phase 11 | Pending |
+| ANIM-05 | Phase 11 | Pending |
+| ANIM-06 | Phase 11 | Pending |
+| TAGUX-01 | Phase 11 | Pending |
+| TAGUX-02 | Phase 11 | Pending |
+| TAGUX-03 | Phase 11 | Pending |
+| TAGUX-04 | Phase 11 | Pending |
+| TAGUX-05 | Phase 11 | Pending |
+| TAGUX-06 | Phase 11 | Pending |
+| TAGUX-07 | Phase 11 | Pending |
 
 **Coverage:**
-- v1 requirements: 45 total
-- Mapped to phases: 45
-- Unmapped: 0
+- v1 requirements: 45 total — mapped to phases: 45, unmapped: 0
+- v1.1 requirements: 45 total — mapped to phases: 45, unmapped: 0
 
 ---
 *Requirements defined: 2026-04-09*
-*Last updated: 2026-04-09 after roadmap creation*
+*Last updated: 2026-04-16 after v1.1 Daily Driver roadmap creation (phases 7-11 added)*

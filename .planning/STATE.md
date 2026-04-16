@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Daily Driver
-status: defining_requirements
+status: roadmap_complete
 last_updated: "2026-04-16T00:00:00Z"
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -16,29 +16,72 @@ progress:
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 7 (Foundation & Derived State) — not started
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-16 — Milestone v1.1 Daily Driver started
+Status: Roadmap complete; ready to plan Phase 7
+Last activity: 2026-04-16 — ROADMAP.md updated with v1.1 Daily Driver phases 7-11
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** A journaling app where you can eventually have AI understand your entries — and none of it ever touches the internet.
 
+## Milestone v1.1 Scope
+
+**Phases 7-11 (5 phases, 45 requirements):**
+
+- [ ] **Phase 7: Foundation & Derived State** — FOUND-01..04 (derived selectors, getEntryStats SQL aggregate, local_date column, animations.css with reduced-motion stanza, ColorGrid primitive)
+- [ ] **Phase 8: Home Dashboard & Widgets** — DASH-01..14 (Overview as default, 4 stat cards, mood trends, On This Day, recent feed, Quick-Write FAB with Ctrl/Cmd+N, writing prompts, AI insights)
+- [ ] **Phase 9: First-Run Onboarding** — ONBRD-01..07 (3-step welcome, SQLite-persisted completion, auto-skip existing users, replay from Settings, data-onboarding attributes)
+- [ ] **Phase 10: Auto-Tagging AI Pipeline** — AUTOTAG-01..07 (sparkle button, hybridAIService routing, JSON-Schema format constraint, ghost-chip accept/dismiss, off by default)
+- [ ] **Phase 11: Microinteractions & Tag Management** — ANIM-01..06, TAGUX-01..07 (stagger-in, pop-in, scale, spring feedback, crossfade; 12-color dual-tone palette, Tag Management view)
+
 ## Phase Status
 
-(Phases will be created by the roadmapper for milestone v1.1.)
+| Phase | Status | Plans |
+|-------|--------|-------|
+| 7. Foundation & Derived State | Not started | TBD |
+| 8. Home Dashboard & Widgets | Not started | TBD |
+| 9. First-Run Onboarding | Not started | TBD |
+| 10. Auto-Tagging AI Pipeline | Not started | TBD |
+| 11. Microinteractions & Tag Management | Not started | TBD |
 
 ## Performance Metrics
 
-- v1.0 shipped: 6 phases, 21 plans, 45 requirements (archived context below)
-- v1.1 phases: pending roadmap
-- v1.1 plans: pending
+- v1.0 shipped: 6 phases, 21 plans, 45 requirements (archived)
+- v1.1 phases: 5 (phases 7-11)
+- v1.1 plans: TBD (pending per-phase planning)
+- v1.1 requirements: 45 mapped, 0 orphaned
 
 ## Accumulated Context
 
-### Decisions (carried over from v1.0)
+### Decisions for v1.1 (from research)
+
+**Stack (from STACK.md):**
+- Zero new runtime deps preferred — Tailwind + `tailwindcss-animate` already present for all microinteractions
+- Custom SVG (~30-50 lines) for mood trends chart — NOT Recharts (bundle bloat + React 19 friction)
+- Radix Popover for onboarding tour — NOT react-joyride/shepherd (inline-style / DOM-coupling issues)
+- `date-fns@4.1.0` already present — all needed helpers available
+- Extend `src/lib/ollamaService.ts` with `generateTagSuggestions()` using Ollama `format` JSON Schema against `llama3.2:3b`
+- `motion@12.x` (ex-Framer Motion) kept as optional fallback — only if CSS can't express a specific interaction
+
+**Architecture (from ARCHITECTURE.md):**
+- NO new stores for v1.1 — dashboard reads `entryStore.allEntries` via derived primitive selectors
+- Auto-tagging is one-shot via `hybridAIService` — NEVER call `ollamaService` directly from new code
+- Onboarding tri-state on `uiStore` (`isOnboardingCompleted: boolean | null`) — mirrors v1.0 `isPinSet` pattern
+- OnboardingOverlay rendered at App.tsx level (above AppShell) — must overlay SettingsView too
+- Tag `color` column + `TAG_COLORS` + `updateTagColor` + TagPill Popover picker ALREADY SHIPPED in v1.0 — v1.1 is polish + Tag Management surface
+- OnThisDay backend already shipped — reuse component AS-IS on dashboard
+
+**Pitfalls to prevent (from PITFALLS.md — must bake into Phase 7):**
+- **C1 Dashboard re-render storm:** widgets must NOT subscribe to `allEntries` — use derived primitive selectors (prevent thrashing during 500ms auto-save)
+- **C2 N+1 dashboard queries:** single view-level SQL aggregate via `getEntryStats()` — NOT per-widget useEffect fetches
+- **C3 Streak TZ/DST bug:** `local_date TEXT` column written at entry creation + streak computed in SQL — NOT browser-local `startOfDay`
+- **C4 Auto-tag hallucination:** JSON-Schema enum constraint + cap 3 suggestions + always preview + off by default
+- **C5 Onboarding fragility:** persist in SQLite `settings` (NOT localStorage); auto-skip users with entries; `data-onboarding` attributes (NOT CSS selectors); "Replay tour" in Settings
+- **I2 Motion a11y/battery:** `@media (prefers-reduced-motion: reduce)` stanza in animations.css — verified in FOUND-04
+
+### Decisions carried over from v1.0
 
 - Granularity: Coarse (4-6 phases) — requirement clusters
 - Tailwind v3 pinned (shadcn/ui v2.3.0 requires Tailwind v3; v4 breaks component compatibility)
@@ -73,9 +116,19 @@ See: .planning/PROJECT.md
 - Citation extraction uses UUID regex on `[Entry ID]` format; deduplicated before display
 - Setup wizard triggered on AI mode selection when Ollama unavailable (non-blocking)
 
+### Open Questions for Planner (from SUMMARY.md)
+
+- Retain `MoodOverview.tsx` (30-day constellation) alongside new `MoodTrends.tsx`? — **Decided: keep both** (DASH-04 + DASH-05 require both as complementary lenses)
+- AI insights summary shape — weekly/monthly/top-moods? — weekly (DASH-12 scope)
+- Writing prompt library content — copywriting task, not technical
+- Ollama version compat for `format` JSON-Schema (requires 0.5+) — UX for older installs; decide in Phase 10 planning
+- `motion@12.x` trigger — default NO; re-evaluate at Phase 11 kickoff
+
 ### Todos
 
-- (none — v1.1 planning in progress)
+- Plan Phase 7 (Foundation & Derived State) — unblocks all downstream work
+- Phase 10 flagged HIGH research — recommend `/gsd-research-phase` at planning time for prompt engineering
+- Finalize writing prompt library copywriting (60+ prompts) during Phase 8 planning
 
 ### Blockers
 
@@ -96,13 +149,10 @@ See: .planning/PROJECT.md
 
 ## Session Continuity
 
-Last action: Milestone v1.1 "Daily Driver" started (2026-04-16)
-- v1.0 MVP complete: 6 phases, 21 plans, 45 requirements shipped
-- WIP dashboard components committed as checkpoint (commit b9af497)
-- Phase 6 completion docs committed (commit 9636fbe)
+Last action: ROADMAP.md updated with v1.1 Daily Driver milestone (phases 7-11, 45 requirements, 100% coverage) — 2026-04-16
 
-Next action: Define v1.1 requirements → create roadmap
+Next action: `/gsd-plan-phase 7` to decompose Foundation & Derived State into executable plans
 
 ---
 
-*Milestone v1.1 Daily Driver: scope gathered, PROJECT.md updated, STATE.md reset. Requirements next.*
+*Milestone v1.1 Daily Driver: roadmap complete. Phases 7-11 defined with dependency chain Foundation → Dashboard → {Onboarding, Auto-Tag} → Polish+Tag UX. Ready for phase planning.*
