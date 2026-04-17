@@ -184,11 +184,11 @@ Plans:
   5. `src/components/ui/ColorGrid.tsx` renders an accessible swatch grid usable by both TagPill and the future Tag Management view; keyboard-navigable with focus-visible rings
 **Plans**: 5/5 plans defined
 Plans:
-- [ ] 07-01-PLAN.md — FOUND-03 schema migration (local_date column DDL + PRAGMA-guarded ALTER + backfill + index)
-- [ ] 07-02-PLAN.md — FOUND-04 motion tokens + animations.css keyframes + global reduced-motion guard + tailwind utilities + main.tsx import
+- [x] 07-01-PLAN.md — FOUND-03 schema migration (local_date column DDL + PRAGMA-guarded ALTER + backfill + index)
+- [x] 07-02-PLAN.md — FOUND-04 motion tokens + animations.css keyframes + global reduced-motion guard + tailwind utilities + main.tsx import
 - [ ] 07-03-PLAN.md — FOUND-02 dbQueries.ts::getEntryStats() SQL aggregate (TZ-safe streak via local_date)
 - [ ] 07-04-PLAN.md — FOUND-01 entryStore derived selectors + FOUND-03 D-11 createEntry local_date INSERT + OverviewView refactor
-- [ ] 07-05-PLAN.md — TAGUX-01 ColorGrid primitive + TagPill refactor (pure refactor, pixel-identical)
+- [x] 07-05-PLAN.md — TAGUX-01 ColorGrid primitive + TagPill refactor (pure refactor, pixel-identical)
 **UI hint**: yes
 
 ### Phase 8: Home Dashboard & Widgets
