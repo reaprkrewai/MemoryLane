@@ -162,6 +162,23 @@ export async function initializeDatabase(): Promise<void> {
     await db.execute(stmt);
   }
 
+  // FOUND-03 D-08/D-09 — guarded ALTER for upgrade installs.
+  // CREATE TABLE IF NOT EXISTS above handles fresh installs (local_date in DDL).
+  // Existing v1.0 DBs need ALTER + backfill, which is not idempotent — guard it.
+  const cols = await db.select<{ name: string }[]>("PRAGMA table_info(entries)");
+  const hasLocalDate = cols.some((c) => c.name === "local_date");
+  if (!hasLocalDate) {
+    await db.execute("ALTER TABLE entries ADD COLUMN local_date TEXT");
+    // D-09 — synchronous backfill from created_at (UTC day, best-effort per D-10).
+    // Pre-migration entries near UTC midnight may be off by ±1 calendar day.
+    await db.execute(
+      "UPDATE entries SET local_date = strftime('%Y-%m-%d', created_at/1000, 'unixepoch') WHERE local_date IS NULL"
+    );
+    if (import.meta.env.DEV) {
+      console.log("[db] Migrated entries.local_date column + backfilled existing rows");
+    }
+  }
+
   // Verify tables were created (development diagnostic — safe in production)
   if (import.meta.env.DEV) {
     const tables = await db.select<{ name: string }[]>(
