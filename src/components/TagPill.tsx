@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { X, Check } from "lucide-react";
+import { X } from "lucide-react";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "./ui/popover";
+import { ColorGrid } from "./ui/ColorGrid";
 import { TAG_COLORS } from "../stores/tagStore";
 
 interface TagPillProps {
@@ -57,28 +58,13 @@ export function TagPill({ tag, onRemove, onColorChange }: TagPillProps) {
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-3" onClick={(e) => e.stopPropagation()}>
-        <div className="grid grid-cols-5 gap-2">
-          {TAG_COLORS.map((color) => (
-            <button
-              key={color}
-              type="button"
-              className="relative flex h-6 w-6 items-center justify-center rounded-md transition-transform hover:scale-110"
-              style={{ backgroundColor: color }}
-              onClick={() => handleColorSelect(color)}
-              aria-label={`Select color ${color}`}
-            >
-              {tag.color === color && (
-                <Check
-                  size={14}
-                  style={{
-                    color: "#ffffff",
-                    strokeWidth: 3,
-                  }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
+        <ColorGrid
+          colors={[...TAG_COLORS]}
+          selected={tag.color}
+          onSelect={handleColorSelect}
+          ariaLabel={`Color for tag ${tag.name}`}
+          cols={5}
+        />
       </PopoverContent>
     </Popover>
   );
