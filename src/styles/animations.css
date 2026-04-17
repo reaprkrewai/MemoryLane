@@ -1,0 +1,26 @@
+/* Phase 7 FOUND-04 — shared keyframes for v1.1 microinteractions.
+ * Imported once from src/main.tsx after globals.css.
+ * Tokens (--motion-fast/med/slow, --ease-*) live in globals.css :root.
+ * Reduced-motion guard is in globals.css and covers everything below. */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop-in {
+  0%   { opacity: 0; transform: scale(0.92); }
+  60%  { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Stagger utility — children opt in by setting --i: <index>.
+ * Per D-17 this is a delay-container pattern, not its own keyframe. */
+.stagger-children > * {
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
