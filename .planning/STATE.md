@@ -1,15 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Daily Driver
-status: roadmap_complete
-last_updated: "2026-04-16T00:00:00Z"
+milestone: v1.0
+milestone_name: MVP
+status: planning
+last_updated: "2026-04-17T11:56:35.109Z"
+last_activity: 2026-04-16 — ROADMAP.md updated with v1.1 Daily Driver phases 7-11
 progress:
-  total_phases: 5
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 11
+  completed_phases: 6
+  total_plans: 21
+  completed_plans: 23
+  percent: 100
 ---
 
 # Project State: Chronicle AI
@@ -58,6 +59,7 @@ See: .planning/PROJECT.md
 ### Decisions for v1.1 (from research)
 
 **Stack (from STACK.md):**
+
 - Zero new runtime deps preferred — Tailwind + `tailwindcss-animate` already present for all microinteractions
 - Custom SVG (~30-50 lines) for mood trends chart — NOT Recharts (bundle bloat + React 19 friction)
 - Radix Popover for onboarding tour — NOT react-joyride/shepherd (inline-style / DOM-coupling issues)
@@ -66,6 +68,7 @@ See: .planning/PROJECT.md
 - `motion@12.x` (ex-Framer Motion) kept as optional fallback — only if CSS can't express a specific interaction
 
 **Architecture (from ARCHITECTURE.md):**
+
 - NO new stores for v1.1 — dashboard reads `entryStore.allEntries` via derived primitive selectors
 - Auto-tagging is one-shot via `hybridAIService` — NEVER call `ollamaService` directly from new code
 - Onboarding tri-state on `uiStore` (`isOnboardingCompleted: boolean | null`) — mirrors v1.0 `isPinSet` pattern
@@ -74,6 +77,7 @@ See: .planning/PROJECT.md
 - OnThisDay backend already shipped — reuse component AS-IS on dashboard
 
 **Pitfalls to prevent (from PITFALLS.md — must bake into Phase 7):**
+
 - **C1 Dashboard re-render storm:** widgets must NOT subscribe to `allEntries` — use derived primitive selectors (prevent thrashing during 500ms auto-save)
 - **C2 N+1 dashboard queries:** single view-level SQL aggregate via `getEntryStats()` — NOT per-widget useEffect fetches
 - **C3 Streak TZ/DST bug:** `local_date TEXT` column written at entry creation + streak computed in SQL — NOT browser-local `startOfDay`
