@@ -23,11 +23,13 @@ CREATE TABLE IF NOT EXISTS entries (
     char_count  INTEGER NOT NULL DEFAULT 0,
     created_at  INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000),
     updated_at  INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000),
-    metadata    TEXT NOT NULL DEFAULT '{}'
+    metadata    TEXT NOT NULL DEFAULT '{}',
+    local_date  TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_entries_created_at ON entries(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_entries_mood ON entries(mood) WHERE mood IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_entries_local_date ON entries(local_date);
 
 CREATE TABLE IF NOT EXISTS tags (
     id         TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
