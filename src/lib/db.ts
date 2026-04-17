@@ -23,11 +23,13 @@ CREATE TABLE IF NOT EXISTS entries (
     char_count  INTEGER NOT NULL DEFAULT 0,
     created_at  INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000),
     updated_at  INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000),
-    metadata    TEXT NOT NULL DEFAULT '{}'
+    metadata    TEXT NOT NULL DEFAULT '{}',
+    local_date  TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_entries_created_at ON entries(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_entries_mood ON entries(mood) WHERE mood IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_entries_local_date ON entries(local_date);
 
 CREATE TABLE IF NOT EXISTS tags (
     id         TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
@@ -158,6 +160,23 @@ export async function initializeDatabase(): Promise<void> {
   for (const stmt of statements) {
     if (stmt.trim() === "") continue;
     await db.execute(stmt);
+  }
+
+  // FOUND-03 D-08/D-09 — guarded ALTER for upgrade installs.
+  // CREATE TABLE IF NOT EXISTS above handles fresh installs (local_date in DDL).
+  // Existing v1.0 DBs need ALTER + backfill, which is not idempotent — guard it.
+  const cols = await db.select<{ name: string }[]>("PRAGMA table_info(entries)");
+  const hasLocalDate = cols.some((c) => c.name === "local_date");
+  if (!hasLocalDate) {
+    await db.execute("ALTER TABLE entries ADD COLUMN local_date TEXT");
+    // D-09 — synchronous backfill from created_at (UTC day, best-effort per D-10).
+    // Pre-migration entries near UTC midnight may be off by ±1 calendar day.
+    await db.execute(
+      "UPDATE entries SET local_date = strftime('%Y-%m-%d', created_at/1000, 'unixepoch') WHERE local_date IS NULL"
+    );
+    if (import.meta.env.DEV) {
+      console.log("[db] Migrated entries.local_date column + backfilled existing rows");
+    }
   }
 
   // Verify tables were created (development diagnostic — safe in production)
