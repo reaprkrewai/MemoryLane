@@ -63,6 +63,32 @@ export default {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      transitionDuration: {
+        fast: 'var(--motion-fast)',
+        med:  'var(--motion-med)',
+        slow: 'var(--motion-slow)',
+      },
+      transitionTimingFunction: {
+        'out-smooth': 'var(--ease-out-smooth)',
+        spring:       'var(--ease-spring)',
+      },
+      keyframes: {
+        'fade-in':  { from: { opacity: '0' }, to: { opacity: '1' } },
+        'slide-up': {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to:   { opacity: '1', transform: 'translateY(0)' },
+        },
+        'pop-in': {
+          '0%':   { opacity: '0', transform: 'scale(0.92)' },
+          '60%':  { opacity: '1', transform: 'scale(1.02)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+      },
+      animation: {
+        'fade-in':  'fade-in var(--motion-med) var(--ease-out-smooth) both',
+        'slide-up': 'slide-up var(--motion-med) var(--ease-out-smooth) both',
+        'pop-in':   'pop-in var(--motion-med) var(--ease-spring) both',
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],
