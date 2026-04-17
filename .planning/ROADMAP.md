@@ -182,7 +182,13 @@ Plans:
   3. `entries.local_date TEXT` column exists; new entries write `YYYY-MM-DD` in the user's local TZ at creation time; existing entries are backfilled best-effort from UTC; streak queries read this column (no `startOfDay(new Date())` remaining in streak code)
   4. `src/styles/animations.css` defines shared keyframes (fade-in, slide-up, pop-in, stagger-in) plus motion tokens, and the file includes a `@media (prefers-reduced-motion: reduce)` stanza that disables all animations — verified by running the app with "Reduce motion" enabled in OS settings and seeing instant transitions
   5. `src/components/ui/ColorGrid.tsx` renders an accessible swatch grid usable by both TagPill and the future Tag Management view; keyboard-navigable with focus-visible rings
-**Plans**: TBD
+**Plans**: 5/5 plans defined
+Plans:
+- [ ] 07-01-PLAN.md — FOUND-03 schema migration (local_date column DDL + PRAGMA-guarded ALTER + backfill + index)
+- [ ] 07-02-PLAN.md — FOUND-04 motion tokens + animations.css keyframes + global reduced-motion guard + tailwind utilities + main.tsx import
+- [ ] 07-03-PLAN.md — FOUND-02 dbQueries.ts::getEntryStats() SQL aggregate (TZ-safe streak via local_date)
+- [ ] 07-04-PLAN.md — FOUND-01 entryStore derived selectors + FOUND-03 D-11 createEntry local_date INSERT + OverviewView refactor
+- [ ] 07-05-PLAN.md — TAGUX-01 ColorGrid primitive + TagPill refactor (pure refactor, pixel-identical)
 **UI hint**: yes
 
 ### Phase 8: Home Dashboard & Widgets
@@ -282,7 +288,7 @@ Phases 9, 10, 11 can execute in parallel once Phase 8 is complete (11 only needs
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 7. Foundation & Derived State | 0/TBD | Not started | — |
+| 7. Foundation & Derived State | 0/5 | Plans defined | — |
 | 8. Home Dashboard & Widgets | 0/TBD | Not started | — |
 | 9. First-Run Onboarding | 0/TBD | Not started | — |
 | 10. Auto-Tagging AI Pipeline | 0/TBD | Not started | — |
@@ -290,4 +296,4 @@ Phases 9, 10, 11 can execute in parallel once Phase 8 is complete (11 only needs
 
 ---
 
-*Roadmap last updated: 2026-04-16 — v1.1 Daily Driver milestone added (Phases 7-11)*
+*Roadmap last updated: 2026-04-17 — Phase 7 decomposed into 5 plans (2 waves)*
