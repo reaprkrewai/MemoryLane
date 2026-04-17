@@ -12,6 +12,7 @@ import "@fontsource/fraunces/600.css";
 import "@fontsource/fraunces/700.css";
 
 import "./styles/globals.css";
+import "./styles/animations.css";  // FOUND-04 — shared keyframes
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
