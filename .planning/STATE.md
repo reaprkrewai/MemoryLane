@@ -2,31 +2,31 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Daily Driver
-status: active
-last_updated: "2026-04-18T23:00:00.000Z"
-last_activity: 2026-04-18
+status: executing
+last_updated: "2026-04-18T22:44:48.329Z"
+last_activity: 2026-04-18 -- Phase 08 execution started
 progress:
-  total_phases: 5
-  completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
-  percent: 20
+  total_phases: 8
+  completed_phases: 7
+  total_plans: 33
+  completed_plans: 30
+  percent: 91
 ---
 
 # Project State: Chronicle AI
 
 ## Current Position
 
-Phase: 08
-Plan: Not started
-Status: v1.1 Daily Driver active — Phase 7 (Foundation & Derived State) complete; Phase 8 (Home Dashboard & Widgets) is next.
-Last activity: 2026-04-18
+Phase: 08 (Home Dashboard & Widgets) — EXECUTING
+Plan: 1 of 5
+Status: Executing Phase 08
+Last activity: 2026-04-18 -- Phase 08 execution started
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-04-18 after v1.0 milestone close)
 **Core value:** A journaling app where AI understands your entries — and none of it ever touches the internet.
-**Current focus:** Phase 8 — Home Dashboard & Widgets (DASH-01..14)
+**Current focus:** Phase 08 — Home Dashboard & Widgets
 
 ## Milestone v1.1 Scope
 
@@ -60,6 +60,7 @@ See: .planning/PROJECT.md (updated 2026-04-18 after v1.0 milestone close)
 ### Decisions carried into v1.1
 
 **Stack (from v1.0):**
+
 - Tauri v2 + React 19 + TypeScript + Vite — locked
 - Tailwind v3 pinned (shadcn/ui v2.3.0 requires v3; v4 breaks component compatibility)
 - Zustand for UI state; module-level timers outside the store for non-serializable state
@@ -69,6 +70,7 @@ See: .planning/PROJECT.md (updated 2026-04-18 after v1.0 milestone close)
 - Zero new runtime deps preferred — `tailwindcss-animate` already present for microinteractions
 
 **Architecture (from v1.0, reinforced in Phase 7):**
+
 - NO new stores for v1.1 — dashboard reads `entryStore.allEntries` via derived primitive selectors (FOUND-01)
 - Derived primitive selectors prevent re-render storms during 500ms auto-save bursts
 - Single-view-level SQL aggregate via `getEntryStats()` — NOT per-widget useEffect fetches (FOUND-02)
@@ -80,6 +82,7 @@ See: .planning/PROJECT.md (updated 2026-04-18 after v1.0 milestone close)
 - OnThisDay backend already shipped — reuse component AS-IS on dashboard
 
 **Pitfalls to prevent:**
+
 - Dashboard re-render storm — widgets must NOT subscribe to `allEntries` (addressed by FOUND-01)
 - N+1 dashboard queries — single `getEntryStats()` aggregate (addressed by FOUND-02)
 - Streak TZ/DST bug — `local_date TEXT` written at entry creation, streak in SQL (addressed by FOUND-03)
@@ -88,6 +91,7 @@ See: .planning/PROJECT.md (updated 2026-04-18 after v1.0 milestone close)
 - Motion a11y/battery — `@media (prefers-reduced-motion: reduce)` stanza in animations.css (addressed by FOUND-04)
 
 **Patterns established in v1.0:**
+
 - Migration-ordering rule: any index/trigger/view referencing a column added by a PRAGMA-guarded ALTER must run AFTER that guarded block as a standalone `db.execute()` call — NEVER inside `MIGRATION_SQL` (01-03 UAT-01 fix)
 - Dev-only raw error surfacing: user-facing error branches render the underlying message in a `<pre>` gated by `import.meta.env.DEV` (01-03)
 - Single-mount invariant for `<TitleBar />` — rendered exactly once at App.tsx root above the state switch (01-04 UAT-02 fix)
