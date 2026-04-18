@@ -2,11 +2,17 @@
 
 ## What This Is
 
-Chronicle AI is a privacy-first desktop journaling app built with Tauri (Rust + React). Everything stays local — no cloud, no network calls, no third-party services. It's a rock-solid journaling foundation designed to eventually support local LLM integration (Ollama/llama.cpp), letting users run AI over their private journal data without their thoughts ever leaving their device.
+Chronicle AI is a privacy-first desktop journaling app built with Tauri (Rust + React). Everything stays local — no cloud, no network calls, no third-party services. v1.0 shipped a working MVP with full local-LLM support via Ollama: users can semantically search and ask natural-language questions of their journal without any content leaving their device.
 
 ## Core Value
 
-A journaling app where you can eventually have AI understand your entries — and none of it ever touches the internet.
+A journaling app where AI understands your entries — and none of it ever touches the internet.
+
+## Current State
+
+**v1.0 MVP (shipped 2026-04-18):** 6 phases, 23 plans, 45 requirements delivered across 9 days. ~9,252 LOC TypeScript + ~372 LOC Rust. Full journaling loop (write → browse → search → AI query) working offline end-to-end. See [.planning/MILESTONES.md](MILESTONES.md) and [.planning/milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md).
+
+**Known UX issue (carried forward, non-blocking):** Built-in AI (llama.cpp) download fails with Windows OS error 216 — workaround is External Ollama backend. See [src-tauri/src/llama.rs:221](../src-tauri/src/llama.rs#L221).
 
 ## Current Milestone: v1.1 Daily Driver
 
@@ -24,82 +30,64 @@ A journaling app where you can eventually have AI understand your entries — an
 - AI insights summary panel
 
 *UX Polish*
-- First-run onboarding flow
-- Animations + microinteractions pass
+- First-run onboarding flow (3-step, SQLite-persisted, auto-skip for v1.0 users)
+- Microinteractions pass (stagger-in, pop-in, scale, spring, crossfade — all honoring `prefers-reduced-motion`)
 
 *AI*
-- Auto-tagging suggestions (local LLM suggests tags for new entries)
+- Auto-tagging suggestions (sparkle-triggered, JSON-Schema bounded, ghost-chip UX, off by default)
 
 *Tag Management*
-- Color picker per tag (preset palette)
+- Expanded 12-color dual-tone palette (WCAG AA)
+- Dedicated Tag Management view (rename, recolor, delete when unused)
 
-**Key context:**
-- Same privacy / local-only constraints as v1.0 — zero network calls, Ollama-only AI
-- WIP scaffolding for OverviewView + widget components already committed as starting point (commit `b9af497`)
-- Inter + Fraunces fonts already wired via @fontsource
+**Constraints preserved from v1.0:** zero network calls, Ollama-only AI, Tailwind v3 pin, no new runtime dependencies preferred.
+
+**Progress:** Phase 7 (Foundation & Derived State) complete — architectural primitives shipped (derived selectors, `getEntryStats()` SQL aggregate, `local_date` column, animations.css with reduced-motion guard, ColorGrid primitive). Phase 8 (Home Dashboard) is next.
 
 ## Requirements
 
-### Validated
+### Validated (v1.0)
 
-**AI Readiness (schema-level) — Validated in Phase 1: Foundation**
-- [x] Schema structured to support future embeddings table without migration pain (AI-01)
-- [x] Entry content stored with UUID TEXT PKs and metadata JSON column (AI-02, AI-03)
-- [x] Zero network calls enforced at capability level — SETT-04 verified
+**AI Readiness (Phase 1)**
+- ✓ Schema includes `embeddings` table from initial migration (AI-01) — v1.0
+- ✓ Entry PKs are UUID TEXT; `metadata` JSON column present (AI-02, AI-03) — v1.0
+- ✓ Zero network calls enforced (SETT-04) — v1.0
 
-### Validated
+**Core Journal (Phase 2)**
+- ✓ Rich-text editor with Markdown round-trip (EDIT-01, EDIT-03) — v1.0
+- ✓ Mood assignment, word/char count, date/time override (EDIT-06..08, EDIT-07) — v1.0
+- ✓ Auto-save every 500ms + configurable keepalive (EDIT-04, EDIT-05) — v1.0
+- ✓ Edit/delete entries (EDIT-02) — v1.0
+- ✓ On-the-fly tag creation with autocomplete and 8-color palette (TAG-01..03) — v1.0
+- ✓ Delete unused tags from autocomplete (TAG-04) — v1.0
 
-**Core Journal — Validated in Phase 2: Editor & Tags**
-- [x] User can create entries with rich text (TipTap/Markdown WYSIWYG) — EDIT-01
-- [x] User can assign a mood to each entry (great / good / okay / bad / awful) — EDIT-02
-- [x] User can add/remove tags on entries with autocomplete — TAG-01, TAG-02, TAG-03
-- [x] Entries auto-save every 5 seconds (debounced 500ms on change) — EDIT-03, EDIT-04
-- [x] User can edit and delete existing entries — EDIT-06, EDIT-07
-- [x] Word count and character count display while writing — EDIT-08
-- [x] User can delete unused tags via trash icon in autocomplete dropdown — TAG-04
-- [x] User can configure auto-save interval (5s / 10s / 30s) — EDIT-05
+**Timeline & Calendar (Phase 3)**
+- ✓ Reverse-chronological timeline with keyset pagination + infinite scroll (TIME-01..03) — v1.0
+- ✓ Entry cards with date/mood/tags/word-count/150-char preview (TIME-04) — v1.0
+- ✓ Inline expansion and click-to-edit (TIME-05, TIME-07) — v1.0
+- ✓ Visual day-separators (TIME-06) — v1.0
+- ✓ Monthly calendar heatmap with day-click filtering (CAL-01..04) — v1.0
 
-### Validated
+**Search & Discovery (Phase 4)**
+- ✓ FTS5 keyword search with highlighting (SRCH-01, SRCH-02) — v1.0
+- ✓ Multi-select date/tag/mood filters with AND semantics (SRCH-03..05) — v1.0
+- ✓ Clear-all action (SRCH-06) — v1.0
+- ✓ On This Day prior-year memories (OTD-01, OTD-02) — v1.0
 
-**Timeline & Calendar — Validated in Phase 3: Timeline & Calendar**
-- [x] User can view entries in reverse-chronological timeline with infinite scroll — TIME-01, TIME-02
-- [x] Each entry card shows date, mood, tags, word count, and 150-char preview — TIME-03, TIME-04
-- [x] User can expand/collapse full entry inline — TIME-05
-- [x] Visual separator between days — TIME-06
-- [x] Back to Journal button returns from editor to timeline — TIME-07
-- [x] User can view a monthly calendar heatmap (color intensity = entry count) — CAL-01, CAL-02
-- [x] Clicking a date filters the timeline to entries on that day — CAL-04
-- [x] Month/year navigation with "Today" shortcut — CAL-03
+**Media, Security & Settings (Phase 5)**
+- ✓ Photo attachments with local file storage (MEDIA-01..04) — v1.0
+- ✓ PBKDF2-SHA256 PIN lock with configurable idle auto-lock (SEC-01..03) — v1.0
+- ✓ Light/dark theme + 3 font sizes (SETT-01, SETT-02) — v1.0
+- ✓ Full ZIP data export (SETT-03) — v1.0
 
-### Validated
+**AI Features (Phase 6)**
+- ✓ Semantic search via local Ollama embeddings (LLMAI-02) — v1.0
+- ✓ Natural-language Q&A with RAG + UUID citations (LLMAI-03) — v1.0
+- ✓ Ollama setup wizard and settings panel with live status (LLMAI-04) — v1.0
 
-**Search & Discovery — Validated in Phase 4: Search & Discovery**
-- [x] Full-text search across all entry content (SQLite FTS5) — SRCH-01
-- [x] Filter by date range, tags (multi-select), mood (multi-select) — SRCH-02, SRCH-03, SRCH-04
-- [x] Matching text highlighted in search results — SRCH-05
-- [x] Clear all filters in one action — SRCH-06
-- [x] On This Day resurfaces entries from prior years — OTD-01, OTD-02
+### Active (v1.1)
 
-### Validated
-
-**Media, Security & Settings — Validated in Phase 5**
-- [x] User can attach photos to entries — MEDIA-01 through MEDIA-04
-- [x] App lock via PIN (PBKDF2-SHA256) — SEC-01, SEC-02, SEC-03
-- [x] Light/dark theme + font scale settings — SETT-01, SETT-02
-- [x] Auto-save interval configurable (5s / 10s / 30s) — SETT-03 / EDIT-05
-- [x] Export all data to JSON backup — SETT-04
-
-### Validated
-
-**AI Features — Validated in Phase 6: AI Features**
-- [x] Semantic search over entries via local embeddings (Ollama) — LLMAI-02
-- [x] Natural-language Q&A with RAG + citations over journal — LLMAI-03
-- [x] Ollama setup wizard + settings page live status — LLMAI-04
-- [x] All inference is local — no entries, embeddings, or questions ever leave the device
-
-### Active
-
-**v1.1 Daily Driver requirements** — see `.planning/REQUIREMENTS.md` for REQ-IDs and details.
+See [.planning/REQUIREMENTS.md](REQUIREMENTS.md) (next milestone). Requirement IDs: FOUND-01..04, DASH-01..14, ONBRD-01..07, AUTOTAG-01..07, ANIM-01..06, TAGUX-01..07.
 
 ### Out of Scope
 
@@ -112,50 +100,60 @@ A journaling app where you can eventually have AI understand your entries — an
 
 ## Context
 
-**The gap Chronicle AI fills:** No existing journaling app (Day One, Obsidian, Diarium) lets users run AI over their journal data without sending content to external APIs. Chronicle AI's Phase 1 MVP builds the foundation; Phase 2 adds local LLM (Ollama/llama.cpp) so users can query, summarize, and get insights from their journal privately.
+**The gap Chronicle AI fills:** No existing journaling app (Day One, Obsidian, Diarium) lets users run AI over their journal data without sending content to external APIs. v1.0 ships the full local-LLM loop; v1.1 turns that loop into a daily-use habit via dashboard-first UX and quiet AI assists.
 
 **Target audience:** Privacy-conscious journalers who want AI assistance without cloud exposure. Public release planned (App Store + website distribution).
 
-**Tech stack rationale:**
-- Tauri over Electron: smaller binary, better performance, Rust safety for local data handling
-- SQLite: proven, embedded, zero-dependency, FTS5 built-in for full-text search
-- TipTap: Markdown WYSIWYG that produces clean, AI-parseable content
-- Tauri plugins for SQLite access from Rust side
+**Tech stack rationale (validated post-v1.0):**
+- **Tauri v2** over Electron — smaller binary, Rust safety, sound for local data handling; React 19 friction exists but manageable
+- **SQLite + FTS5** — proven, embedded, built-in full-text search; migration ordering required learning (PRAGMA-guarded ALTERs must finalize before referencing indexes)
+- **TipTap v3** — Markdown WYSIWYG with clean AI-parseable output; Floating UI (not Tippy) for BubbleMenu placement
+- **Ollama (external)** over built-in llama.cpp — built-in binary has Windows compat issue (os error 216); Ollama HTTP with health-check gate is the reliable path
+- **Tailwind v3 pinned** — shadcn/ui v2.3.0 requires v3; v4 breaks component compatibility
+- **Zustand** for UI state; module-level timers (not in store) for non-serializable state
+- **Web Crypto PBKDF2-SHA256** (310k iterations) for PIN — no argon2-browser needed
 
 ## Constraints
 
 - **Privacy**: No network calls in any feature — local-only, no analytics, no telemetry
 - **Distribution**: Must package as installable desktop app (Windows, macOS, Linux via Tauri)
-- **Tech Stack**: Tauri + React + TypeScript + SQLite — locked in by spec
-- **AI Compatibility**: Entry content must be clean Markdown; schema must accommodate embeddings table in Phase 2 without breaking changes
+- **Tech Stack**: Tauri v2 + React 19 + TypeScript + SQLite — locked
+- **AI Compatibility**: Entry content must be clean Markdown; schema accommodates embeddings table without breaking changes
+- **AI Runtime**: Local-only (Ollama HTTP); graceful fallback to keyword search when unavailable, never cloud
 - **Design**: Production-grade UI via frontend-design skill patterns — no generic AI aesthetics
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Tauri over Electron | Smaller binary, Rust safety, better perf for local data app | — Pending |
-| SQLite FTS5 for search | Built-in to SQLite, zero extra deps, handles journal-scale data well | — Pending |
-| TipTap + Markdown storage | Clean Markdown output future-proofs AI readability | — Pending |
-| Local LLM only (Phase 2) | Core privacy guarantee — no content leaves device, ever | — Pending |
-| No cloud sync (ever) | Privacy-first positioning; sync would compromise core value | — Pending |
+| Tauri over Electron | Smaller binary, Rust safety, better perf for local-data app | ✓ Good — v1.0 ships as native desktop, ~9.6k LOC frontend stayed performant |
+| SQLite FTS5 for search | Built-in, zero extra deps, handles journal-scale data | ✓ Good — FTS5 with phrase-wrap escaping handles special chars and scales |
+| TipTap + Markdown storage | Clean Markdown future-proofs AI readability | ✓ Good — round-trip works; embeddings operate on clean text |
+| Local LLM only (Ollama) | Core privacy guarantee — no content leaves device | ✓ Good — semantic search and Q&A both shipped fully local; graceful keyword fallback |
+| No cloud sync (ever) | Privacy-first positioning; sync would compromise core value | ✓ Good — reinforced as core positioning; multi-device deferred to future milestone |
+| Inline migrations in db.ts | `?raw` import unreliable for files outside `src/` | ✓ Good — multi-statement splitter handles BEGIN...END for FTS5 trigger bodies |
+| PBKDF2-SHA256 Web Crypto | Native browser API, no argon2-browser runtime dep | ✓ Good — 310k iterations + Web Crypto avoids extra runtime weight |
+| Window controls outside drag-region | Tauri drag-region intercepts mousedown | ✓ Good — but Phase 5 introduced a regression (TitleBar only mounted under Unlocked) fixed in gap-closure 01-04 |
+| External Ollama over built-in llama.cpp | Built-in binary fails on Windows (os error 216) | ⚠️ Revisit — track ggml-org/llama.cpp releases for a working Windows build |
+| Tailwind v3 pin | shadcn/ui v2 requires v3; v4 breaks components | ✓ Good — pin is stable until shadcn moves forward |
+| Granularity: Coarse | 4-6 phases per milestone (requirement clusters) | ✓ Good — v1.0 shipped in 6 phases over 9 days |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
-**After each phase transition** (via `/gsd:transition`):
+**After each phase transition:**
 1. Requirements invalidated? → Move to Out of Scope with reason
 2. Requirements validated? → Move to Validated with phase reference
 3. New requirements emerged? → Add to Active
 4. Decisions to log? → Add to Key Decisions
 5. "What This Is" still accurate? → Update if drifted
 
-**After each milestone** (via `/gsd:complete-milestone`):
+**After each milestone (`/gsd-complete-milestone`):**
 1. Full review of all sections
 2. Core Value check — still the right priority?
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-16 — v1.0 MVP complete (6 phases shipped); v1.1 Daily Driver milestone started*
+*Last updated: 2026-04-18 — v1.0 MVP shipped and archived; v1.1 Daily Driver active (Phase 7 complete, Phase 8 next)*
