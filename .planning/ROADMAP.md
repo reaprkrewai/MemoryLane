@@ -81,7 +81,7 @@ Plans:
   6. User can click the Quick-Write FAB or press `Ctrl/Cmd+N` from any top-level view to create a new entry and open it in the editor; FAB has `aria-label="New entry"` and visible `focus-visible` ring
 **Plans**: 5/5 plans planned
 Plans:
-- [ ] 08-01-PLAN.md — Store extension (entriesThisMonth derived primitive) + writingPrompts.ts 60-item library
+- [x] 08-01-PLAN.md — Store extension (entriesThisMonth derived primitive) + writingPrompts.ts 60-item library
 - [ ] 08-02-PLAN.md — OverviewView refactor (4 stat cards, 5-item feed, 5-widget sidebar) + RecentEntriesFeed extraction + widget stubs
 - [ ] 08-03-PLAN.md — MoodTrends 30-day stacked-bar SVG + WritingPrompts deterministic daily prompt cycling
 - [ ] 08-04-PLAN.md — insightService (7-day SQL + hybridAI + settings cache) + AIInsights widget (Refresh + 4 states + graceful Ollama-down fallback)
