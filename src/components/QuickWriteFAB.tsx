@@ -8,12 +8,13 @@ export function QuickWriteFAB({ onClick }: QuickWriteFABProps) {
   return (
     <button
       onClick={onClick}
-      className="group fixed bottom-8 right-8 z-40 flex items-center gap-2.5 overflow-hidden rounded-full pl-5 pr-6 py-3.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(124,109,255,0.4)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(124,109,255,0.55)] hover:-translate-y-0.5 active:translate-y-0"
+      className="group fixed bottom-8 right-8 z-40 flex items-center gap-2.5 overflow-hidden rounded-full pl-5 pr-6 py-3.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(124,109,255,0.4)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(124,109,255,0.55)] hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
       style={{
         background:
           "linear-gradient(135deg, var(--color-primary-glow) 0%, var(--color-primary) 60%, #6B5FDE 100%)",
       }}
-      aria-label="Quick write new entry"
+      aria-label="New entry"
+      data-onboarding="quick-write-fab"
     >
       {/* Shimmer overlay on hover */}
       <span
