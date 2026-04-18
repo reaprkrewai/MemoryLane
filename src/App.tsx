@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { invoke } from "@tauri-apps/api/core";
 import { AppShell } from "./components/AppShell";
+import { TitleBar } from "./components/TitleBar";
 import { JournalView } from "./components/JournalView";
 import { SettingsView } from "./components/SettingsView";
 import { PinSetupScreen } from "./components/PinSetupScreen";
@@ -138,65 +139,71 @@ function App() {
   };
 
   return (
-    <>
-      {/* State 1: Database loading */}
-      {!isDbReady && !dbError && (
-        <div className="flex h-full items-center justify-center bg-background">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 size={24} className="animate-spin text-muted" />
-            <p className="text-body text-muted">Opening your journal...</p>
+    <div className="flex h-screen flex-col bg-bg text-text">
+      <TitleBar />
+      <div className="flex flex-1 overflow-hidden">
+        {/* State 1: Database loading */}
+        {!isDbReady && !dbError && (
+          <div className="flex h-full w-full items-center justify-center bg-background">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 size={24} className="animate-spin text-muted" />
+              <p className="text-body text-muted">Opening your journal...</p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* State 2: Database error */}
-      {dbError && (
-        <div className="flex h-full flex-col items-center justify-center gap-4 bg-background">
-          <h1 className="text-display text-text">
-            Could not open your journal
-          </h1>
-          <p className="max-w-sm text-center text-body text-muted">
-            The database failed to initialize. Check that the app has write
-            access to your data folder, then restart.
-          </p>
-          {import.meta.env.DEV && (
-            <pre className="mt-2 max-w-md whitespace-pre-wrap rounded-md border border-border bg-surface p-3 text-xs text-muted font-mono">
-              {dbError}
-            </pre>
-          )}
-        </div>
-      )}
-
-      {/* State 3: PIN state unknown (should not show, prevents content flash) */}
-      {isDbReady && !dbError && isPinSet === null && (
-        <div className="flex h-full items-center justify-center bg-background">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 size={24} className="animate-spin text-muted" />
-            <p className="text-body text-muted">Checking security...</p>
+        {/* State 2: Database error */}
+        {dbError && (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-background">
+            <h1 className="text-display text-text">
+              Could not open your journal
+            </h1>
+            <p className="max-w-sm text-center text-body text-muted">
+              The database failed to initialize. Check that the app has write
+              access to your data folder, then restart.
+            </p>
+            {import.meta.env.DEV && (
+              <pre className="mt-2 max-w-md whitespace-pre-wrap rounded-md border border-border bg-surface p-3 text-xs text-muted font-mono">
+                {dbError}
+              </pre>
+            )}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* State 4: PIN not set, show setup */}
-      {isDbReady && !dbError && isPinSet === false && (
-        <PinSetupScreen onComplete={handlePinSetupComplete} />
-      )}
+        {/* State 3: PIN state unknown (should not show, prevents content flash) */}
+        {isDbReady && !dbError && isPinSet === null && (
+          <div className="flex h-full w-full items-center justify-center bg-background">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 size={24} className="animate-spin text-muted" />
+              <p className="text-body text-muted">Checking security...</p>
+            </div>
+          </div>
+        )}
 
-      {/* State 5: PIN set and locked, show entry screen */}
-      {isDbReady && !dbError && isPinSet === true && isLocked && (
-        <PinEntryScreen onUnlock={handleUnlock} />
-      )}
+        {/* State 4: PIN not set, show setup */}
+        {isDbReady && !dbError && isPinSet === false && (
+          <div className="h-full w-full">
+            <PinSetupScreen onComplete={handlePinSetupComplete} />
+          </div>
+        )}
 
-      {/* State 6: Unlocked, show content */}
-      {isDbReady && !dbError && isPinSet === true && !isLocked && (
-        <AppShell>
-          {activeView === "settings" && <SettingsView />}
-          {activeView !== "settings" && <JournalView />}
-        </AppShell>
-      )}
+        {/* State 5: PIN set and locked, show entry screen */}
+        {isDbReady && !dbError && isPinSet === true && isLocked && (
+          <div className="h-full w-full">
+            <PinEntryScreen onUnlock={handleUnlock} />
+          </div>
+        )}
 
+        {/* State 6: Unlocked, show content */}
+        {isDbReady && !dbError && isPinSet === true && !isLocked && (
+          <AppShell>
+            {activeView === "settings" && <SettingsView />}
+            {activeView !== "settings" && <JournalView />}
+          </AppShell>
+        )}
+      </div>
       <Toaster position="bottom-right" />
-    </>
+    </div>
   );
 }
 
