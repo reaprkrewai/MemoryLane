@@ -139,14 +139,16 @@ export const useEntryStore = create<EntryState>((set, get) => ({
   createEntry: async () => {
     const db = await getDb();
     const localDate = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD in user local TZ (FOUND-03 D-11)
+    // Generate id client-side to avoid the racy "ORDER BY created_at DESC LIMIT 1"
+    // recovery pattern. Two createEntry calls in the same millisecond (bulk seed,
+    // double-click, batch import) would otherwise risk returning the wrong row's id
+    // and miswiring local_date semantics (D-11). Shape matches the DB schema's
+    // `lower(hex(randomblob(16)))` default — 32 lowercase hex chars.
+    const newId = crypto.randomUUID().replace(/-/g, "");
     await db.execute(
-      "INSERT INTO entries (content, word_count, char_count, local_date) VALUES ('', 0, 0, ?)",
-      [localDate]
+      "INSERT INTO entries (id, content, word_count, char_count, local_date) VALUES (?, '', 0, 0, ?)",
+      [newId, localDate]
     );
-    const rows = await db.select<{ id: string }[]>(
-      "SELECT id FROM entries ORDER BY created_at DESC LIMIT 1"
-    );
-    const newId = rows[0].id;
     await get().loadEntries();
     set({ selectedEntryId: newId });
     // Phase 3: keep the paginated timeline in sync with newly created entries
