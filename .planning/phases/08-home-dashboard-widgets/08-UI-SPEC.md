@@ -47,10 +47,11 @@ No design system changes required for Phase 8. All tokens are pre-existing.
 
 **Exceptions:**
 - Stat card icon tile: `h-11 w-11` (44px) — meets touch-target minimum for keyboard focus
-- QuickWrite FAB: `py-3.5 pl-5 pr-6` (56px height total) — matches existing FAB
 - Widget cards: `rounded-2xl` border radius — matches existing `StatCard`, `MoodOverview` visual grammar
 - Section gap between stat row and main split: `mb-8` (32px) — matches existing layout
 - Header margin: `mb-10` (40px) — matches existing OverviewView header
+
+**FAB padding inherited unchanged from v1.0 QuickWriteFAB component; not part of Phase 8 spacing contract.** The FAB occupies a 56px total height as a layout constant (measurement), derived from the existing v1.0 pill geometry — Phase 8 does not introduce or change this value.
 
 ---
 
@@ -60,16 +61,15 @@ Four roles, two fonts, two weights. No new type styles introduced in Phase 8 —
 
 | Role | Size | Font | Weight | Line Height | CSS class / Tailwind |
 |------|------|------|--------|-------------|----------------------|
-| Label | 11–12px | Inter | 500 (medium) | 1.4 | `text-[11px] text-small-caps` or `text-label` |
+| Label | 11–12px | Inter | 400 (regular) | 1.4 | `text-[11px] text-small-caps` or `text-label` |
 | Body | 14px | Inter | 400 (regular) | 1.5 | `text-sm` |
 | Heading | 18–20px | Fraunces | 600 (semibold) | 1.2 | `font-display text-lg font-semibold` |
-| Display (stat numerals) | 44px | Fraunces | 400 (regular) | 1.0 | `font-display font-tabular text-[44px] leading-none` |
-| Display (greeting) | 52px | Fraunces italic | 400 (regular) | 1.05 | `font-display-italic text-[52px] leading-[1.05]` |
+| Display | 44–52px | Fraunces / Fraunces italic | 400 (regular) | 1.0–1.05 | Stat numerals: `font-display font-tabular text-[44px] leading-none`; Greeting: `font-display-italic text-[52px] leading-[1.05]` |
 
 **Rules:**
 - Widget titles (`MoodTrends`, `WritingPrompts`, `AIInsights`, `OnThisDay`) use `font-display text-lg font-semibold` — matches `MoodOverview` exactly.
 - Timestamp/relative-time labels use `font-display-italic text-xs text-[var(--color-text-muted)]` — matches existing entry rows in OverviewView.
-- Stat card labels use `text-small-caps text-[11px] text-[var(--color-text-muted)]` — matches existing `StatCard`.
+- Stat card labels use `text-small-caps text-[11px] text-[var(--color-text-muted)]` — matches existing `StatCard`. Small-caps visually differentiates Label from Body without needing a separate weight.
 - Prompt text in `WritingPrompts` widget uses `text-sm leading-relaxed text-[var(--color-text-secondary)]` — body weight, no emphasis.
 - AI Insights summary body uses `text-sm leading-relaxed text-[var(--color-text)]` — readable prose.
 - Freshness timestamp (`Generated N minutes ago`) uses `text-xs text-[var(--color-text-muted)]` — secondary metadata.
@@ -220,7 +220,7 @@ Empty state copy already reads: `"Your mood story unfolds here / as entries are 
 [content preview 2 lines, line-clamp-2, 14px Inter, leading-relaxed]   [mood dot 8px circle]
 [relative time, font-display-italic, 12px, text-muted]
 ```
-- Row height: `py-3.5` (28px vertical padding each side)
+- Row height: `py-3.5` (28px vertical padding each side) — inherited from v1.0 OverviewView row pattern; not a Phase 8 spacing token
 - Row hover: content text transitions to `text-[var(--color-primary)]` (existing pattern)
 - Divider: `divide-y divide-[var(--color-border-subtle)]`
 - `preview = stripMarkdown(content).slice(0, 140).trim()` — 140-char preview
@@ -272,7 +272,7 @@ rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5
 ```
 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5
   ├── header row: "Weekly insight" (font-display text-lg font-semibold) + Sparkles icon (Lucide Sparkles, 16px, text-muted)
-  │               + "Refresh" button (text-xs text-[var(--color-primary)] always visible)
+  │               + "Refresh insight" button (text-xs text-[var(--color-primary)] always visible)
   ├── [CONDITIONAL: summary loaded]
   │     summary text (14px Inter, leading-relaxed, text-[var(--color-text)])
   │     "Generated {relativeTime}" (text-xs text-muted, mt-2)
@@ -280,10 +280,10 @@ rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5
   │     placeholder illustration: Sparkles icon (32px, text-muted, centered, opacity-40)
   │     "Insight unavailable" (14px, text-secondary, text-center)
   │     "Start Ollama to generate your weekly summary." (text-xs, text-muted, text-center)
-  │     [Refresh button stays visible — user can retry once Ollama is up]
+  │     [Refresh insight button stays visible — user can retry once Ollama is up]
   ├── [CONDITIONAL: Ollama available, no cached summary yet]
   │     "No summary yet" (14px, text-secondary, text-center)
-  │     "Click Refresh to generate your weekly insight." (text-xs, text-muted, text-center)
+  │     "Click Refresh insight to generate your weekly insight." (text-xs, text-muted, text-center)
   └── [CONDITIONAL: isGenerating]
         Skeleton pulse (2 bars, see Skeleton section)
         "Generating…" (text-xs, text-muted)
@@ -291,11 +291,11 @@ rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5
 
 **Auto-generate on first-ever open decision (discretion — CONTEXT.md D-17 left open):** Do NOT auto-generate on open. Wait for explicit first Refresh click. Rationale: respects battery and user agency; LLM calls can be slow (10–30 seconds on modest hardware); first open should be instant.
 
-**Refresh button:**
+**Refresh insight button:**
 - Always visible per DASH-14 — even when Ollama is down
-- Label: `"Refresh"` with `RefreshCw` icon (12px)
+- Label: `"Refresh insight"` with `RefreshCw` icon (12px)
 - When `isGenerating`: show spinning `RefreshCw` via `animate-spin`, button disabled (`opacity-50 cursor-not-allowed`)
-- When Ollama unavailable and user clicks Refresh: silent no-op (no toast, no dialog per CONTEXT.md D-18)
+- When Ollama unavailable and user clicks Refresh insight: silent no-op (no toast, no dialog per CONTEXT.md D-18)
 - When fewer than 1 entry in the last 7 days: show "Not enough entries yet — keep writing!" — no LLM call
 
 **"Generated" freshness display:** `"Generated {formatDistanceToNow(generatedAt, { addSuffix: true })}"` e.g. `"Generated 2 hours ago"`. Shown below the summary text only when a cached summary exists.
@@ -309,9 +309,9 @@ rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5
 2. Add `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2` to the button classes (CONTEXT.md D-22)
 3. Rendered at `AppShell` level (not inside `OverviewView`) — CONTEXT.md D-21
 
-**Visual spec (unchanged from v1.0):**
+**Visual spec (unchanged from v1.0 — inherited, not a Phase 8 token):**
 - `fixed bottom-8 right-8 z-40` — position locked
-- `rounded-full pl-5 pr-6 py-3.5` — pill shape, 56px total height
+- Pill shape, 56px total height (layout constant from v1.0 geometry)
 - Gradient: `linear-gradient(135deg, var(--color-primary-glow) 0%, var(--color-primary) 60%, #6B5FDE 100%)`
 - Shadow: `shadow-[0_8px_32px_rgba(124,109,255,0.4)]`
 - Hover: `hover:shadow-[0_12px_40px_rgba(124,109,255,0.55)] hover:-translate-y-0.5`
@@ -394,7 +394,7 @@ Phase 8 uses Phase 7's `animations.css` keyframes and motion tokens. Phase 8 doe
 
 ### AI Insights Refresh Flow
 
-1. User clicks `"Refresh"` button
+1. User clicks `"Refresh insight"` button
 2. Check `aiStore.available`: if false → silent no-op (no toast)
 3. Check last-7-days entry count: if 0 → show "Not enough entries yet" toast or inline message
 4. Show `isGenerating` skeleton state (spinner on Refresh icon, body becomes skeleton bars)
@@ -434,7 +434,7 @@ Existing behavior: toggle via header button click, state in `uiStore.onThisDayCo
 | Recent feed "Write first entry" link | `Write your first entry` |
 | Recent feed navigation link | `View all` |
 | Writing Prompts cycle button | `Another prompt` |
-| AI Insights refresh button | `Refresh` |
+| AI Insights refresh button | `Refresh insight` |
 
 ### Streak Card Framing (DASH-03)
 
@@ -453,7 +453,7 @@ Existing behavior: toggle via header button click, state in `uiStore.onThisDayCo
 | MoodOverview | Zero mood entries (last 30d) | *(no heading)* | `Your mood story unfolds here` / italic: `as entries are written` |
 | MoodTrends | Zero entries (last 30d) | *(none — visual only)* | Faint placeholder bars (no text copy) |
 | AI Insights | Ollama unavailable | `Insight unavailable` | `Start Ollama to generate your weekly summary.` |
-| AI Insights | Ollama available, no cache | `No summary yet` | `Click Refresh to generate your weekly insight.` |
+| AI Insights | Ollama available, no cache | `No summary yet` | `Click Refresh insight to generate your weekly insight.` |
 | AI Insights | Ollama available, <1 entry last 7d | `Not enough entries yet` | `Keep writing — your first weekly insight arrives after a few entries.` |
 | OnThisDay | Zero OTD entries | *(widget hidden — renders null)* | n/a |
 | WritingPrompts | n/a | *(always has a prompt)* | n/a |
@@ -472,7 +472,7 @@ Existing behavior: toggle via header button click, state in `uiStore.onThisDayCo
 |----------|----|
 | `getEntryStats()` DB failure | Propagates to App-level error boundary (no per-widget handling per CONTEXT.md D-11) |
 | AI Insights LLM call fails | Silent — re-show "No summary yet" state, log to console in dev |
-| AI Insights: Ollama down on Refresh click | Silent no-op |
+| AI Insights: Ollama down on Refresh insight click | Silent no-op |
 
 ### `data-onboarding` Attributes (for Phase 9)
 
@@ -515,7 +515,7 @@ Phase 8 adds these attributes opportunistically — no onboarding logic ships ye
 |-----------|------|-------------|
 | `MoodTrends` | `src/components/dashboard/MoodTrends.tsx` | 30-day stacked bar chart as inline SVG; local `useMemo([allEntries])` for windowed mood data |
 | `WritingPrompts` | `src/components/dashboard/WritingPrompts.tsx` | Static prompt display; `day_of_year % N` daily index; local offset cycling |
-| `AIInsights` | `src/components/dashboard/AIInsights.tsx` | Cached LLM summary; Refresh button; Ollama-gated empty state |
+| `AIInsights` | `src/components/dashboard/AIInsights.tsx` | Cached LLM summary; Refresh insight button; Ollama-gated empty state |
 | `RecentEntriesFeed` | `src/components/dashboard/RecentEntriesFeed.tsx` | 5-item recent entries list extracted from OverviewView |
 
 ### New Utilities
@@ -548,7 +548,7 @@ Per 08-CONTEXT.md `### Claude's Discretion` — all discretion items resolved he
 | `MoodTrends` chart type | Vertical stacked bar chart as inline SVG | Bars cleanly show daily distribution; lines imply false continuity for categorical mood data |
 | Streak `/7 this week` micro-copy | `value={min(streak,7)}` + `suffix="/7"` + `label="this week"` | Compact; existing `suffix` prop handles the rendering; label provides the word "week" |
 | `WritingPrompts` "Another prompt" | Text button with inline `ArrowRight` icon | Text is clearer than icon-only for first-time users; matches "View all" link style |
-| AI Insights auto-run on first open | No — wait for explicit Refresh click | LLM calls can take 10–30s; respects battery and user agency; avoids surprise on landing |
+| AI Insights auto-run on first open | No — wait for explicit Refresh insight click | LLM calls can take 10–30s; respects battery and user agency; avoids surprise on landing |
 | FAB z-index behind modals | Keep `z-40` (existing) — modals/popovers use Radix `z-50`+ | Current z-40 naturally stacks behind modal overlays |
 | Pulse skeleton threshold | Triple-gate: `isLoadingPage && allEntries.length === 0 && primitive === 0/[]` | Skeletons = "loading", not "empty" — distinguishes the two states |
 | InsightService layout | Single `generateWeeklySummary()` export + private helper functions | Matches `aiSettingsService.ts` pattern; one clear entry point |
@@ -570,4 +570,5 @@ Per 08-CONTEXT.md `### Claude's Discretion` — all discretion items resolved he
 
 *Phase: 08-home-dashboard-widgets*
 *UI-SPEC created: 2026-04-18*
+*UI-SPEC revised: 2026-04-18 (revision 1 — typography/spacing fixes)*
 *Source artifacts: 08-CONTEXT.md (authoritative), 07-CONTEXT.md, 07-VERIFICATION.md, OverviewView.tsx, StatCard.tsx, MoodOverview.tsx, QuickWriteFAB.tsx, OnThisDay.tsx, animations.css, globals.css, tailwind.config.js*
