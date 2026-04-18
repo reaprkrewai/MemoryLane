@@ -65,8 +65,11 @@ export function OverviewView() {
   const moodCounts = useMemo(() => calculateMoodCounts(allEntries), [allEntries]);
 
   // Subscribes to FOUND-01 D-02 stable-ref primitive. The store maintains a 5-item
-  // identity-stable slice; we take the first 3 here. Visual identity preserved.
-  const recentEntries = useEntryStore((s) => s.recentEntries.slice(0, 3));
+  // identity-stable slice; we take the first 3 here via useMemo so the selector itself
+  // returns the identity-stable reference (calling .slice() inside the selector would
+  // create a fresh array on every store update and defeat the D-02 optimization).
+  const recentFive = useEntryStore((s) => s.recentEntries);
+  const recentEntries = useMemo(() => recentFive.slice(0, 3), [recentFive]);
 
   const handleNewEntry = async () => {
     const newId = await createEntry();
