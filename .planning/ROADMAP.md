@@ -36,7 +36,7 @@ Plans:
 - [x] 01-01-PLAN.md — Scaffold Tauri v2 project with all dependencies, Tailwind v3 + shadcn/ui design system
 - [x] 01-02-PLAN.md — SQLite schema (AI-ready), DB initialization, app shell UI, and empty state
 - [x] 01-03-PLAN.md — UAT-01 fix: DB migration ordering (idx_entries_local_date moved after PRAGMA/ALTER guard) + dev-only raw SQLite error surfacing
-- [ ] 01-04-PLAN.md — UAT-02 fix: lift TitleBar to render in every app state (loading, dbError, PIN setup, PIN entry)
+- [x] 01-04-PLAN.md — UAT-02 fix: lift TitleBar to render in every app state (loading, dbError, PIN setup, PIN entry)
 **UI hint**: yes
 
 ### Phase 2: Editor & Tags

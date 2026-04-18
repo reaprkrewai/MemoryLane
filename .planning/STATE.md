@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: MVP
-status: executing
-last_updated: "2026-04-18T02:49:42.149Z"
-last_activity: 2026-04-18
+status: ready-for-v1.1
+last_updated: "2026-04-17T00:00:00.000Z"
+last_activity: 2026-04-17 -- 01-04 complete (UAT-02 fix; TitleBar lifted above state switch; UAT approved)
 progress:
   total_phases: 6
-  completed_phases: 5
-  total_plans: 23
-  completed_plans: 23
+  completed_phases: 6
+  total_plans: 25
+  completed_plans: 25
   percent: 100
 ---
 
@@ -17,10 +17,10 @@ progress:
 
 ## Current Position
 
-Phase: 01 (foundation) — EXECUTING (gap-closure pass)
-Plan: 01-03 complete (UAT-01 fix); 01-04 next (UAT-02 window controls)
-Status: Ready to execute 01-04
-Last activity: 2026-04-17 -- 01-03 complete (DB migration ordering fix; UAT approved)
+Phase: 01 (foundation) — COMPLETE (gap-closure pass finished; both 01-03 and 01-04 shipped)
+Plan: 01-04 complete (UAT-02 fix — TitleBar renders in every app state)
+Status: v1.0 complete with no known UAT gaps. Ready to begin v1.1 Phase 7 (Foundation & Derived State).
+Last activity: 2026-04-17 -- 01-04 complete (window-controls regression fix; UAT approved)
 
 ## Project Reference
 
@@ -133,11 +133,11 @@ See: .planning/PROJECT.md
 
 ### Todos
 
-- Execute plan 01-04 to close UAT-02 (window controls missing in non-Unlocked app states — TitleBar needs to render above state switch)
-- Plan Phase 7 (Foundation & Derived State) — unblocks all downstream work
+- Execute Phase 7 (Foundation & Derived State) via `/gsd-execute-phase 07` — all 5 plans defined; unblocks all downstream v1.1 work
+- Optionally run `/gsd-verify-work 01` across both gap-closure plans (01-03 + 01-04) before starting v1.1
 - Phase 10 flagged HIGH research — recommend `/gsd-research-phase` at planning time for prompt engineering
 - Finalize writing prompt library copywriting (60+ prompts) during Phase 8 planning
-- Consider adding ESLint + `lint` npm script as its own plan (surfaced during 01-03 execution)
+- Consider adding ESLint + `lint` npm script as its own plan (surfaced during 01-03 and re-confirmed during 01-04 execution)
 
 ### Blockers
 
@@ -158,10 +158,10 @@ See: .planning/PROJECT.md
 
 ## Session Continuity
 
-Last action: Completed plan 01-03 (DB migration ordering fix — moved idx_entries_local_date creation out of MIGRATION_SQL into guarded initializeDatabase() block, added dev-only raw SQLite error surfacing in dbError UI; UAT scenarios A+B passed, user approved) — 2026-04-17
+Last action: Completed plan 01-04 (window-controls regression fix — lifted `<TitleBar />` from inside `<AppShell>` (Unlocked-only) to a single mount above the state switch in App.tsx; Min/Max/Close controls now render in every app state; simplified AppShell to layout-only; PIN screens wrapped in `h-full w-full` parents; user approved UAT across states 1/4/5/6) — 2026-04-17
 
-Next action: Execute plan `01-04-PLAN.md` to close UAT-02 (major — window controls missing in non-Unlocked app states)
+Next action: Begin v1.1 — run `/gsd-execute-phase 07` to start Phase 7 (Foundation & Derived State; 5 plans already defined). Optionally run `/gsd-verify-work 01` first to regression-sweep the gap-closure pass.
 
 ---
 
-*Milestone v1.1 Daily Driver: roadmap complete. Phases 7-11 defined with dependency chain Foundation → Dashboard → {Onboarding, Auto-Tag} → Polish+Tag UX. Phase 01 gap-closure pass (plans 01-03, 01-04) in flight before v1.1 planning resumes.*
+*Milestone v1.1 Daily Driver: roadmap complete. Phases 7-11 defined with dependency chain Foundation → Dashboard → {Onboarding, Auto-Tag} → Polish+Tag UX. Phase 01 gap-closure pass (plans 01-03 + 01-04) complete — Milestone v1.0 has no known UAT gaps. v1.1 planning resumes.*
