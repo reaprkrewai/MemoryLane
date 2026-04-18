@@ -15,6 +15,7 @@ import { useAIStore } from "./stores/aiStore";
 import * as hybridAI from "./lib/hybridAIService";
 import { loadAIBackendPreference } from "./utils/aiSettingsService";
 import { useIdleTimeout } from "./hooks/useIdleTimeout";
+import { useGlobalShortcuts } from "./hooks/useGlobalShortcuts";
 
 function App() {
   const isDbReady = useUiStore((s) => s.isDbReady);
@@ -128,6 +129,9 @@ function App() {
 
   // Set up idle timeout monitoring
   useIdleTimeout();
+  // DASH-09 — register Ctrl/Cmd+N global new-entry shortcut (guards internally
+  // via isLocked/isDbReady store state + isTypingContext).
+  useGlobalShortcuts();
 
   const handlePinSetupComplete = async () => {
     setIsPinSet(true);
