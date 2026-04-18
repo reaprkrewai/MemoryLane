@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: MVP
 status: executing
-last_updated: "2026-04-17T12:37:19.779Z"
-last_activity: 2026-04-17 -- Phase 07 execution started
+last_updated: "2026-04-18T02:49:42.149Z"
+last_activity: 2026-04-18
 progress:
   total_phases: 6
-  completed_phases: 6
-  total_plans: 21
+  completed_phases: 5
+  total_plans: 23
   completed_plans: 23
   percent: 100
 ---
@@ -17,10 +17,10 @@ progress:
 
 ## Current Position
 
-Phase: 07 (foundation-derived-state) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 07
-Last activity: 2026-04-17 -- Phase 07 execution started
+Phase: 01 (foundation) — EXECUTING (gap-closure pass)
+Plan: 01-03 complete (UAT-01 fix); 01-04 next (UAT-02 window controls)
+Status: Ready to execute 01-04
+Last activity: 2026-04-17 -- 01-03 complete (DB migration ordering fix; UAT approved)
 
 ## Project Reference
 
@@ -119,6 +119,9 @@ See: .planning/PROJECT.md
 - RAG pipeline retrieves top-K similar entries before LLM call; grounded system prompt
 - Citation extraction uses UUID regex on `[Entry ID]` format; deduplicated before display
 - Setup wizard triggered on AI mode selection when Ollama unavailable (non-blocking)
+- Migration-ordering rule: any index/trigger/view referencing a column added by a PRAGMA-guarded ALTER inside `initializeDatabase()` must run AFTER that guarded block as a standalone `db.execute()` call — NEVER inside MIGRATION_SQL, even behind `IF NOT EXISTS` (01-03 UAT-01 fix)
+- Dev-only raw SQLite error surfacing pattern: in every user-facing error branch, render the underlying message in a `<pre>` gated by `import.meta.env.DEV` so future diagnoses don't get misrouted to generic copy (01-03)
+- No `npm run lint` script or ESLint config exists in this repo yet — verifiers should use `npx tsc --noEmit` as the type/lint surrogate, or add ESLint as its own plan
 
 ### Open Questions for Planner (from SUMMARY.md)
 
@@ -130,9 +133,11 @@ See: .planning/PROJECT.md
 
 ### Todos
 
+- Execute plan 01-04 to close UAT-02 (window controls missing in non-Unlocked app states — TitleBar needs to render above state switch)
 - Plan Phase 7 (Foundation & Derived State) — unblocks all downstream work
 - Phase 10 flagged HIGH research — recommend `/gsd-research-phase` at planning time for prompt engineering
 - Finalize writing prompt library copywriting (60+ prompts) during Phase 8 planning
+- Consider adding ESLint + `lint` npm script as its own plan (surfaced during 01-03 execution)
 
 ### Blockers
 
@@ -153,10 +158,10 @@ See: .planning/PROJECT.md
 
 ## Session Continuity
 
-Last action: ROADMAP.md updated with v1.1 Daily Driver milestone (phases 7-11, 45 requirements, 100% coverage) — 2026-04-16
+Last action: Completed plan 01-03 (DB migration ordering fix — moved idx_entries_local_date creation out of MIGRATION_SQL into guarded initializeDatabase() block, added dev-only raw SQLite error surfacing in dbError UI; UAT scenarios A+B passed, user approved) — 2026-04-17
 
-Next action: `/gsd-plan-phase 7` to decompose Foundation & Derived State into executable plans
+Next action: Execute plan `01-04-PLAN.md` to close UAT-02 (major — window controls missing in non-Unlocked app states)
 
 ---
 
-*Milestone v1.1 Daily Driver: roadmap complete. Phases 7-11 defined with dependency chain Foundation → Dashboard → {Onboarding, Auto-Tag} → Polish+Tag UX. Ready for phase planning.*
+*Milestone v1.1 Daily Driver: roadmap complete. Phases 7-11 defined with dependency chain Foundation → Dashboard → {Onboarding, Auto-Tag} → Polish+Tag UX. Phase 01 gap-closure pass (plans 01-03, 01-04) in flight before v1.1 planning resumes.*

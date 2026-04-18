@@ -31,10 +31,12 @@
   3. All entry primary keys are UUID TEXT — no auto-increment integer IDs anywhere in the schema
   4. A `metadata` JSON column exists on the entries table, confirmed by inspecting the schema
   5. The app runs fully offline — no network call is made under any condition, including first launch
-**Plans:** 2/2 plans complete
+**Plans:** 3/4 plans complete (gap-closure pass in progress — UAT-01 closed, UAT-02 pending)
 Plans:
 - [x] 01-01-PLAN.md — Scaffold Tauri v2 project with all dependencies, Tailwind v3 + shadcn/ui design system
 - [x] 01-02-PLAN.md — SQLite schema (AI-ready), DB initialization, app shell UI, and empty state
+- [x] 01-03-PLAN.md — UAT-01 fix: DB migration ordering (idx_entries_local_date moved after PRAGMA/ALTER guard) + dev-only raw SQLite error surfacing
+- [ ] 01-04-PLAN.md — UAT-02 fix: lift TitleBar to render in every app state (loading, dbError, PIN setup, PIN entry)
 **UI hint**: yes
 
 ### Phase 2: Editor & Tags
@@ -145,7 +147,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/2 | Complete | 2026-04-09 |
+| 1. Foundation | 3/4 | Gap-closure (UAT-01 fixed 2026-04-17; 01-04 UAT-02 pending) | 2026-04-09 (v1.0 base) |
 | 2. Editor & Tags | 3/3 | Complete | 2026-04-10 |
 | 3. Timeline & Calendar | 3/3 | Complete | 2026-04-11 |
 | 4. Search & Discovery | 3/3 | Complete | 2026-04-11 |
