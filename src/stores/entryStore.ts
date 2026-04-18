@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { getDb } from "../lib/db";
 import { generateEmbeddingAsync } from "../utils/embeddingService";
+import { getEntryStats } from "../lib/dbQueries";
 
 export interface Photo {
   id: string;
@@ -36,6 +37,12 @@ interface EntryState {
   hasMore: boolean;
   isLoadingPage: boolean;
   pageSize: number;
+
+  // FOUND-01 — maintained derived primitives (D-01..D-05)
+  totalEntries: number;
+  dayStreak: number;
+  moodCounts: Record<string, number>;
+  recentEntries: Entry[];
 
   loadEntries: () => Promise<void>;
   selectEntry: (id: string) => Promise<void>;
@@ -76,6 +83,30 @@ let _intervalTimer: ReturnType<typeof setInterval> | null = null;
 let _pendingSave: (() => Promise<void>) | null = null;
 let _autoSaveInterval = 5000; // default, loaded from settings
 
+// FOUND-01 D-02 — identity-stable top-5 slice. Returns prev (same reference) when the
+// top 5 entries' id+updated_at are unchanged; returns a new slice otherwise. Subscribers
+// get === stability across mutations that don't touch the leading 5.
+function stableRecentSlice(all: Entry[], prev: Entry[]): Entry[] {
+  const next = all.slice(0, 5);
+  if (next.length !== prev.length) return next;
+  for (let i = 0; i < next.length; i++) {
+    if (next[i].id !== prev[i].id || next[i].updated_at !== prev[i].updated_at) {
+      return next;
+    }
+  }
+  return prev; // identity-stable: avoid re-render
+}
+
+// FOUND-01 D-04 — lifetime mood totals over allEntries. Cheap O(n) scan.
+// 30-day windowed shapes are widget-local concerns (Phase 8), not FOUND-01.
+function computeMoodCounts(all: Entry[]): Record<string, number> {
+  const counts: Record<string, number> = { great: 0, good: 0, okay: 0, bad: 0, awful: 0 };
+  for (const e of all) {
+    if (e.mood && e.mood in counts) counts[e.mood] += 1;
+  }
+  return counts;
+}
+
 export const useEntryStore = create<EntryState>((set, get) => ({
   entries: [],
   selectedEntryId: null,
@@ -85,6 +116,12 @@ export const useEntryStore = create<EntryState>((set, get) => ({
   hasMore: true,
   isLoadingPage: false,
   pageSize: 20,
+
+  // FOUND-01 — maintained derived primitives initial values
+  totalEntries: 0,
+  dayStreak: 0,
+  moodCounts: {},
+  recentEntries: [],
 
   loadEntries: async () => {
     const db = await getDb();
@@ -101,7 +138,11 @@ export const useEntryStore = create<EntryState>((set, get) => ({
 
   createEntry: async () => {
     const db = await getDb();
-    await db.execute("INSERT INTO entries (content, word_count, char_count) VALUES ('', 0, 0)");
+    const localDate = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD in user local TZ (FOUND-03 D-11)
+    await db.execute(
+      "INSERT INTO entries (content, word_count, char_count, local_date) VALUES ('', 0, 0, ?)",
+      [localDate]
+    );
     const rows = await db.select<{ id: string }[]>(
       "SELECT id FROM entries ORDER BY created_at DESC LIMIT 1"
     );
@@ -116,6 +157,14 @@ export const useEntryStore = create<EntryState>((set, get) => ({
     if (newRow.length > 0) {
       set((state) => ({ allEntries: [newRow[0], ...state.allEntries] }));
     }
+    const stats = await getEntryStats();
+    const all = get().allEntries;
+    set({
+      totalEntries: stats.totalEntries,
+      dayStreak: stats.dayStreak,
+      moodCounts: computeMoodCounts(all),
+      recentEntries: stableRecentSlice(all, get().recentEntries),
+    });
     return newId;
   },
 
@@ -126,6 +175,14 @@ export const useEntryStore = create<EntryState>((set, get) => ({
     set((state) => ({
       allEntries: state.allEntries.filter((e) => e.id !== id),
     }));
+    const statsDel = await getEntryStats();
+    const allDel = get().allEntries;
+    set({
+      totalEntries: statsDel.totalEntries,
+      dayStreak: statsDel.dayStreak,
+      moodCounts: computeMoodCounts(allDel),
+      recentEntries: stableRecentSlice(allDel, get().recentEntries),
+    });
     const { entries, selectedEntryId } = get();
     if (selectedEntryId === id) {
       set({ selectedEntryId: entries.length > 0 ? entries[0].id : null });
@@ -161,6 +218,11 @@ export const useEntryStore = create<EntryState>((set, get) => ({
         isSaving: false,
         lastSavedAt: Date.now(),
       }));
+      const after = get().allEntries;
+      set({
+        moodCounts: computeMoodCounts(after),
+        recentEntries: stableRecentSlice(after, get().recentEntries),
+      });
       // Trigger async embedding generation (fire-and-forget)
       generateEmbeddingAsync(entryId, content);
     } catch (err) {
@@ -227,6 +289,14 @@ export const useEntryStore = create<EntryState>((set, get) => ({
         hasMore: rows.length === limit,
         isLoadingPage: false,
       }));
+      const statsPage = await getEntryStats();
+      const allPage = get().allEntries;
+      set({
+        totalEntries: statsPage.totalEntries,
+        dayStreak: statsPage.dayStreak,
+        moodCounts: computeMoodCounts(allPage),
+        recentEntries: stableRecentSlice(allPage, get().recentEntries),
+      });
     } catch (err) {
       set({ isLoadingPage: false });
       throw err;
