@@ -159,6 +159,11 @@ function App() {
             The database failed to initialize. Check that the app has write
             access to your data folder, then restart.
           </p>
+          {import.meta.env.DEV && (
+            <pre className="mt-2 max-w-md whitespace-pre-wrap rounded-md border border-border bg-surface p-3 text-xs text-muted font-mono">
+              {dbError}
+            </pre>
+          )}
         </div>
       )}
 
