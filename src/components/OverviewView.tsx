@@ -1,14 +1,16 @@
 import { useEffect, useMemo } from "react";
-import { BookOpen, Hash, Flame, Tag, Plus, Pencil, ArrowRight } from "lucide-react";
-import { format, formatDistanceToNow, subDays } from "date-fns";
+import { BookOpen, CalendarDays, Flame, Tag, Plus } from "lucide-react";
+import { format, subDays } from "date-fns";
 import { useEntryStore } from "../stores/entryStore";
 import { useTagStore } from "../stores/tagStore";
 import { useViewStore } from "../stores/viewStore";
 import { StatCard } from "./StatCard";
-import { QuickActions } from "./QuickActions";
 import { MoodOverview } from "./MoodOverview";
-import { QuickWriteFAB } from "./QuickWriteFAB";
-import { stripMarkdown } from "../lib/stripMarkdown";
+import { OnThisDay } from "./OnThisDay";
+import { MoodTrends } from "./dashboard/MoodTrends";
+import { WritingPrompts } from "./dashboard/WritingPrompts";
+import { AIInsights } from "./dashboard/AIInsights";
+import { RecentEntriesFeed } from "./dashboard/RecentEntriesFeed";
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -42,7 +44,6 @@ export function OverviewView() {
   const selectEntry = useEntryStore((s) => s.selectEntry);
   const tags = useTagStore((s) => s.tags);
   const loadTags = useTagStore((s) => s.loadTags);
-  const setView = useViewStore((s) => s.setView);
   const navigateToEditor = useViewStore((s) => s.navigateToEditor);
 
   useEffect(() => {
@@ -55,34 +56,16 @@ export function OverviewView() {
 
   const totalEntries = useEntryStore((s) => s.totalEntries);
   const dayStreak = useEntryStore((s) => s.dayStreak);
-  const wordsWritten = useMemo(
-    () => allEntries.reduce((sum, e) => sum + (e.word_count ?? 0), 0),
-    [allEntries]
-  );
+  const entriesThisMonth = useEntryStore((s) => s.entriesThisMonth); // DASH-02 via Plan 01
   const tagsCreated = tags.length;
-  const stats = { totalEntries, wordsWritten, dayStreak, tagsCreated };
 
   const moodCounts = useMemo(() => calculateMoodCounts(allEntries), [allEntries]);
-
-  // Subscribes to FOUND-01 D-02 stable-ref primitive. The store maintains a 5-item
-  // identity-stable slice; we take the first 3 here via useMemo so the selector itself
-  // returns the identity-stable reference (calling .slice() inside the selector would
-  // create a fresh array on every store update and defeat the D-02 optimization).
-  const recentFive = useEntryStore((s) => s.recentEntries);
-  const recentEntries = useMemo(() => recentFive.slice(0, 3), [recentFive]);
 
   const handleNewEntry = async () => {
     const newId = await createEntry();
     await selectEntry(newId);
     navigateToEditor("timeline");
   };
-
-  const handleOpenEntry = async (id: string) => {
-    await selectEntry(id);
-    navigateToEditor("timeline");
-  };
-
-  const hasEntries = allEntries.length > 0;
 
   return (
     <div className="relative min-h-full overflow-y-auto">
@@ -119,125 +102,52 @@ export function OverviewView() {
         </div>
 
         {/* Stat grid */}
-        <section className="mb-8 grid grid-cols-4 gap-4">
+        <section
+          className="mb-8 grid grid-cols-4 gap-4"
+          data-onboarding="stat-cards"
+        >
           <StatCard
             icon={BookOpen}
-            label="Total entries"
-            value={stats.totalEntries}
+            label="total entries"
+            value={totalEntries}
             variant="blue"
           />
           <StatCard
-            icon={Hash}
-            label="Words written"
-            value={stats.wordsWritten.toLocaleString()}
+            icon={CalendarDays}
+            label="this month"
+            value={entriesThisMonth}
             variant="violet"
           />
           <StatCard
             icon={Flame}
-            label="Day streak"
-            value={stats.dayStreak}
+            label="this week"
+            value={Math.min(dayStreak, 7)}
             variant="amber"
-            suffix={stats.dayStreak === 1 ? "day" : "days"}
+            suffix="/7"
           />
           <StatCard
             icon={Tag}
-            label="Tags created"
-            value={stats.tagsCreated}
+            label="tags created"
+            value={tagsCreated}
             variant="emerald"
           />
         </section>
 
         {/* Main content split */}
         <section className="grid grid-cols-[2fr_1fr] gap-4">
-          {/* Recent entries */}
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
-            <div className="mb-5 flex items-baseline justify-between">
-              <h3 className="font-display text-lg font-semibold text-[var(--color-text)]">
-                Recent entries
-              </h3>
-              {hasEntries && (
-                <button
-                  onClick={() => setView("timeline")}
-                  className="group flex items-center gap-1 text-xs text-[var(--color-primary)] transition-colors hover:text-[var(--color-primary-glow)]"
-                >
-                  View all
-                  <ArrowRight
-                    size={12}
-                    className="transition-transform duration-200 group-hover:translate-x-0.5"
-                  />
-                </button>
-              )}
-            </div>
+          {/* Recent entries (extracted to dashboard/) */}
+          <RecentEntriesFeed />
 
-            {!hasEntries ? (
-              <div className="flex flex-col items-center justify-center py-14 text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface-secondary)]">
-                  <Pencil
-                    size={20}
-                    strokeWidth={1.5}
-                    className="text-[var(--color-text-muted)]"
-                  />
-                </div>
-                <p className="mb-1 text-sm text-[var(--color-text-secondary)]">
-                  No entries yet
-                </p>
-                <button
-                  onClick={() => void handleNewEntry()}
-                  className="font-display-italic text-sm text-[var(--color-primary)] transition-colors hover:text-[var(--color-primary-glow)]"
-                >
-                  Write your first entry
-                </button>
-              </div>
-            ) : (
-              <ul className="flex flex-col divide-y divide-[var(--color-border-subtle)]">
-                {recentEntries.map((entry) => {
-                  const preview = stripMarkdown(entry.content).slice(0, 140).trim();
-                  const relativeTime = formatDistanceToNow(new Date(entry.created_at), {
-                    addSuffix: true,
-                  });
-                  return (
-                    <li key={entry.id}>
-                      <button
-                        onClick={() => void handleOpenEntry(entry.id)}
-                        className="group flex w-full items-start gap-4 py-3.5 text-left transition-colors"
-                      >
-                        <div className="flex-1 overflow-hidden">
-                          <p className="mb-1 line-clamp-2 text-sm leading-relaxed text-[var(--color-text)] transition-colors group-hover:text-[var(--color-primary)]">
-                            {preview || (
-                              <span className="italic text-[var(--color-text-muted)]">
-                                Empty entry
-                              </span>
-                            )}
-                          </p>
-                          <p className="font-display-italic text-xs text-[var(--color-text-muted)]">
-                            {relativeTime}
-                          </p>
-                        </div>
-                        {entry.mood && (
-                          <span className="mt-1 flex h-2 w-2 shrink-0 rounded-full bg-[var(--color-primary)]" />
-                        )}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-
-          {/* Right column — stacked */}
+          {/* Right column — stacked widgets (D-03 order) */}
           <div className="flex flex-col gap-4">
             <MoodOverview moodCounts={moodCounts} />
-            <QuickActions
-              onStartWriting={() => void handleNewEntry()}
-              onAskAI={() => setView("search")}
-              onViewInsights={() => setView("search")}
-              onSearch={() => setView("search")}
-            />
+            <MoodTrends />
+            <WritingPrompts />
+            <AIInsights />
+            <OnThisDay />
           </div>
         </section>
       </div>
-
-      <QuickWriteFAB onClick={() => void handleNewEntry()} />
     </div>
   );
 }
