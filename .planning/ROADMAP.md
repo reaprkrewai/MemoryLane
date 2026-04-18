@@ -186,8 +186,8 @@ Plans:
 Plans:
 - [x] 07-01-PLAN.md — FOUND-03 schema migration (local_date column DDL + PRAGMA-guarded ALTER + backfill + index)
 - [x] 07-02-PLAN.md — FOUND-04 motion tokens + animations.css keyframes + global reduced-motion guard + tailwind utilities + main.tsx import
-- [ ] 07-03-PLAN.md — FOUND-02 dbQueries.ts::getEntryStats() SQL aggregate (TZ-safe streak via local_date)
-- [ ] 07-04-PLAN.md — FOUND-01 entryStore derived selectors + FOUND-03 D-11 createEntry local_date INSERT + OverviewView refactor
+- [x] 07-03-PLAN.md — FOUND-02 dbQueries.ts::getEntryStats() SQL aggregate (TZ-safe streak via local_date)
+- [x] 07-04-PLAN.md — FOUND-01 entryStore derived selectors + FOUND-03 D-11 createEntry local_date INSERT + OverviewView refactor
 - [x] 07-05-PLAN.md — TAGUX-01 ColorGrid primitive + TagPill refactor (pure refactor, pixel-identical)
 **UI hint**: yes
 
