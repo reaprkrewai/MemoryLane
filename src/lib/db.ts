@@ -29,7 +29,6 @@ CREATE TABLE IF NOT EXISTS entries (
 
 CREATE INDEX IF NOT EXISTS idx_entries_created_at ON entries(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_entries_mood ON entries(mood) WHERE mood IS NOT NULL;
-CREATE INDEX IF NOT EXISTS idx_entries_local_date ON entries(local_date);
 
 CREATE TABLE IF NOT EXISTS tags (
     id         TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
@@ -178,6 +177,12 @@ export async function initializeDatabase(): Promise<void> {
       console.log("[db] Migrated entries.local_date column + backfilled existing rows");
     }
   }
+
+  // UAT-01 fix — create the local_date index AFTER the column is guaranteed to exist.
+  // Must not run inside MIGRATION_SQL because pre-Phase-07 DBs hit the for-loop
+  // before the ALTER above has had a chance to add the column. Idempotent via
+  // CREATE INDEX IF NOT EXISTS — safe to run on every launch.
+  await db.execute("CREATE INDEX IF NOT EXISTS idx_entries_local_date ON entries(local_date)");
 
   // Verify tables were created (development diagnostic — safe in production)
   if (import.meta.env.DEV) {
