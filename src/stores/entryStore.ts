@@ -43,6 +43,7 @@ interface EntryState {
   dayStreak: number;
   moodCounts: Record<string, number>;
   recentEntries: Entry[];
+  entriesThisMonth: number; // DASH-02 — wired to stats.thisMonth; same D-05 contract as FOUND-01
 
   loadEntries: () => Promise<void>;
   selectEntry: (id: string) => Promise<void>;
@@ -122,6 +123,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
   dayStreak: 0,
   moodCounts: {},
   recentEntries: [],
+  entriesThisMonth: 0,
 
   loadEntries: async () => {
     const db = await getDb();
@@ -164,6 +166,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
     set({
       totalEntries: stats.totalEntries,
       dayStreak: stats.dayStreak,
+      entriesThisMonth: stats.thisMonth,
       moodCounts: computeMoodCounts(all),
       recentEntries: stableRecentSlice(all, get().recentEntries),
     });
@@ -182,6 +185,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
     set({
       totalEntries: statsDel.totalEntries,
       dayStreak: statsDel.dayStreak,
+      entriesThisMonth: statsDel.thisMonth,
       moodCounts: computeMoodCounts(allDel),
       recentEntries: stableRecentSlice(allDel, get().recentEntries),
     });
@@ -306,6 +310,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       set({
         totalEntries: statsPage.totalEntries,
         dayStreak: statsPage.dayStreak,
+        entriesThisMonth: statsPage.thisMonth,
         moodCounts: computeMoodCounts(allPage),
         recentEntries: stableRecentSlice(allPage, get().recentEntries),
       });
