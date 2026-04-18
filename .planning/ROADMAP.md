@@ -79,7 +79,13 @@ Plans:
   4. Writing Prompts widget shows one prompt per day chosen deterministically via `day_of_year % N` from a library of 60+ prompts; "Another prompt" button cycles to the next in the library
   5. AI Insights widget shows a cached LLM summary of the last 7 days when Ollama is available; when Ollama is unavailable, it renders a graceful empty state (no error dialog) and keeps the Refresh button visible so the user can retry; refresh writes `ai_insight_generated_at` to the `settings` KV table
   6. User can click the Quick-Write FAB or press `Ctrl/Cmd+N` from any top-level view to create a new entry and open it in the editor; FAB has `aria-label="New entry"` and visible `focus-visible` ring
-**Plans**: TBD
+**Plans**: 5/5 plans planned
+Plans:
+- [ ] 08-01-PLAN.md — Store extension (entriesThisMonth derived primitive) + writingPrompts.ts 60-item library
+- [ ] 08-02-PLAN.md — OverviewView refactor (4 stat cards, 5-item feed, 5-widget sidebar) + RecentEntriesFeed extraction + widget stubs
+- [ ] 08-03-PLAN.md — MoodTrends 30-day stacked-bar SVG + WritingPrompts deterministic daily prompt cycling
+- [ ] 08-04-PLAN.md — insightService (7-day SQL + hybridAI + settings cache) + AIInsights widget (Refresh + 4 states + graceful Ollama-down fallback)
+- [ ] 08-05-PLAN.md — FAB hoist to AppShell + normalize aria-label + focus-visible ring + useGlobalShortcuts (Ctrl/Cmd+N global)
 **UI hint**: yes
 
 ### Phase 9: First-Run Onboarding
@@ -172,11 +178,11 @@ Phases 9, 10, 11 can execute in parallel once Phase 8 is complete (11 only needs
 | 5. Media, Security & Settings | v1.0 | 4/4 | Complete | 2026-04-14 |
 | 6. AI Features | v1.0 | 4/4 | Complete | 2026-04-14 |
 | 7. Foundation & Derived State | v1.1 | 5/5 | Complete | 2026-04-18 |
-| 8. Home Dashboard & Widgets | v1.1 | 0/TBD | Not started | — |
+| 8. Home Dashboard & Widgets | v1.1 | 0/5 | Not started | — |
 | 9. First-Run Onboarding | v1.1 | 0/TBD | Not started | — |
 | 10. Auto-Tagging AI Pipeline | v1.1 | 0/TBD | Not started | — |
 | 11. Microinteractions & Tag Management | v1.1 | 0/TBD | Not started | — |
 
 ---
 
-*Roadmap last updated: 2026-04-18 — v1.0 shipped and archived; v1.1 Phase 7 complete, Phase 8 next*
+*Roadmap last updated: 2026-04-18 — v1.0 shipped and archived; v1.1 Phase 7 complete, Phase 8 planned (5 plans)*
