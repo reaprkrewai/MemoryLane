@@ -246,6 +246,16 @@ export const useEntryStore = create<EntryState>((set, get) => ({
         e.id === entryId ? { ...e, mood, updated_at: now } : e
       ),
     }));
+    // FOUND-01 D-01 — every write action that can affect a derived primitive must
+    // recompute it. updateMood is the canonical mood-mutating action; refresh
+    // moodCounts (D-04) and recentEntries (D-02; updated_at bump may rotate slice).
+    // totalEntries / dayStreak don't change here — skip getEntryStats() to avoid
+    // unnecessary DB round-trips, matching the saveContent treatment.
+    const after = get().allEntries;
+    set({
+      moodCounts: computeMoodCounts(after),
+      recentEntries: stableRecentSlice(after, get().recentEntries),
+    });
   },
 
   updateCreatedAt: async (entryId: string, timestamp: number) => {
