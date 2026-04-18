@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { BookOpen, Hash, Flame, Tag, Plus, Pencil, ArrowRight } from "lucide-react";
-import { format, formatDistanceToNow, startOfDay, subDays } from "date-fns";
+import { format, formatDistanceToNow, subDays } from "date-fns";
 import { useEntryStore } from "../stores/entryStore";
 import { useTagStore } from "../stores/tagStore";
 import { useViewStore } from "../stores/viewStore";
@@ -21,24 +21,6 @@ function getGreeting(): string {
 
 function formatFullDate(date: Date): string {
   return format(date, "EEEE, MMMM d, yyyy");
-}
-
-function calculateDayStreak(entries: { created_at: number }[]): number {
-  if (entries.length === 0) return 0;
-
-  const uniqueDates = new Set(
-    entries.map((e) => format(startOfDay(new Date(e.created_at)), "yyyy-MM-dd"))
-  );
-
-  let streak = 0;
-  let cursor = startOfDay(new Date());
-
-  while (uniqueDates.has(format(cursor, "yyyy-MM-dd"))) {
-    streak += 1;
-    cursor = subDays(cursor, 1);
-  }
-
-  return streak;
 }
 
 function calculateMoodCounts(
@@ -71,17 +53,20 @@ export function OverviewView() {
   const greeting = useMemo(() => getGreeting(), []);
   const today = useMemo(() => new Date(), []);
 
-  const stats = useMemo(() => {
-    const totalEntries = allEntries.length;
-    const wordsWritten = allEntries.reduce((sum, e) => sum + (e.word_count ?? 0), 0);
-    const dayStreak = calculateDayStreak(allEntries);
-    const tagsCreated = tags.length;
-    return { totalEntries, wordsWritten, dayStreak, tagsCreated };
-  }, [allEntries, tags]);
+  const totalEntries = useEntryStore((s) => s.totalEntries);
+  const dayStreak = useEntryStore((s) => s.dayStreak);
+  const wordsWritten = useMemo(
+    () => allEntries.reduce((sum, e) => sum + (e.word_count ?? 0), 0),
+    [allEntries]
+  );
+  const tagsCreated = tags.length;
+  const stats = { totalEntries, wordsWritten, dayStreak, tagsCreated };
 
   const moodCounts = useMemo(() => calculateMoodCounts(allEntries), [allEntries]);
 
-  const recentEntries = useMemo(() => allEntries.slice(0, 3), [allEntries]);
+  // Subscribes to FOUND-01 D-02 stable-ref primitive. The store maintains a 5-item
+  // identity-stable slice; we take the first 3 here. Visual identity preserved.
+  const recentEntries = useEntryStore((s) => s.recentEntries.slice(0, 3));
 
   const handleNewEntry = async () => {
     const newId = await createEntry();
