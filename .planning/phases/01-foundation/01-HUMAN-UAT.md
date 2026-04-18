@@ -1,9 +1,10 @@
 ---
-status: diagnosed
+status: resolved
 phase: 01-foundation
 source: [01-VERIFICATION.md]
 started: 2026-04-09T00:00:00Z
-updated: 2026-04-17T21:00:00Z
+updated: 2026-04-17T00:00:00Z
+resolved_by: [01-03-PLAN.md, 01-04-PLAN.md]
 ---
 
 ## Current Test
@@ -35,16 +36,18 @@ result: pass
 ## Summary
 
 total: 4
-passed: 2
-issues: 2
+passed: 4
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
+notes: "Tests 1 and 3 originally failed; resolved by 01-03 (UAT-01) and 01-04 (UAT-02) gap-closure plans, re-verified 2026-04-17."
 
 ## Gaps
 
 - truth: "Running `npm run tauri dev` opens a working journal window with the empty-state UI and 'Journal opened' toast."
-  status: failed
+  status: resolved
+  resolved_by: 01-03-PLAN.md
   reason: "User reported: Screenshot shows 'Could not open your journal — The database failed to initialize. Check that the app has write access to your data folder, then restart.' Application failed to start."
   severity: blocker
   test: 1
@@ -64,7 +67,8 @@ blocked: 0
   debug_session: .planning/debug/db-init-failure.md
 
 - truth: "Custom title bar exposes Minimize, Maximize, and Close controls that invoke the Tauri window API."
-  status: failed
+  status: resolved
+  resolved_by: 01-04-PLAN.md
   reason: "User reported: There are no minimize, maximize or close buttons visible in the title bar."
   severity: major
   test: 3
