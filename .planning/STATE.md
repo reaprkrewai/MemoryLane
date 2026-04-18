@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: MVP
-status: ready-for-v1.1
-last_updated: "2026-04-17T00:00:00.000Z"
-last_activity: 2026-04-17 -- 01-04 complete (UAT-02 fix; TitleBar lifted above state switch; UAT approved)
+status: completed
+last_updated: "2026-04-18T03:23:13.607Z"
+last_activity: 2026-04-18
 progress:
   total_phases: 6
   completed_phases: 6
-  total_plans: 25
+  total_plans: 23
   completed_plans: 25
   percent: 100
 ---
@@ -17,10 +17,10 @@ progress:
 
 ## Current Position
 
-Phase: 01 (foundation) — COMPLETE (gap-closure pass finished; both 01-03 and 01-04 shipped)
-Plan: 01-04 complete (UAT-02 fix — TitleBar renders in every app state)
+Phase: 02
+Plan: Not started
 Status: v1.0 complete with no known UAT gaps. Ready to begin v1.1 Phase 7 (Foundation & Derived State).
-Last activity: 2026-04-17 -- 01-04 complete (window-controls regression fix; UAT approved)
+Last activity: 2026-04-18
 
 ## Project Reference
 
