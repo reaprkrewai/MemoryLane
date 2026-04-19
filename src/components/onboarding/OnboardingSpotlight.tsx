@@ -58,6 +58,21 @@ export function OnboardingSpotlight() {
       ro.observe(target);
     }
 
+    // WR-03 fix: per-frame re-measure to catch layout shifts that don't trigger
+    // window resize or FAB resize (sidebar collapse/expand, font-scale changes
+    // re-flowing the FAB's parent, image lazy-load above the FAB, scroll inside
+    // a non-body scroll container — the body scroll lock below only locks
+    // document.body, not nested scrollers). Step 2 is short-lived (until the
+    // user clicks "Got it" or "Skip tour"), so a rAF loop is acceptable
+    // overhead. recompute is cheap (one getBoundingClientRect + one setState
+    // call that React bails out of when values are unchanged).
+    let rafId: number | null = null;
+    const tick = () => {
+      recompute();
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+
     // Scroll lock — capture prior value to restore on unmount
     const priorOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -70,6 +85,7 @@ export function OnboardingSpotlight() {
     return () => {
       window.removeEventListener("resize", recompute);
       if (ro) ro.disconnect();
+      if (rafId !== null) cancelAnimationFrame(rafId);
       document.body.style.overflow = priorOverflow;
       document.body.classList.remove(BODY_CLASS);
     };
