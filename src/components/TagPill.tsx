@@ -59,11 +59,11 @@ export function TagPill({ tag, onRemove, onColorChange }: TagPillProps) {
       </PopoverTrigger>
       <PopoverContent className="w-auto p-3" onClick={(e) => e.stopPropagation()}>
         <ColorGrid
-          colors={[...TAG_COLORS]}
+          colors={TAG_COLORS.map(t => t.base)}
           selected={tag.color}
           onSelect={handleColorSelect}
           ariaLabel={`Color for tag ${tag.name}`}
-          cols={5}
+          cols={6}
         />
       </PopoverContent>
     </Popover>
