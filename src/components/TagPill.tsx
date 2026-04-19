@@ -16,6 +16,15 @@ interface TagPillProps {
 
 export function TagPill({ tag, onRemove, onColorChange }: TagPillProps) {
   const [open, setOpen] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isRemoving) return; // prevent double-fire
+    setIsRemoving(true);
+    // Defer the actual removal until the pop-out animation completes (120ms per tailwind.config.js token)
+    setTimeout(() => onRemove(), 120);
+  };
 
   const handleColorSelect = (color: string) => {
     onColorChange(color);
@@ -26,7 +35,7 @@ export function TagPill({ tag, onRemove, onColorChange }: TagPillProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div
-          className="group inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all hover:shadow-sm"
+          className={`group inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all hover:shadow-sm animate-tag-pop-in ${isRemoving ? "animate-tag-pop-out" : ""}`}
           style={{
             backgroundColor: `color-mix(in srgb, ${tag.color} 12%, transparent)`,
             borderColor: `color-mix(in srgb, ${tag.color} 35%, transparent)`,
@@ -47,10 +56,7 @@ export function TagPill({ tag, onRemove, onColorChange }: TagPillProps) {
           <button
             type="button"
             className="opacity-0 transition-opacity group-hover:opacity-100 flex items-center justify-center p-0.5 rounded hover:text-destructive"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
+            onClick={handleRemove}
             aria-label={`Remove tag ${tag.name}`}
           >
             <X size={14} />
