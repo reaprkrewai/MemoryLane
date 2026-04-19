@@ -39,8 +39,6 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogAction,
-  AlertDialogCancel,
 } from "../ui/alert-dialog";
 import { Popover, PopoverContent, PopoverAnchor } from "../ui/popover";
 import { useUiStore } from "../../stores/uiStore";
@@ -204,7 +202,18 @@ export function OnboardingOverlay() {
               <StepIndicator step={1} total={3} />
               <SkipLink onSkip={() => void handleSkip()} />
             </div>
-            <AlertDialogAction onClick={handleStep1Continue}>Continue</AlertDialogAction>
+            {/* CR-01 fix: plain <button> instead of AlertDialogAction. Radix's
+                Action auto-closes the dialog and fires onOpenChange(false),
+                which would route through handleSkip() and silently end the
+                tour. The Escape/click-outside dismissal still uses
+                onOpenChange -> handleSkip above. */}
+            <button
+              type="button"
+              onClick={handleStep1Continue}
+              className="px-4 py-2 text-label rounded-md bg-accent text-amber-950 dark:text-bg font-medium"
+            >
+              Continue
+            </button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -276,12 +285,27 @@ export function OnboardingOverlay() {
               <SkipLink onSkip={() => void handleSkip()} />
             </div>
             <div className="flex items-center gap-2">
-              <AlertDialogCancel onClick={() => void handleStep3Explore()}>
+              {/* CR-01 fix: plain <button>s instead of AlertDialogCancel /
+                  AlertDialogAction. Both Radix variants auto-close the dialog
+                  and fire onOpenChange(false), which would route through
+                  handleSkip() and trigger a redundant markOnboardingCompleted
+                  write (also resolves IN-01). The handlers below already mark
+                  completion explicitly. Escape / click-outside dismissal still
+                  uses onOpenChange -> handleSkip above. */}
+              <button
+                type="button"
+                onClick={() => void handleStep3Explore()}
+                className="px-4 py-2 text-label rounded-md border border-border text-text-secondary hover:text-text font-medium"
+              >
                 I'll explore first
-              </AlertDialogCancel>
-              <AlertDialogAction onClick={() => void handleWriteFirstEntry()}>
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleWriteFirstEntry()}
+                className="px-4 py-2 text-label rounded-md bg-accent text-amber-950 dark:text-bg font-medium"
+              >
                 Write your first entry
-              </AlertDialogAction>
+              </button>
             </div>
           </AlertDialogFooter>
         </AlertDialogContent>
