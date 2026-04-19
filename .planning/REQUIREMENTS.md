@@ -66,11 +66,11 @@ Goal: turn the working MVP into a habit-forming daily driver — land users on a
 
 - [x] **TAGUX-01**: `src/components/ui/ColorGrid.tsx` primitive renders the tag color palette as an accessible swatch grid; reused wherever a color is selected
 - [x] **TAGUX-02**: Tag color palette expands from 8 to 12 preset colors; each defined as a dual-tone token (`base`, `bg`, `text`) verified to pass WCAG AA contrast in both light and dark themes
-- [ ] **TAGUX-03**: User can open a "Tag Management" view from Settings → Tag Management
-- [ ] **TAGUX-04**: Tag Management lists all tags with color swatch, usage count, and last-used date; sortable by usage or recency
+- [x] **TAGUX-03**: User can open a "Tag Management" view from Settings → Tag Management
+- [x] **TAGUX-04**: Tag Management lists all tags with color swatch, usage count, and last-used date; sortable by usage or recency
 - [x] **TAGUX-05**: User can rename a tag from Tag Management; rename propagates to all entries that reference it
-- [ ] **TAGUX-06**: User can change a tag's color from Tag Management via the ColorGrid picker; change reflects everywhere (TagPill, autocomplete, timeline)
-- [ ] **TAGUX-07**: User can delete a tag from Tag Management only if it has zero entries; delete button is disabled with tooltip otherwise
+- [x] **TAGUX-06**: User can change a tag's color from Tag Management via the ColorGrid picker; change reflects everywhere (TagPill, autocomplete, timeline)
+- [x] **TAGUX-07**: User can delete a tag from Tag Management only if it has zero entries; delete button is disabled with tooltip otherwise
 
 ## Out of Scope
 
@@ -128,11 +128,11 @@ Goal: turn the working MVP into a habit-forming daily driver — land users on a
 | ANIM-06 | Phase 11 | Complete |
 | TAGUX-01 | Phase 7 | Complete |
 | TAGUX-02 | Phase 11 | Complete |
-| TAGUX-03 | Phase 11 | Pending |
-| TAGUX-04 | Phase 11 | Pending |
+| TAGUX-03 | Phase 11 | Complete |
+| TAGUX-04 | Phase 11 | Complete |
 | TAGUX-05 | Phase 11 | Complete |
-| TAGUX-06 | Phase 11 | Pending |
-| TAGUX-07 | Phase 11 | Pending |
+| TAGUX-06 | Phase 11 | Complete |
+| TAGUX-07 | Phase 11 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 45 total — mapped to phases: 45, unmapped: 0

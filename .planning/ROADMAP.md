@@ -137,7 +137,7 @@ Plans:
 Plans:
 - [x] 11-01-PLAN.md — TAGUX-02 palette refactor (12 tokens) + renameTag store action + db.ts color backfill + animations.css keyframes + tailwind.config.js tokens (Wave 1)
 - [ ] 11-02-PLAN.md — TagPill pop-in/out + MoodSelector spring + OverviewView stagger + JournalView crossfade (Wave 2, ANIM-01/02/04/05)
-- [ ] 11-03-PLAN.md — TagManagementSection new component + SettingsView integration (Wave 3, TAGUX-03..07)
+- [x] 11-03-PLAN.md — TagManagementSection new component + SettingsView integration (Wave 3, TAGUX-03..07)
 **UI hint**: yes
 
 ---
