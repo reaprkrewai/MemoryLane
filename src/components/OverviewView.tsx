@@ -103,34 +103,42 @@ export function OverviewView() {
 
         {/* Stat grid */}
         <section
-          className="mb-8 grid grid-cols-4 gap-4"
+          className="mb-8 grid grid-cols-4 gap-4 stagger-children"
           data-onboarding="stat-cards"
         >
-          <StatCard
-            icon={BookOpen}
-            label="total entries"
-            value={totalEntries}
-            variant="blue"
-          />
-          <StatCard
-            icon={CalendarDays}
-            label="this month"
-            value={entriesThisMonth}
-            variant="violet"
-          />
-          <StatCard
-            icon={Flame}
-            label="this week"
-            value={Math.min(dayStreak, 7)}
-            variant="amber"
-            suffix="/7"
-          />
-          <StatCard
-            icon={Tag}
-            label="tags created"
-            value={tagsCreated}
-            variant="emerald"
-          />
+          <div style={{ "--i": 0 } as React.CSSProperties} className="animate-fade-in">
+            <StatCard
+              icon={BookOpen}
+              label="total entries"
+              value={totalEntries}
+              variant="blue"
+            />
+          </div>
+          <div style={{ "--i": 1 } as React.CSSProperties} className="animate-fade-in">
+            <StatCard
+              icon={CalendarDays}
+              label="this month"
+              value={entriesThisMonth}
+              variant="violet"
+            />
+          </div>
+          <div style={{ "--i": 2 } as React.CSSProperties} className="animate-fade-in">
+            <StatCard
+              icon={Flame}
+              label="this week"
+              value={Math.min(dayStreak, 7)}
+              variant="amber"
+              suffix="/7"
+            />
+          </div>
+          <div style={{ "--i": 3 } as React.CSSProperties} className="animate-fade-in">
+            <StatCard
+              icon={Tag}
+              label="tags created"
+              value={tagsCreated}
+              variant="emerald"
+            />
+          </div>
         </section>
 
         {/* Main content split */}
