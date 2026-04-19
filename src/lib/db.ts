@@ -217,6 +217,28 @@ export async function initializeDatabase(): Promise<void> {
   // CREATE INDEX IF NOT EXISTS — safe to run on every launch.
   await db.execute("CREATE INDEX IF NOT EXISTS idx_entries_local_date ON entries(local_date)");
 
+  // Phase 11 TAGUX-02 — normalize tag.color values to the new 12-token palette.
+  // Each UPDATE is idempotent: rerunning updates zero rows once the migration has
+  // applied, and user-picked custom hexes (not in OLD_TO_NEW) are preserved as-is.
+  // Placed as standalone db.execute() calls AFTER MIGRATION_SQL loop — per the
+  // v1.0 UAT-01 migration-ordering rule (never inside MIGRATION_SQL).
+  const OLD_TO_NEW_TAG_COLORS: Record<string, string> = {
+    "#EF4444": "#DC2626", // red
+    "#F97316": "#EA580C", // orange
+    "#EAB308": "#CA8A04", // yellow
+    "#22C55E": "#16A34A", // green
+    "#3B82F6": "#2563EB", // blue
+    "#8B5CF6": "#7C3AED", // violet
+    "#EC4899": "#DB2777", // pink
+    "#6B7280": "#475569", // slate
+  };
+  for (const [oldHex, newHex] of Object.entries(OLD_TO_NEW_TAG_COLORS)) {
+    await db.execute("UPDATE tags SET color = ? WHERE color = ?", [newHex, oldHex]);
+  }
+  if (import.meta.env.DEV) {
+    console.log("[db] Phase 11: backfilled tag colors to new 12-token palette");
+  }
+
   // Verify tables were created (development diagnostic — safe in production)
   if (import.meta.env.DEV) {
     const tables = await db.select<{ name: string }[]>(
