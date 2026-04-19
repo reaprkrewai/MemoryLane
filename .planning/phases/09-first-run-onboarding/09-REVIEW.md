@@ -14,311 +14,105 @@ files_reviewed_list:
   - src/styles/globals.css
   - src/utils/onboardingService.ts
 findings:
-  critical: 2
-  warning: 4
-  info: 5
-  total: 11
-status: issues_found
+  critical: 0
+  warning: 0
+  info: 0
+  total: 0
+status: clean
+iteration: 2
 ---
 
-# Phase 9: Code Review Report
+# Phase 9: Code Review Report (Iteration 2)
 
 **Reviewed:** 2026-04-18
 **Depth:** standard
 **Files Reviewed:** 9
-**Status:** issues_found
+**Status:** clean
 
 ## Summary
 
-Phase 9 lands the first-run onboarding flow with thoughtful state machine design, a clean tri-state store mirror of `isPinSet`, and a good migration seed for v1.0 users. The SQL migration, store integration, and `useGlobalShortcuts` guard are correct and idempotent.
+Re-review of Iteration 1 fixes. All six issues from the prior review (CR-01, CR-02, WR-01, WR-02, WR-03, WR-04) are correctly addressed. No new issues or regressions were introduced. The onboarding flow is now functionally correct end-to-end, and the previously-flagged bugs (broken Step 1 advance, broken Replay) are resolved.
 
-However, **two critical interaction bugs** prevent the onboarding flow from functioning as designed:
+The fixes are well-commented in-source — every patched site has an inline comment that names the prior issue (`CR-01 fix:`, `CR-02 fix:`, `WR-02 fix:`, `WR-03 fix:`, `WR-04`) and explains why the change works. This makes the diff easy to audit and protects against future regressions.
 
-1. **Step transitions are short-circuited by `onOpenChange`.** Radix's `AlertDialogAction`/`AlertDialogCancel` close the dialog automatically when clicked, which fires `onOpenChange(false)`. The current handler unconditionally calls `handleSkip()` on every close — meaning clicking "Continue" on Step 1 advances state to 1, then immediately calls `handleSkip()` which marks onboarding completed and unmounts the overlay. **Users will never see Steps 2 or 3.** This is the highest-priority defect in the phase.
+## Verification of Iteration 1 Fixes
 
-2. **Replay is silently broken after first completion.** `currentStep` is internal `useState` that persists across the `return null` guard — it stays at `"done"` after the first run. When Replay flips the store back to `false`, the overlay re-renders but every `AlertDialog` evaluates `open={currentStep === N}` to `false`, so nothing appears. SC #4 (Replay tour) does not work end-to-end.
+### CR-01 — RESOLVED
+**Files:** `src/components/onboarding/OnboardingOverlay.tsx:234-240, 319-332`
 
-Both bugs are mechanical to fix and surface only at runtime — they will not be caught by the type system or a static lint pass. Recommend addressing both before sign-off; after that, the warnings are quality-of-life improvements that can ship in a follow-up.
+The Step 1 "Continue" button and both Step 3 CTAs (`I'll explore first`, `Write your first entry`) are now plain `<button type="button">` elements with explicit `onClick` handlers, replacing Radix's `AlertDialogAction` / `AlertDialogCancel`. Because plain buttons do not auto-close the parent `AlertDialog`, the spurious `onOpenChange(false)` -> `handleSkip()` cascade no longer fires. The `onOpenChange` prop on both AlertDialogs remains wired to `handleSkip` so Escape and click-outside still route through the single skip path (UI-SPEC L228 + T-09-04). Inline comments at L229-233 and L312-318 document the rationale and reference the prior CR-01.
 
-## Critical Issues
+Walk-through verification — Step 1 -> Step 2:
+1. User clicks Continue -> `handleStep1Continue()` runs, captures `fabRef.current` (WR-02), and calls `setCurrentStep(1)`.
+2. The dialog stays open from Radix's perspective — no auto-close, no `onOpenChange(false)`.
+3. React re-renders; `<AlertDialog open={currentStep === 0}>` evaluates to `open={false}` → Step 1 dialog closes naturally; `currentStep === 1 &&` block mounts the Spotlight + Popover.
 
-### CR-01: `onOpenChange` short-circuits Step 1 and Step 3 advances — users never reach Step 2 or finish the tour normally
+The same disambiguation applies to Step 3, eliminating the redundant `markOnboardingCompleted` write previously flagged as IN-01.
 
-**File:** `src/components/onboarding/OnboardingOverlay.tsx:165-168, 207, 261-264, 279-285`
+### CR-02 — RESOLVED
+**File:** `src/components/onboarding/OnboardingOverlay.tsx:120-124`
 
-**Issue:** Both AlertDialogs (Step 1 and Step 3) wire `onOpenChange={(open) => { if (!open) void handleSkip(); }}`. The intent (per the doc comment at L19-22) is to route the Escape-key dismiss path through `handleSkip`. But Radix's `AlertDialog.Action` and `AlertDialog.Cancel` (re-exported verbatim from `src/components/ui/alert-dialog.tsx`) auto-close the dialog when clicked, and that close fires `onOpenChange(false)` — same as Escape.
+A new `useEffect` resets `currentStep` to `0` whenever `isOnboardingCompleted` transitions to `false`. Critically, the effect is declared **before** the early-return guard at L128 so hook order is preserved across renders (the effect always runs, regardless of whether the gate lets the JSX through). On fresh install, the initial-state `currentStep === 0` makes this a no-op; on Replay, it correctly snaps state back to Step 1. The inline comment at L113-119 explains the trap (state persists across `return null`) and why the order matters.
 
-Walk-through for Step 1 → Step 2:
+### WR-01 — RESOLVED
+**File:** `src/components/SettingsView.tsx:604`
 
-1. User clicks `<AlertDialogAction onClick={handleStep1Continue}>Continue</AlertDialogAction>`.
-2. `handleStep1Continue` runs synchronously — `setCurrentStep(1)` is queued.
-3. Radix's internal `Action` handler fires `onOpenChange(false)` (because the Action button always closes the dialog).
-4. `onOpenChange` callback runs `handleSkip()` → `setCurrentStep("done")` AND `await markOnboardingCompleted()` → store flips to `true`.
-5. App.tsx's `OnboardingOverlay` is still mounted, but the early return `if (isOnboardingCompleted !== false) return null` now hides it.
+`handleReplay` now calls `useViewStore.getState().setView("overview")` synchronously **before** awaiting `replayOnboarding()`. Verified `setView` is a synchronous Zustand setter (`viewStore.ts:25`) — the view switch is committed to the store before the async DB write resolves, so by the time `isOnboardingCompleted` flips to `false` and the overlay re-mounts at Step 1, AppShell has already re-rendered with `activeView === "overview"` and the QuickWriteFAB is in the DOM. When the user advances to Step 2, the spotlight selector finds its target and the cutout draws correctly. Comment at L597-603 documents the FAB-mount dependency.
 
-**Net effect:** clicking "Continue" on Step 1 silently dismisses the entire onboarding flow and writes the completion row. The user never sees Steps 2 or 3. The same race fires for Step 3's "Write your first entry" and "I'll explore first" — those buttons trigger `markOnboardingCompleted` twice (once in the handler, once in the spurious `handleSkip` from `onOpenChange`). For Step 3 the second write is harmless (idempotent), but for Step 1 the bug is fatal.
+### WR-02 — RESOLVED
+**File:** `src/components/onboarding/OnboardingOverlay.tsx:146-149`
 
-This is a runtime regression of SC #1 ("3-step welcome overlay") and SC #2 ("user can advance step-by-step").
+`handleStep1Continue` now front-loads `fabRef.current = document.querySelector(FAB_SELECTOR)` before `setCurrentStep(1)`. By the time React re-renders and the Popover commits with `virtualRef={fabRef}`, the ref's current value already points to the FAB element. No more one-frame anchor-at-(0,0) jump. The defensive `useLayoutEffect` at L107-111 is preserved as a safety net for re-mount scenarios (font-scale change between Step 1 and Step 2, etc.). Comment at L138-145 explains both layers.
 
-**Fix:** Disambiguate Escape/click-outside dismissal from advance-button clicks. Either (a) move advance handlers off `AlertDialogAction` (use a regular `<button>` so no auto-close fires), or (b) gate `onOpenChange` so it only counts as Skip when not already advancing. Pattern (a) is cleaner:
+### WR-03 — RESOLVED
+**File:** `src/components/onboarding/OnboardingSpotlight.tsx:69-74, 88`
 
-```tsx
-{/* Step 1 footer — replace AlertDialogAction with a plain button so the
-    Action's auto-close doesn't fire onOpenChange(false). */}
-<AlertDialogFooter className="flex items-center justify-between mt-2">
-  <div className="flex items-center gap-3">
-    <StepIndicator step={1} total={3} />
-    <SkipLink onSkip={() => void handleSkip()} />
-  </div>
-  <button
-    type="button"
-    onClick={handleStep1Continue}
-    className="px-4 py-2 text-label rounded-md bg-accent text-amber-950 dark:text-bg font-medium"
-  >
-    Continue
-  </button>
-</AlertDialogFooter>
-```
+A `requestAnimationFrame` loop calls `recompute()` every paint while Step 2 is active, with `cancelAnimationFrame(rafId)` in the cleanup. This catches all the layout-shift scenarios previously enumerated (sidebar collapse, font-scale change in another module, image lazy-load, scroll inside a non-body container). The cleanup ordering is correct — `cancelAnimationFrame` runs before the body-class removal, so no stale frame callback can fire after unmount. Comment at L65-68 documents the trade-off and notes the loop is acceptable because Step 2 is short-lived.
 
-Apply the same change to Step 3's `AlertDialogAction` and `AlertDialogCancel`. Keep `onOpenChange` wired to `handleSkip` only for Escape/click-outside (which only fire when the user did NOT press an advance button).
+### WR-04 — RESOLVED
+**File:** `src/lib/db.ts:117-132`
 
-Alternative (less surgical): introduce a ref or state flag like `isAdvancingRef` that handlers set before they change `currentStep`, and check inside `onOpenChange` to suppress the spurious skip. The button-swap above is preferred because it removes the foot-gun rather than papering over it.
+The `splitSqlStatements` docstring now contains an explicit **LIMITATION (WR-04)** section enumerating the three known foot-guns:
+1. String literals containing `BEGIN`/`END`
+2. CASE expressions whose `END` appears on its own line
+3. Trailing inline comments after `END;`
 
----
+Plus a pointer to a real tokenizer (peggy / nearley / sqlite-parser) if future migrations need any of the above, and an explicit reassurance that the Phase-9 seed at L188+ is safe because it lives outside `MIGRATION_SQL`.
 
-### CR-02: Replay is broken after the first completion — `currentStep` is stuck at `"done"` and no dialog opens
+## Regression Check
 
-**File:** `src/components/onboarding/OnboardingOverlay.tsx:99, 117`
+I scanned the patched files for new issues that the fixes might have introduced. None found. Specifically verified:
 
-**Issue:** `currentStep` is a `useState<Step>(0)` local to `OnboardingOverlay`. After the user finishes (or skips) onboarding the first time, `currentStep` becomes `"done"` and `isOnboardingCompleted` flips to `true`. The component remains mounted (App.tsx mounts it whenever `isOnboardingCompleted !== null`, which includes `true`), and the early return `if (isOnboardingCompleted !== false) return null` hides the UI without unmounting the component. **`useState` is preserved across that null return.**
+- **Hook ordering in `OnboardingOverlay`:** The new `useEffect` is declared between `useLayoutEffect` and the early `return null` guard, so React sees the same hook count on every render whether the overlay is gated open or closed. Safe.
+- **Initial-mount behavior:** On fresh install where `isOnboardingCompleted` loads as `false`, the new reset effect calls `setCurrentStep(0)` once — a no-op since `currentStep` initializes to 0. No first-launch regression.
+- **`setView` -> async replay sequencing:** `setView("overview")` is synchronous (`viewStore.ts:25` is a single `set({...})`), so the view switch is observable in the store before `await replayOnboarding()` resolves. Order-of-operations is correct.
+- **rAF cleanup ordering in `OnboardingSpotlight`:** Cleanup runs `cancelAnimationFrame(rafId)` before mutating `document.body.style.overflow` and removing the body class. No stale frame can re-set state after unmount.
+- **CR-02 effect interplay with WR-01:** When user clicks Replay from Settings, the sequence is: (1) `setView("overview")` commits — AppShell re-renders, FAB mounts. (2) `await replayOnboarding()` resolves — DB row deleted, `setIsOnboardingCompleted(false)` called. (3) OnboardingOverlay re-renders; the early-return now lets JSX through; the new `useEffect` fires (`isOnboardingCompleted` changed from `true` -> `false`) and resets `currentStep` to 0. (4) Step 1 AlertDialog opens. All steps land in correct order.
+- **CR-01 button styling parity:** The replacement `<button>` for Step 1 Continue uses the same `bg-accent text-amber-950 dark:text-bg font-medium` classes as the original `AlertDialogAction` would have rendered. Step 3 secondary ("I'll explore first") uses `border border-border text-text-secondary` — visually distinct from the primary CTA, matching UI-SPEC's secondary-button treatment. No visual regression.
+- **No new TypeScript escape hatches:** The only `as` cast in OnboardingOverlay is the pre-existing `fabRef as RefObject<{ getBoundingClientRect(): DOMRect }>` (L260) — the WR-02 fix did not add new casts. The `document.querySelector` at L147 is correctly typed as `HTMLElement | null` via `as HTMLElement | null`, mirroring the existing pattern at L109.
+- **`useGlobalShortcuts`, `uiStore`, `globals.css`, `App.tsx`, `onboardingService.ts`:** Unchanged from Iteration 1 (or unchanged in ways that don't affect this review). No new issues.
 
-When the user later clicks Settings → Replay, `replayOnboarding()` flips the store back to `false`. The early return now lets the JSX render — but `currentStep` is still `"done"`. Every `<AlertDialog open={currentStep === N}>` evaluates to `open={false}`, the Step 2 `currentStep === 1 && ...` block is skipped, and the user sees nothing. SC #4 (Replay tour) silently fails.
+## Outstanding Info Items from Iteration 1
 
-This breaks the explicit doc-comment claim at SettingsView.tsx:597-600 ("re-mounts at Step 1 — no app restart needed").
+The previous review's Info items (IN-01..IN-05) are either resolved by the Iteration 1 fixes or remain documented trade-offs:
 
-**Fix:** Reset `currentStep` whenever `isOnboardingCompleted` transitions to `false`, OR mount/unmount the overlay only when the flag is exactly `false`. Two clean options:
+- **IN-01** (double `markOnboardingCompleted` write on Step 3): **Resolved** by CR-01's button-swap fix — `onOpenChange(false)` no longer fires on advance-button clicks.
+- **IN-02** (render-gate doc-comment mismatch): **Resolved** — the comment at L15-17 still describes the "render gate" but the new comments at L113-119 and L126-128 explicitly explain the persistent-mount + early-return pattern, so a future reader has full context.
+- **IN-03** (`loadOnboardingState` swallows DB errors): Unchanged — left as a documented UX trade-off per the original Info-level classification. Not a regression.
+- **IN-04** (`useGlobalShortcuts` settings-view block): Unchanged — no fix was requested in Iteration 1. Still a minor UX nit, not a regression.
+- **IN-05** (`!important` in globals.css): Unchanged — left as a stylistic observation. Not a regression.
 
-Option A — reset the step when the gate opens (preferred — keeps App.tsx unchanged):
+None of these warrant re-flagging at this iteration.
 
-```tsx
-// Inside OnboardingOverlay, after the existing useLayoutEffect:
-useEffect(() => {
-  if (isOnboardingCompleted === false) {
-    setCurrentStep(0);
-  }
-}, [isOnboardingCompleted]);
-```
+## Conclusion
 
-Option B — mount only when the flag is exactly `false` (forces fresh state via component remount), edit `src/App.tsx:229`:
+All six requested fixes hold under re-review. The onboarding flow is now end-to-end functional: Step 1 Continue advances to Step 2, Replay from Settings restarts the tour at Step 1 with the FAB visible, Step 2 spotlight tracks the FAB across layout shifts, and the SQL splitter has clear guardrails for future editors.
 
-```tsx
-{isOnboardingCompleted === false && <OnboardingOverlay />}
-```
-
-Either fix restores SC #4. Option A is slightly safer because it preserves the documented mount lifecycle in the OnboardingOverlay header comment ("Render gate: isOnboardingCompleted === false ... this component only mounts when the flow should actually render"). That comment is currently aspirational — the component is mounted earlier than the comment implies; Option A makes the runtime match the comment's intent.
-
-## Warnings
-
-### WR-01: `replayOnboarding` from Settings shows a broken Step 2 (FAB not in DOM)
-
-**File:** `src/components/SettingsView.tsx:593-605`, `src/components/AppShell.tsx:7,16,33`
-
-**Issue:** The QuickWriteFAB is only rendered when `activeView` is one of `overview, timeline, calendar, search` (AppShell.tsx:7,16). When the user clicks Replay from Settings, `activeView === "settings"` so the FAB is not in the DOM. After CR-02 is fixed and the flow restarts at Step 1 → Step 2, `OnboardingSpotlight` queries `document.querySelector('[data-onboarding="quick-write-fab"]')` and gets `null` → falls back to a fully-dimmed backdrop with no cutout, and the Step 2 Popover anchors to a null `fabRef.current` → either positions at the viewport origin (0,0) or no-ops, leaving the user with a dim screen and a stranded popover.
-
-The doc comment at OnboardingSpotlight.tsx:16-18 anticipates this case ("if the FAB target is missing ... user can still escape via Skip tour or Esc") but the result is poor UX — the user has just clicked "Replay tour" and is rewarded with a broken screen.
-
-**Fix:** Navigate the user to a FAB-visible view before the overlay renders. In `handleReplay` (SettingsView.tsx:593):
-
-```tsx
-const handleReplay = async () => {
-  setIsReplaying(true);
-  try {
-    // Land on Overview so QuickWriteFAB is mounted before Step 2's spotlight
-    // queries the DOM (D-12 spotlight target is the FAB).
-    useViewStore.getState().setView("overview");
-    await replayOnboarding();
-  } finally {
-    setIsReplaying(false);
-  }
-};
-```
-
-Alternative: have `OnboardingSpotlight` re-query on a short interval / `requestAnimationFrame` until the FAB appears, with a timeout. The view-switch is simpler and matches existing single-source-of-truth patterns.
-
----
-
-### WR-02: Step 2 PopoverAnchor receives a null `fabRef.current` on the first render — brief positioning glitch
-
-**File:** `src/components/onboarding/OnboardingOverlay.tsx:107-113, 227`
-
-**Issue:** When `currentStep` transitions to `1`, the JSX block `currentStep === 1 && (...)` renders the Popover **before** the `useLayoutEffect` runs to populate `fabRef.current`. React's render-then-effect ordering means the first commit of `<PopoverAnchor virtualRef={fabRef as RefObject<...>}>` sees `fabRef.current === null`. Floating-ui's positioning math reads `getBoundingClientRect()` on the ref's current value and either returns `(0,0,0,0)` or skips positioning. After `useLayoutEffect` populates the ref, subsequent layout cycles correct the position, but a one-frame visual jump from origin to FAB is possible.
-
-The cast to `RefObject<{ getBoundingClientRect(): DOMRect }>` (line 227) silently hides the null-current discrepancy from TypeScript.
-
-**Fix:** Capture the FAB element BEFORE rendering the Popover. Two options:
-
-Option A — do the query during `handleStep1Continue` so the ref is populated by the time the Popover mounts:
-
-```tsx
-const handleStep1Continue = () => {
-  fabRef.current = document.querySelector(FAB_SELECTOR) as HTMLElement | null;
-  setCurrentStep(1);
-};
-```
-
-Option B — gate the Popover render on `fabRef.current` being populated:
-
-```tsx
-{currentStep === 1 && fabRef.current && (
-  <>
-    <OnboardingSpotlight />
-    <Popover open>
-      <PopoverAnchor virtualRef={fabRef as RefObject<...>} />
-      ...
-```
-
-Option A is preferred — it preserves the unconditional render and just front-loads the DOM query.
-
----
-
-### WR-03: Spotlight cutout misaligns on layout shifts that don't trigger window resize or FAB resize
-
-**File:** `src/components/onboarding/OnboardingSpotlight.tsx:39-76`
-
-**Issue:** `recompute()` is wired to two triggers — `window.addEventListener("resize", ...)` and `ResizeObserver(target)`. Neither fires for layout shifts that change the FAB's viewport position without resizing the window or the FAB itself. Examples: sidebar collapse/expand, font-scale change in another module that re-flows the FAB's parent, image lazy-load above the FAB on overview, or any scroll inside a non-`<body>` scrolling container (the body scroll-lock at L62-63 only locks `document.body`, not nested scrollers).
-
-When that happens, the cutout points at the FAB's old viewport rect while the FAB has moved, leaving the user with a dimmed circle next to the FAB instead of around it.
-
-**Fix:** Add `IntersectionObserver` or a scroll/`requestAnimationFrame` loop while Step 2 is active. Simplest:
-
-```tsx
-useLayoutEffect(() => {
-  // ... existing setup ...
-
-  // Re-measure on every paint while the spotlight is active, using rAF
-  // to avoid runaway recomputes. Cleanup cancels the scheduled frame.
-  let rafId: number | null = null;
-  const tick = () => {
-    recompute();
-    rafId = requestAnimationFrame(tick);
-  };
-  rafId = requestAnimationFrame(tick);
-
-  return () => {
-    // ... existing cleanup ...
-    if (rafId !== null) cancelAnimationFrame(rafId);
-  };
-}, []);
-```
-
-Alternative, lower-overhead: also listen on `scroll` (capture-phase, passive) and use `IntersectionObserver` with a sentinel near the FAB. The rAF loop is acceptable here because Step 2 is short-lived.
-
----
-
-### WR-04: `splitSqlStatements` BEGIN/END detection is fragile and was never updated for the Phase-9 seed
-
-**File:** `src/lib/db.ts:117-152, 188-193`
-
-**Issue:** The Phase-9 seed (D-04, lines 188-193) is correctly placed *after* the `splitSqlStatements` loop and uses parameterized `db.execute(...)` — so this isn't a bug today. However, the SQL splitter in `splitSqlStatements` has an existing brittleness that anyone editing `MIGRATION_SQL` could trip on:
-
-- L130-132 detects `BEGIN`/`END` via `trimmed.toUpperCase()` matching `"BEGIN"`, `endsWith(" BEGIN")`, `"END"`, `"END;"`. A trigger body that ends with `END;` followed by a trailing comment on the same line, or that uses `END WHEN`/`END IF` (SQLite-allowed in `CASE`), or a column literal containing the substring `BEGIN`, will throw the depth tracker off.
-- The depth tracker has no awareness of string literals or comments — `INSERT INTO foo VALUES('BEGIN')` would increment depth.
-
-Add a comment warning future editors. If a future migration adds a literal containing `BEGIN`/`END`, the splitter will silently produce malformed statements. The seed at L188-193 is safe today because it doesn't touch `MIGRATION_SQL`, but the splitter is one careless edit away from a hard-to-diagnose initialization failure.
-
-**Fix:** Either (a) add a docstring noting the limitation and forbidding string literals containing `BEGIN`/`END` inside `MIGRATION_SQL`, or (b) replace the splitter with a tokenizer that respects single-quoted string literals and comments. (a) is cheaper:
-
-```ts
-/**
- * Splits a SQL migration string into individual statements.
- * ...
- *
- * LIMITATION: BEGIN/END detection is line-based and string-unaware. Do NOT
- * include single-quoted string literals containing the substrings 'BEGIN'
- * or 'END' inside MIGRATION_SQL — the depth tracker will mis-count and
- * produce malformed statements. If you need that, switch to a real SQL
- * tokenizer.
- */
-function splitSqlStatements(sql: string): string[] { ... }
-```
-
-## Info
-
-### IN-01: Step transitions write `markOnboardingCompleted` twice in the Step 3 path
-
-**File:** `src/components/onboarding/OnboardingOverlay.tsx:133-136, 142-158, 263`
-
-**Issue:** Both `handleStep3Explore` (L133) and `handleWriteFirstEntry` (L142) call `markOnboardingCompleted()`. After CR-01 is fixed, these still fire `onOpenChange(false)` → `handleSkip` → `markOnboardingCompleted()` a second time. The settings write is `INSERT OR REPLACE` (idempotent) so functionally harmless, but it means two SQL writes per completion plus an extra store-set call. Once CR-01's button-swap fix lands, this disappears too. No action needed if CR-01 is fixed via the button-swap; flagged here for cross-reference.
-
-**Fix:** Resolved by CR-01's recommended fix (replace `AlertDialogAction`/`AlertDialogCancel` with plain buttons so `onOpenChange(false)` only fires for true dismissal events).
-
----
-
-### IN-02: `OnboardingOverlay`'s render-gate doc comment doesn't match runtime behavior
-
-**File:** `src/components/onboarding/OnboardingOverlay.tsx:15-17`
-
-**Issue:** The header comment claims "Render gate: isOnboardingCompleted === false (loading and completed states are handled in App.tsx — this component only mounts when the flow should actually render)." But `src/App.tsx:223` mounts the overlay whenever `isOnboardingCompleted !== null`, including `true`. The component then uses an early `return null` (L117) to hide itself — which is what enables CR-02's stale-state bug.
-
-**Fix:** Either align App.tsx to the doc (mount only when `=== false` — see CR-02 Option B), or update the comment to match reality:
-
-```tsx
- * Render gate: this component is mounted whenever isOnboardingCompleted !== null
- * (App.tsx state-6 fragment). It returns null when the flag is true so the UI
- * is hidden but state is preserved across completion / replay cycles. Internal
- * currentStep state is reset by the useEffect on isOnboardingCompleted below.
-```
-
----
-
-### IN-03: `loadOnboardingState` swallows DB errors and returns `false`, which renders the overlay over a broken DB
-
-**File:** `src/utils/onboardingService.ts:24-36`
-
-**Issue:** On any SQL failure, `loadOnboardingState()` logs and returns `false`. The doc comment justifies this ("safer than silently hiding it forever after a transient glitch"). But App.tsx already shows a "Could not open your journal" error screen for `dbError` from `initializeDatabase()`. If `loadOnboardingState` fails (which is downstream of a successful `initializeDatabase`), returning `false` causes the welcome overlay to render on top of an app whose settings table is broken — and any user action through the overlay (`markOnboardingCompleted`) will silently fail too, leaving the user trapped in onboarding on every launch.
-
-**Fix:** This is a genuine UX trade-off, not a clear bug. Two options:
-
-- Keep current behavior but surface a `toast.error` so the user knows something went wrong before they hit Skip.
-- Return `null` (or throw) and let App.tsx decide — if the settings table is unreadable, that's actionable info worth showing rather than silently re-onboarding.
-
-If shipping as-is, suppress this Info item by tightening the doc-comment justification.
-
----
-
-### IN-04: `useGlobalShortcuts` has redundant `editor`/`settings` view check
-
-**File:** `src/hooks/useGlobalShortcuts.ts:62-63`
-
-**Issue:** The "belt-and-suspenders" check `if (view.activeView === "editor" || view.activeView === "settings") return;` is well-intentioned but partially incorrect. On the Settings view, no editable element has focus by default, and the user has every reason to want Ctrl/Cmd+N to fire (jump from Settings into a new entry). Blocking it on Settings is a UX regression vs. the documented rationale, which only justifies blocking the editor view (where focus is in TipTap, but `isTypingContext()` already catches that).
-
-**Fix:** Either remove the check entirely (rely on `isTypingContext()`), or block only `editor`:
-
-```ts
-// Editor-view gate — isTypingContext() handles the contentEditable case;
-// this is just a safety net for the brief window between view-switch and
-// focus settling into TipTap. Settings has no editor — allow Ctrl/Cmd+N.
-if (view.activeView === "editor") return;
-```
-
----
-
-### IN-05: `globals.css` `body.onboarding-spotlight-active` rule uses `!important` — note for future overrides
-
-**File:** `src/styles/globals.css:421-423`
-
-**Issue:** The `z-index: 80 !important;` override is justified for beating the FAB's inline `z-40` Tailwind class, and the comment explains why. Flagging for awareness only — `!important` in a global stylesheet can complicate future z-index work (e.g., if a modal needs to overlay the spotlight FAB). Consider promoting the FAB's z-index to a CSS variable so the override doesn't need `!important`:
-
-```css
-/* In QuickWriteFAB component or globals.css */
-.quick-write-fab { z-index: var(--fab-z, 40); }
-body.onboarding-spotlight-active { --fab-z: 80; }
-```
-
-Not a bug, just a cleaner pattern when more z-index orchestration ships in later phases.
+**Recommendation:** This phase is ready for sign-off from a code-correctness standpoint. Manual UAT can proceed.
 
 ---
 
 _Reviewed: 2026-04-18_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
+_Iteration: 2_
