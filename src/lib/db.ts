@@ -178,6 +178,23 @@ export async function initializeDatabase(): Promise<void> {
     }
   }
 
+  // ONBRD-05 — auto-seed onboarding completion for existing v1.0 users.
+  // Idempotent: INSERT OR IGNORE collapses to no-op when the row already exists;
+  // the WHERE (SELECT COUNT(*) FROM entries) > 0 filter ensures fresh installs
+  // (no entries) skip the seed and see the welcome overlay on first launch.
+  // Compound idempotence: both the OR IGNORE and the WHERE clause must agree
+  // before a row is written.
+  const onboardingSeedNow = Date.now();
+  await db.execute(
+    `INSERT OR IGNORE INTO settings(key, value, updated_at)
+     SELECT 'onboarding_completed_at', CAST(? AS TEXT), ?
+     WHERE (SELECT COUNT(*) FROM entries) > 0`,
+    [onboardingSeedNow, onboardingSeedNow]
+  );
+  if (import.meta.env.DEV) {
+    console.log("[db] Seeded onboarding_completed_at for existing-user install (no-op on fresh DBs)");
+  }
+
   // UAT-01 fix — create the local_date index AFTER the column is guaranteed to exist.
   // Must not run inside MIGRATION_SQL because pre-Phase-07 DBs hit the for-loop
   // before the ALTER above has had a chance to add the column. Idempotent via
