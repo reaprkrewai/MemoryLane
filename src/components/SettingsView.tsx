@@ -7,7 +7,7 @@ import { useAIStore } from "../stores/aiStore";
 import { useDataExport } from "../hooks/useDataExport";
 import { useExportFile } from "../hooks/useExportFile";
 import * as hybridAI from "../lib/hybridAIService";
-import { saveAIBackendPreference } from "../utils/aiSettingsService";
+import { saveAIBackendPreference, saveTagSuggestionsEnabled } from "../utils/aiSettingsService";
 import { replayOnboarding } from "../utils/onboardingService";
 import { createExportZip } from "../utils/zipUtils";
 import { SettingRow } from "./SettingRow";
@@ -284,6 +284,8 @@ function SecuritySection() {
 function AIFeaturesSection() {
   const aiBackend = useAIStore((s) => s.aiBackend);
   const setAiBackend = useAIStore((s) => s.setAIBackend);
+  const tagSuggestionsEnabled = useAIStore((s) => s.tagSuggestionsEnabled);
+  const setTagSuggestionsEnabled = useAIStore((s) => s.setTagSuggestionsEnabled);
   const available = useAIStore((s) => s.available);
   const embedding = useAIStore((s) => s.embedding);
   const llm = useAIStore((s) => s.llm);
@@ -315,6 +317,11 @@ function AIFeaturesSection() {
 
   const handleSetupGuide = () => {
     useAIStore.setState({ showSetupWizard: true });
+  };
+
+  const handleTagSuggestionsToggle = async (value: boolean) => {
+    setTagSuggestionsEnabled(value);
+    await saveTagSuggestionsEnabled(value);
   };
 
   const handleBackendChange = async (newBackend: "embedded" | "ollama") => {
@@ -500,6 +507,25 @@ function AIFeaturesSection() {
                 <ChevronRight size={14} />
               </button>
             )}
+          </div>
+        </SettingRow>
+
+        <div className="border-t border-border/50" />
+        <SettingRow
+          label="Tag suggestions"
+          description="Show a sparkle button in the editor to suggest tags via local AI"
+        >
+          <div className="flex gap-2">
+            <OptionButton
+              label="On"
+              selected={tagSuggestionsEnabled}
+              onClick={() => handleTagSuggestionsToggle(true)}
+            />
+            <OptionButton
+              label="Off"
+              selected={!tagSuggestionsEnabled}
+              onClick={() => handleTagSuggestionsToggle(false)}
+            />
           </div>
         </SettingRow>
       </div>

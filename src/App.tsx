@@ -14,7 +14,7 @@ import { useUiStore, applyTheme, applyFontScale } from "./stores/uiStore";
 import { useViewStore } from "./stores/viewStore";
 import { useAIStore } from "./stores/aiStore";
 import * as hybridAI from "./lib/hybridAIService";
-import { loadAIBackendPreference } from "./utils/aiSettingsService";
+import { loadAIBackendPreference, loadTagSuggestionsEnabled } from "./utils/aiSettingsService";
 import { loadOnboardingState } from "./utils/onboardingService";
 import { useIdleTimeout } from "./hooks/useIdleTimeout";
 import { useGlobalShortcuts } from "./hooks/useGlobalShortcuts";
@@ -89,6 +89,10 @@ function App() {
         // Load persisted backend preference
         const backend = await loadAIBackendPreference();
         useAIStore.setState({ aiBackend: backend });
+
+        // Load persisted "Tag suggestions" toggle (AUTOTAG-06) — defaults false on missing row.
+        const tagSuggestionsEnabled = await loadTagSuggestionsEnabled();
+        useAIStore.setState({ tagSuggestionsEnabled });
 
         // If embedded backend, initialize the server
         if (backend === "embedded") {
