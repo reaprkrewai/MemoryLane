@@ -8,12 +8,14 @@ import { JournalView } from "./components/JournalView";
 import { SettingsView } from "./components/SettingsView";
 import { PinSetupScreen } from "./components/PinSetupScreen";
 import { PinEntryScreen } from "./components/PinEntryScreen";
+import { OnboardingOverlay } from "./components/onboarding/OnboardingOverlay";
 import { initializeDatabase, getAppLock } from "./lib/db";
 import { useUiStore, applyTheme, applyFontScale } from "./stores/uiStore";
 import { useViewStore } from "./stores/viewStore";
 import { useAIStore } from "./stores/aiStore";
 import * as hybridAI from "./lib/hybridAIService";
 import { loadAIBackendPreference } from "./utils/aiSettingsService";
+import { loadOnboardingState } from "./utils/onboardingService";
 import { useIdleTimeout } from "./hooks/useIdleTimeout";
 import { useGlobalShortcuts } from "./hooks/useGlobalShortcuts";
 
@@ -26,6 +28,8 @@ function App() {
   const setDbError = useUiStore((s) => s.setDbError);
   const setIsPinSet = useUiStore((s) => s.setIsPinSet);
   const setIsLocked = useUiStore((s) => s.setIsLocked);
+  const isOnboardingCompleted = useUiStore((s) => s.isOnboardingCompleted);
+  const setIsOnboardingCompleted = useUiStore((s) => s.setIsOnboardingCompleted);
   const theme = useUiStore((s) => s.theme);
   const fontSize = useUiStore((s) => s.fontSize);
   const activeView = useViewStore((s) => s.activeView);
@@ -62,6 +66,12 @@ function App() {
         if (appLock !== null) {
           setIsLocked(true);
         }
+
+        // ONBRD-03 / ONBRD-05 — load onboarding completion state from SQLite settings.
+        // Mirrors the PIN-state hydration pattern. Plan-01 migration seed pre-populates
+        // this row for any v1.0 user (COUNT(entries) > 0); fresh installs see the flow.
+        const onboardingCompleted = await loadOnboardingState();
+        setIsOnboardingCompleted(onboardingCompleted);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         setDbError(message);
@@ -70,7 +80,7 @@ function App() {
     };
 
     initApp();
-  }, [setDbReady, setDbError, setIsPinSet, setIsLocked]);
+  }, [setDbReady, setDbError, setIsPinSet, setIsLocked, setIsOnboardingCompleted]);
 
   // Initialize AI backend and check availability on app mount
   useEffect(() => {
@@ -198,12 +208,26 @@ function App() {
           </div>
         )}
 
-        {/* State 6: Unlocked, show content */}
-        {isDbReady && !dbError && isPinSet === true && !isLocked && (
-          <AppShell>
-            {activeView === "settings" && <SettingsView />}
-            {activeView !== "settings" && <JournalView />}
-          </AppShell>
+        {/* State 6.5: Unlocked but onboarding state still loading (prevents content flash). D-06 */}
+        {isDbReady && !dbError && isPinSet === true && !isLocked && isOnboardingCompleted === null && (
+          <div className="flex h-full w-full items-center justify-center bg-background">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 size={24} className="animate-spin text-muted" />
+              <p className="text-body text-muted">Preparing your journal...</p>
+            </div>
+          </div>
+        )}
+
+        {/* State 6: Unlocked + onboarding state known. AppShell + OnboardingOverlay
+            mounted as siblings so the overlay covers SettingsView too (D-02 / SC #5). */}
+        {isDbReady && !dbError && isPinSet === true && !isLocked && isOnboardingCompleted !== null && (
+          <>
+            <AppShell>
+              {activeView === "settings" && <SettingsView />}
+              {activeView !== "settings" && <JournalView />}
+            </AppShell>
+            <OnboardingOverlay />
+          </>
         )}
       </div>
       <Toaster position="bottom-right" />

@@ -51,6 +51,11 @@ export function useGlobalShortcuts(): void {
       const ui = useUiStore.getState();
       if (ui.isLocked || !ui.isDbReady) return;
 
+      // ONBRD-05 / D-20 — onboarding-active guard. Mirrors the locked/DB-ready
+      // rationale: no Ctrl/Cmd+N while the welcome modal is up, otherwise users
+      // could short-circuit the flow and start writing without ever finishing it.
+      if (ui.isOnboardingCompleted === false) return;
+
       // Editor-view gate — belt-and-suspenders defense. isTypingContext() already
       // catches TipTap (contentEditable), but an explicit view check avoids firing
       // the shortcut if focus is momentarily in an editor toolbar button etc.
