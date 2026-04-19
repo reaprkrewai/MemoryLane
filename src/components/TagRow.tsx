@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTagStore } from "../stores/tagStore";
+import { useAIStore } from "../stores/aiStore";
 import { TagPill } from "./TagPill";
 import { TagInput } from "./TagInput";
+import { TagSuggestButton } from "./TagSuggestButton";
 
 interface TagWithCount {
   id: string;
@@ -13,14 +15,22 @@ interface TagWithCount {
 
 interface TagRowProps {
   entryId: string;
+  content: string;  // current editor markdown for LLM tag suggestion input
 }
 
-export function TagRow({ entryId }: TagRowProps) {
+export function TagRow({ entryId, content }: TagRowProps) {
   const [entryTags, setEntryTags] = useState<TagWithCount[]>([]);
   const getEntryTags = useTagStore((s) => s.getEntryTags);
   const loadTags = useTagStore((s) => s.loadTags);
   const removeTagFromEntry = useTagStore((s) => s.removeTagFromEntry);
   const updateTagColor = useTagStore((s) => s.updateTagColor);
+  // Sparkle visibility: AI healthy AND tag suggestions enabled.
+  // Unmount-not-hide per AUTOTAG-05 "hidden (not disabled)" requirement.
+  const showSparkle = useAIStore(
+    (s) => s.available && s.llm && s.tagSuggestionsEnabled
+  );
+  // Global tag library (not just this entry's tags) — feeds LLM enum per AUTOTAG-03.
+  const allTagNames = useTagStore((s) => s.tags.map((t) => t.name));
 
   const reloadEntryTags = async () => {
     const tags = await getEntryTags(entryId);
@@ -57,6 +67,14 @@ export function TagRow({ entryId }: TagRowProps) {
         entryTags={entryTags}
         onTagAdded={reloadEntryTags}
       />
+      {showSparkle && (
+        <TagSuggestButton
+          entryId={entryId}
+          content={content}
+          existingTagNames={allTagNames}
+          onAccept={reloadEntryTags}
+        />
+      )}
     </div>
   );
 }
