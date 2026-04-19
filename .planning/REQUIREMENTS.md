@@ -45,13 +45,13 @@ Goal: turn the working MVP into a habit-forming daily driver — land users on a
 
 ### Auto-Tagging — Local LLM Tag Suggestions
 
-- [ ] **AUTOTAG-01**: User sees a sparkle "Suggest tags" button in the TagRow of the entry editor (visible only when AI backend is available)
+- [x] **AUTOTAG-01**: User sees a sparkle "Suggest tags" button in the TagRow of the entry editor (visible only when AI backend is available)
 - [ ] **AUTOTAG-02**: Clicking the sparkle calls `hybridAIService.askQuestion` (never `ollamaService` directly) to request 1–3 tag suggestions grounded in the entry's current content
 - [ ] **AUTOTAG-03**: The LLM call uses Ollama's `format` JSON-Schema constraint to bound output to a structured tag array with a maximum-length enum of existing tags + up to 2 new-tag proposals
-- [ ] **AUTOTAG-04**: Suggestions render as ghost chips the user explicitly accepts (click to add) or dismisses (× to remove) — suggestions are never auto-applied to the entry
-- [ ] **AUTOTAG-05**: When Ollama is unavailable, the sparkle button is hidden (consistent with v1.0 `aiStore.available` gating)
+- [x] **AUTOTAG-04**: Suggestions render as ghost chips the user explicitly accepts (click to add) or dismisses (× to remove) — suggestions are never auto-applied to the entry
+- [x] **AUTOTAG-05**: When Ollama is unavailable, the sparkle button is hidden (consistent with v1.0 `aiStore.available` gating)
 - [x] **AUTOTAG-06**: User can toggle "Tag suggestions" in Settings → AI Features; the setting defaults to **off**
-- [ ] **AUTOTAG-07**: When Settings toggle is off, the sparkle button is hidden even if AI backend is available
+- [x] **AUTOTAG-07**: When Settings toggle is off, the sparkle button is hidden even if AI backend is available
 
 ### Microinteractions & Animations
 
@@ -113,13 +113,13 @@ Goal: turn the working MVP into a habit-forming daily driver — land users on a
 | ONBRD-05 | Phase 9 | Pending |
 | ONBRD-06 | Phase 9 | Pending |
 | ONBRD-07 | Phase 9 | Pending |
-| AUTOTAG-01 | Phase 10 | Pending |
+| AUTOTAG-01 | Phase 10 | Complete |
 | AUTOTAG-02 | Phase 10 | Pending |
 | AUTOTAG-03 | Phase 10 | Pending |
-| AUTOTAG-04 | Phase 10 | Pending |
-| AUTOTAG-05 | Phase 10 | Pending |
+| AUTOTAG-04 | Phase 10 | Complete |
+| AUTOTAG-05 | Phase 10 | Complete |
 | AUTOTAG-06 | Phase 10 | Complete |
-| AUTOTAG-07 | Phase 10 | Pending |
+| AUTOTAG-07 | Phase 10 | Complete |
 | ANIM-01 | Phase 11 | Pending |
 | ANIM-02 | Phase 11 | Pending |
 | ANIM-03 | Phase 11 | Pending |

@@ -34,7 +34,7 @@ Full phase details archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROAD
 - [x] **Phase 7: Foundation & Derived State** — Architectural primitives that unblock every downstream widget (derived selectors, SQL aggregates, `local_date` column, animations.css with reduced-motion guard, ColorGrid primitive)
 - [ ] **Phase 8: Home Dashboard & Widgets** — Overview as default view with 7 widgets (stat cards, mood trends, On This Day, recent entries, writing prompts, AI insights, Quick-Write FAB)
 - [ ] **Phase 9: First-Run Onboarding** — 3-step welcome flow with SQLite-persisted completion, auto-skip for existing users, replay from Settings
-- [ ] **Phase 10: Auto-Tagging AI Pipeline** — Sparkle-triggered local LLM tag suggestions with JSON-Schema constraint, ghost-chip accept/dismiss UX, off by default
+- [x] **Phase 10: Auto-Tagging AI Pipeline** — Sparkle-triggered local LLM tag suggestions with JSON-Schema constraint, ghost-chip accept/dismiss UX, off by default (completed 2026-04-19)
 - [ ] **Phase 11: Microinteractions & Tag Management** — Dashboard stagger-in, tag-pill pop-in, modal scales, mood spring feedback; expanded 12-color palette + Tag Management settings view
 
 ---
@@ -119,7 +119,7 @@ Plans:
 Plans:
 - [x] 10-01-PLAN.md — hybridAIService.requestStructured helper + tagSuggestionService.ts (AUTOTAG-02, AUTOTAG-03)
 - [x] 10-02-PLAN.md — aiSettingsService load/save + aiStore field + App.tsx initAI + SettingsView toggle (AUTOTAG-06)
-- [ ] 10-03-PLAN.md — TagSuggestButton component + TagRow gate + EntryEditor content prop (AUTOTAG-01, AUTOTAG-04, AUTOTAG-05, AUTOTAG-07)
+- [x] 10-03-PLAN.md — TagSuggestButton component + TagRow gate + EntryEditor content prop (AUTOTAG-01, AUTOTAG-04, AUTOTAG-05, AUTOTAG-07)
 **UI hint**: yes
 
 ### Phase 11: Microinteractions & Tag Management
