@@ -117,8 +117,8 @@ Plans:
   5. When Ollama is unavailable mid-session, the sparkle button disappears without any error toast (consistent with v1.0 `aiStore.available` gating)
 **Plans**: 3 plans
 Plans:
-- [ ] 10-01-PLAN.md — hybridAIService.requestStructured helper + tagSuggestionService.ts (AUTOTAG-02, AUTOTAG-03)
-- [ ] 10-02-PLAN.md — aiSettingsService load/save + aiStore field + App.tsx initAI + SettingsView toggle (AUTOTAG-06)
+- [x] 10-01-PLAN.md — hybridAIService.requestStructured helper + tagSuggestionService.ts (AUTOTAG-02, AUTOTAG-03)
+- [x] 10-02-PLAN.md — aiSettingsService load/save + aiStore field + App.tsx initAI + SettingsView toggle (AUTOTAG-06)
 - [ ] 10-03-PLAN.md — TagSuggestButton component + TagRow gate + EntryEditor content prop (AUTOTAG-01, AUTOTAG-04, AUTOTAG-05, AUTOTAG-07)
 **UI hint**: yes
 
