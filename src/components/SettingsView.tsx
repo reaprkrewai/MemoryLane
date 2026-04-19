@@ -11,6 +11,7 @@ import { saveAIBackendPreference, saveTagSuggestionsEnabled } from "../utils/aiS
 import { replayOnboarding } from "../utils/onboardingService";
 import { createExportZip } from "../utils/zipUtils";
 import { SettingRow } from "./SettingRow";
+import { TagManagementSection } from "./settings/TagManagementSection";
 import { OllamaSetupWizard } from "./OllamaSetupWizard";
 import { EmbeddedAISetup } from "./EmbeddedAISetup";
 import { PRESETS } from "../lib/paletteData";
@@ -690,6 +691,7 @@ export function SettingsView() {
           <SecuritySection />
           <AIFeaturesSection />
           <DataSection />
+          <TagManagementSection />
           <HelpSection />
         </div>
 
