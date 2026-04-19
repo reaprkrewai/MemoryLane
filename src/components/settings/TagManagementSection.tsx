@@ -80,14 +80,17 @@ export function TagManagementSection() {
 
   const commitRename = async (id: string, newName: string, originalName: string) => {
     const trimmed = newName.trim();
-    setEditingId(null);
-    if (trimmed.length === 0 || trimmed === originalName) return;
+    if (trimmed.length === 0 || trimmed === originalName) {
+      setEditingId(null);
+      return;
+    }
     try {
       await renameTag(id, trimmed);
+      setEditingId(null); // only close on success — preserves draft on error
     } catch {
-      // SQLite UNIQUE constraint on tags.name rejects duplicates
+      // SQLite UNIQUE constraint on tags.name rejects duplicates.
+      // Leave editingId as-is so the input stays open with the user's typed text.
       toast.error(`A tag named "${trimmed}" already exists`);
-      setEditingId(id); // return to editing state
     }
   };
 
@@ -287,7 +290,7 @@ function TagRow({
       <div className="flex items-center gap-2 flex-shrink-0 w-24 justify-end">
         <button
           type="button"
-          onClick={onStartRename}
+          onClick={() => { if (!isEditing) onStartRename(); }}
           className="flex items-center justify-center h-7 w-7 rounded-md text-muted hover:text-accent hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
           aria-label={`Rename tag ${tag.name}`}
         >
