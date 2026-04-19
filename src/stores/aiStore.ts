@@ -29,6 +29,9 @@ interface AIState {
   showSetupWizard: boolean; // Whether to show the setup wizard modal
   skipSetupWizard: boolean; // Whether user has skipped wizard for this session
 
+  // Tag suggestions toggle (AUTOTAG-06 — persisted to SQLite settings, default off)
+  tagSuggestionsEnabled: boolean;
+
   // Actions
   setAIBackend(backend: AIBackend): void;
   setAIStatus(health: {
@@ -41,6 +44,7 @@ interface AIState {
   setStatus(status: "checking" | "ready" | "unavailable"): void;
   setShowSetupWizard(show: boolean): void;
   setSkipSetupWizard(skip: boolean): void;
+  setTagSuggestionsEnabled(v: boolean): void;
 }
 
 export const useAIStore = create<AIState>((set) => ({
@@ -55,6 +59,7 @@ export const useAIStore = create<AIState>((set) => ({
   status: "checking",
   showSetupWizard: false,
   skipSetupWizard: false,
+  tagSuggestionsEnabled: false, // AUTOTAG-06: default OFF — users opt in consciously
 
   setAIBackend: (backend) => set({ aiBackend: backend }),
 
@@ -75,4 +80,5 @@ export const useAIStore = create<AIState>((set) => ({
   setShowSetupWizard: (show) => set({ showSetupWizard: show }),
 
   setSkipSetupWizard: (skip) => set({ skipSetupWizard: skip }),
+  setTagSuggestionsEnabled: (v) => set({ tagSuggestionsEnabled: v }),
 }));
