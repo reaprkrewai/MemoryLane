@@ -56,19 +56,19 @@ Goal: turn the working MVP into a habit-forming daily driver — land users on a
 ### Microinteractions & Animations
 
 - [ ] **ANIM-01**: Dashboard widgets stagger-in on Overview mount with 50ms-per-card delay (CSS keyframes from `animations.css`)
-- [ ] **ANIM-02**: Tag pills scale pop-in on add (0.8→1.0) and scale-out on remove (1.0→0.8 + fade)
-- [ ] **ANIM-03**: Modals, popovers, and AlertDialogs fade + scale (0.95→1.0) on open; reverse on close
-- [ ] **ANIM-04**: Mood selector buttons provide a tactile spring-feedback animation on click (scale 1.0→0.9→1.0)
-- [ ] **ANIM-05**: View transitions between Overview/Timeline/Calendar/Search use a 150ms crossfade
-- [ ] **ANIM-06**: All animations honor `prefers-reduced-motion: reduce` — transitions become instant (verified via FOUND-04 stanza)
+- [x] **ANIM-02**: Tag pills scale pop-in on add (0.8→1.0) and scale-out on remove (1.0→0.8 + fade)
+- [x] **ANIM-03**: Modals, popovers, and AlertDialogs fade + scale (0.95→1.0) on open; reverse on close
+- [x] **ANIM-04**: Mood selector buttons provide a tactile spring-feedback animation on click (scale 1.0→0.9→1.0)
+- [x] **ANIM-05**: View transitions between Overview/Timeline/Calendar/Search use a 150ms crossfade
+- [x] **ANIM-06**: All animations honor `prefers-reduced-motion: reduce` — transitions become instant (verified via FOUND-04 stanza)
 
 ### Tag UX — Color Picker & Management
 
 - [x] **TAGUX-01**: `src/components/ui/ColorGrid.tsx` primitive renders the tag color palette as an accessible swatch grid; reused wherever a color is selected
-- [ ] **TAGUX-02**: Tag color palette expands from 8 to 12 preset colors; each defined as a dual-tone token (`base`, `bg`, `text`) verified to pass WCAG AA contrast in both light and dark themes
+- [x] **TAGUX-02**: Tag color palette expands from 8 to 12 preset colors; each defined as a dual-tone token (`base`, `bg`, `text`) verified to pass WCAG AA contrast in both light and dark themes
 - [ ] **TAGUX-03**: User can open a "Tag Management" view from Settings → Tag Management
 - [ ] **TAGUX-04**: Tag Management lists all tags with color swatch, usage count, and last-used date; sortable by usage or recency
-- [ ] **TAGUX-05**: User can rename a tag from Tag Management; rename propagates to all entries that reference it
+- [x] **TAGUX-05**: User can rename a tag from Tag Management; rename propagates to all entries that reference it
 - [ ] **TAGUX-06**: User can change a tag's color from Tag Management via the ColorGrid picker; change reflects everywhere (TagPill, autocomplete, timeline)
 - [ ] **TAGUX-07**: User can delete a tag from Tag Management only if it has zero entries; delete button is disabled with tooltip otherwise
 
@@ -121,16 +121,16 @@ Goal: turn the working MVP into a habit-forming daily driver — land users on a
 | AUTOTAG-06 | Phase 10 | Complete |
 | AUTOTAG-07 | Phase 10 | Complete |
 | ANIM-01 | Phase 11 | Pending |
-| ANIM-02 | Phase 11 | Pending |
-| ANIM-03 | Phase 11 | Pending |
-| ANIM-04 | Phase 11 | Pending |
-| ANIM-05 | Phase 11 | Pending |
-| ANIM-06 | Phase 11 | Pending |
+| ANIM-02 | Phase 11 | Complete |
+| ANIM-03 | Phase 11 | Complete |
+| ANIM-04 | Phase 11 | Complete |
+| ANIM-05 | Phase 11 | Complete |
+| ANIM-06 | Phase 11 | Complete |
 | TAGUX-01 | Phase 7 | Complete |
-| TAGUX-02 | Phase 11 | Pending |
+| TAGUX-02 | Phase 11 | Complete |
 | TAGUX-03 | Phase 11 | Pending |
 | TAGUX-04 | Phase 11 | Pending |
-| TAGUX-05 | Phase 11 | Pending |
+| TAGUX-05 | Phase 11 | Complete |
 | TAGUX-06 | Phase 11 | Pending |
 | TAGUX-07 | Phase 11 | Pending |
 

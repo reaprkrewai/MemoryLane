@@ -133,7 +133,11 @@ Plans:
   4. TagPill renders the palette via the shared `ColorGrid` primitive (no duplicate swatch grid implementation); changing a tag's color updates TagPill, autocomplete, and timeline instantly
   5. User can open Tag Management from Settings → Tag Management; the view lists all tags with color swatch, usage count, and last-used date, sortable by usage or recency
   6. User can rename a tag and the change propagates to every entry that references it; user can change a tag's color via ColorGrid and the change reflects everywhere; user can delete a tag only when it has zero entries (delete button disabled with tooltip otherwise)
-**Plans**: TBD
+**Plans**: 3 plans planned
+Plans:
+- [x] 11-01-PLAN.md — TAGUX-02 palette refactor (12 tokens) + renameTag store action + db.ts color backfill + animations.css keyframes + tailwind.config.js tokens (Wave 1)
+- [ ] 11-02-PLAN.md — TagPill pop-in/out + MoodSelector spring + OverviewView stagger + JournalView crossfade (Wave 2, ANIM-01/02/04/05)
+- [ ] 11-03-PLAN.md — TagManagementSection new component + SettingsView integration (Wave 3, TAGUX-03..07)
 **UI hint**: yes
 
 ---
@@ -189,8 +193,8 @@ Phases 9, 10, 11 can execute in parallel once Phase 8 is complete (11 only needs
 | 8. Home Dashboard & Widgets | v1.1 | 0/5 | Not started | — |
 | 9. First-Run Onboarding | v1.1 | 0/3 | Not started | — |
 | 10. Auto-Tagging AI Pipeline | v1.1 | 0/TBD | Not started | — |
-| 11. Microinteractions & Tag Management | v1.1 | 0/TBD | Not started | — |
+| 11. Microinteractions & Tag Management | v1.1 | 0/3 | Not started | — |
 
 ---
 
-*Roadmap last updated: 2026-04-18 — v1.0 shipped and archived; v1.1 Phase 7 complete, Phase 8 planned (5 plans)*
+*Roadmap last updated: 2026-04-19 — v1.0 shipped and archived; v1.1 Phase 7 complete, Phase 8/9/10 planned; Phase 11 planned (3 plans, 3 waves)*
