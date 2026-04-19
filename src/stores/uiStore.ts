@@ -35,6 +35,9 @@ interface UIState {
   isLocked: boolean;
   lastActivityTime: number;
 
+  // Onboarding state (tri-state: null = unknown, true = completed, false = needs onboarding)
+  isOnboardingCompleted: boolean | null;
+
   // Settings state
   theme: "light" | "dark";
   fontSize: "small" | "medium" | "large";
@@ -50,6 +53,9 @@ interface UIState {
   setIsPinSet: (set: boolean | null) => void;
   setIsLocked: (locked: boolean) => void;
   setLastActivityTime: () => void;
+
+  // Onboarding setters
+  setIsOnboardingCompleted: (v: boolean | null) => void;
 
   // Settings setters
   setTheme: (theme: "light" | "dark") => void;
@@ -87,6 +93,8 @@ export const useUiStore = create<UIState>((set, get) => ({
   isLocked: false,
   lastActivityTime: Date.now(),
 
+  isOnboardingCompleted: null, // tri-state: null = unknown, true = completed, false = needs onboarding
+
   theme: getStoredTheme(),
   fontSize: getStoredFontSize(),
   idleTimeout: getStoredIdleTimeout(),
@@ -100,6 +108,8 @@ export const useUiStore = create<UIState>((set, get) => ({
   setIsPinSet: (isPinSet) => set({ isPinSet }),
   setIsLocked: (locked) => set({ isLocked: locked }),
   setLastActivityTime: () => set({ lastActivityTime: Date.now() }),
+
+  setIsOnboardingCompleted: (isOnboardingCompleted) => set({ isOnboardingCompleted }),
 
   setTheme: (theme) => {
     set({ theme });
