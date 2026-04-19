@@ -98,7 +98,11 @@ Plans:
   3. Existing v1.0 users (`COUNT(entries) > 0` at migration time) have `onboarding_completed` auto-seeded to `'true'` and never see the flow on first v1.1 launch
   4. User can replay the onboarding tour from Settings → Help → "Replay tour"; tour targets resolve to live DOM elements via `data-onboarding="step-name"` attributes (not CSS class selectors that churn on refactor)
   5. OnboardingOverlay renders at the App.tsx level (above AppShell, alongside SettingsView) so it overlays every top-level view including Settings
-**Plans**: TBD
+**Plans**: 3 plans planned
+Plans:
+- [ ] 09-01-PLAN.md — uiStore tri-state + onboardingService.ts (load/mark/replay) + db.ts migration seed for v1.0 users (ONBRD-03, ONBRD-05)
+- [ ] 09-02-PLAN.md — OnboardingSpotlight + OnboardingOverlay (3-step) + App.tsx mount (State 6.5 + State 6) + Ctrl/Cmd+N onboarding guard (ONBRD-01, ONBRD-02, ONBRD-06, ONBRD-07)
+- [ ] 09-03-PLAN.md — SettingsView HelpSection + Replay button wired to replayOnboarding() (ONBRD-04)
 **UI hint**: yes
 
 ### Phase 10: Auto-Tagging AI Pipeline
@@ -179,7 +183,7 @@ Phases 9, 10, 11 can execute in parallel once Phase 8 is complete (11 only needs
 | 6. AI Features | v1.0 | 4/4 | Complete | 2026-04-14 |
 | 7. Foundation & Derived State | v1.1 | 5/5 | Complete | 2026-04-18 |
 | 8. Home Dashboard & Widgets | v1.1 | 0/5 | Not started | — |
-| 9. First-Run Onboarding | v1.1 | 0/TBD | Not started | — |
+| 9. First-Run Onboarding | v1.1 | 0/3 | Not started | — |
 | 10. Auto-Tagging AI Pipeline | v1.1 | 0/TBD | Not started | — |
 | 11. Microinteractions & Tag Management | v1.1 | 0/TBD | Not started | — |
 
