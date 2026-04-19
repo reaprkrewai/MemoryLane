@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
@@ -25,6 +25,10 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
 
   const { loadPhotos, removePhoto, currentPhotos } = usePhotoManagement(entryId);
 
+  // Track the editor's current markdown so TagRow (and TagSuggestButton) can send
+  // fresh text to the LLM without reading the TipTap editor directly.
+  const [editorContent, setEditorContent] = useState<string>("");
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -35,6 +39,7 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
     content: "",
     onUpdate: ({ editor: e }) => {
       const md = e.getMarkdown();
+      setEditorContent(md);
       const words = e.storage.characterCount.words();
       const chars = e.storage.characterCount.characters();
       scheduleAutoSave(entryId, md, words, chars);
@@ -77,6 +82,7 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
       editor.commands.setContent(entry.content, {
         contentType: "markdown",
       });
+      setEditorContent(entry.content);
     }
   }, [entryId, editor]);
 
@@ -96,7 +102,7 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
       </div>
 
       {/* TagRow: fixed at bottom of editor pane, below scroll area */}
-      <TagRow entryId={entryId} />
+      <TagRow entryId={entryId} content={editorContent} />
 
       {/* Photo attachment: below TagRow */}
       <div className="border-t border-border bg-bg px-6 py-4">
