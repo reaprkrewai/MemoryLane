@@ -24,3 +24,28 @@
 .stagger-children > * {
   animation-delay: calc(var(--i, 0) * 50ms);
 }
+
+/* Phase 11 ANIM-02 — TagPill pop-in on add (0.8→1.0, 150ms ease-out) */
+@keyframes tag-pop-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1.0); }
+}
+
+/* Phase 11 ANIM-02 — TagPill scale-out on remove (1.0→0.8 + fade, 120ms ease-in) */
+@keyframes tag-pop-out {
+  from { opacity: 1; transform: scale(1.0); }
+  to   { opacity: 0; transform: scale(0.8); }
+}
+
+/* Phase 11 ANIM-04 — MoodSelector spring feedback on click (1.0→0.9→1.0, 120ms) */
+@keyframes mood-spring {
+  0%   { transform: scale(1.0); }
+  50%  { transform: scale(0.9); }
+  100% { transform: scale(1.0); }
+}
+
+/* Phase 11 ANIM-03 — scale-in for non-Radix modal wrappers (opacity 0→1, scale 0.95→1.0) */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1.0); }
+}
