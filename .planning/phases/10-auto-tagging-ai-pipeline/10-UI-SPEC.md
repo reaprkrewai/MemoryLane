@@ -32,14 +32,14 @@ Inherited from Phase 7 / globals.css. No new tokens introduced. Declared values 
 
 | Token | Value | Usage in this phase |
 |-------|-------|---------------------|
-| xs | 4px | Icon internal gap (Plus icon `mr-1 -ml-0.5`), X button padding (`p-0.5`) |
+| xs | 4px | Icon internal gap (Plus icon `mr-1`), X button padding (`p-0.5`) |
 | sm | 8px | Gap between sparkle button and ghost chip row |
 | md | 16px | TagRow horizontal padding (existing `px-0 py-4`) |
 | lg | 24px | Settings SettingRow internal padding (existing pattern) |
 | xl | 32px | TagRow max-width side margin (existing `ml-8 mr-8`) |
 
 **Ghost chip internal spacing (locked):**
-- Padding: `px-3 py-1` — `px-3` = 12px (multiple of 4); `py-1` = 4px (multiple of 4)
+- Padding: `px-2 py-1` — `px-2` = 8px, `py-1` = 4px (tight pill proportioned to `text-xs` ghost chip text; both in standard spacing set)
 - Gap from sparkle button to first chip: `gap-2` (8px) — consistent with existing `gap-2` in TagRow flex-wrap
 - X button hit target: `h-4 w-4` (16px × 16px) with `ml-1` separation from label text
 
@@ -130,7 +130,7 @@ The dashed border color is `--color-text-muted` at 50% opacity — NOT `--color-
 | Property | Value | Source |
 |----------|-------|--------|
 | Shape | `rounded-full` | CONTEXT.md D-12 (researcher discretion: `rounded-full` over TagPill's `rounded-lg` — softer feel signals pending status) |
-| Padding | `px-3 py-1` | CONTEXT.md D-12 (12px horizontal, 4px vertical — both multiples of 4) |
+| Padding | `px-2 py-1` | Researcher discretion — 8px horizontal, 4px vertical; both in standard spacing set and proportioned to `text-xs` ghost chip scale |
 | Font size | `text-xs` (12px) | Researcher discretion — subordinate to accepted TagPills (`text-sm`) |
 | Font weight | `font-normal` (400) | Researcher discretion — `text-xs` size + `text-muted` color provide sufficient subordination |
 | Line height | `leading-tight` | CONTEXT.md D-12 |
@@ -143,7 +143,7 @@ The dashed border color is `--color-text-muted` at 50% opacity — NOT `--color-
 | Max label width | `max-w-[120px] truncate` | Researcher discretion — long new-tag names (>20 chars) get ellipsis; `title` attribute shows full name on hover |
 | Transition | `transition-colors transition-border duration-fast` | globals.css interactive pattern |
 
-**New-tag prefix icon:** `<Plus size={10} className="mr-1 -ml-0.5 inline flex-shrink-0" />` — only on chips where `isNew === true`. Color inherits from chip text (`text-muted` → `hover:text-text`). (CONTEXT.md D-12)
+**New-tag prefix icon:** `<Plus size={10} className="mr-1 inline flex-shrink-0" />` — only on chips where `isNew === true`. Color inherits from chip text (`text-muted` → `hover:text-text`). (CONTEXT.md D-12)
 
 **Chip body (accept target):**
 - `role="button"` + `tabIndex={0}`
