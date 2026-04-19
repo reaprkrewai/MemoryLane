@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Palette, Shield, Database, ChevronRight, Loader2, Sparkles, Check, Circle, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useUiStore } from "../stores/uiStore";
+import { useViewStore } from "../stores/viewStore";
 import { useAIStore } from "../stores/aiStore";
 import { useDataExport } from "../hooks/useDataExport";
 import { useExportFile } from "../hooks/useExportFile";
@@ -593,6 +594,15 @@ function HelpSection() {
   const handleReplay = async () => {
     setIsReplaying(true);
     try {
+      // WR-01 fix: land on Overview before flipping the gate so QuickWriteFAB
+      // is mounted in the DOM by the time Step 2's OnboardingSpotlight queries
+      // [data-onboarding="quick-write-fab"]. AppShell only renders the FAB
+      // when activeView is overview/timeline/calendar/search — Settings hides
+      // it, which would leave Step 2 with a fully-dimmed backdrop and no
+      // cutout. setView is synchronous so the view switch is committed before
+      // replayOnboarding's awaited DB write resolves.
+      useViewStore.getState().setView("overview");
+
       // replayOnboarding (Plan 01) deletes the settings row AND flips
       // useUiStore.isOnboardingCompleted to false. The OnboardingOverlay
       // mounted by App.tsx (Plan 02) reacts to that primitive and re-mounts
