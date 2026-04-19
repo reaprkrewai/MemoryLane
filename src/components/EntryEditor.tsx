@@ -102,7 +102,7 @@ export function EntryEditor({ entryId }: EntryEditorProps) {
       </div>
 
       {/* TagRow: fixed at bottom of editor pane, below scroll area */}
-      <TagRow entryId={entryId} content={editorContent} />
+      <TagRow key={entryId} entryId={entryId} content={editorContent} />
 
       {/* Photo attachment: below TagRow */}
       <div className="border-t border-border bg-bg px-6 py-4">
