@@ -39,7 +39,7 @@ Inherited from Phase 7 / globals.css. No new tokens introduced. Declared values 
 | xl | 32px | TagRow max-width side margin (existing `ml-8 mr-8`) |
 
 **Ghost chip internal spacing (locked):**
-- Padding: `px-2.5 py-1` — matches TagPill horizontal/vertical rhythm
+- Padding: `px-3 py-1` — `px-3` = 12px (multiple of 4); `py-1` = 4px (multiple of 4)
 - Gap from sparkle button to first chip: `gap-2` (8px) — consistent with existing `gap-2` in TagRow flex-wrap
 - X button hit target: `h-4 w-4` (16px × 16px) with `ml-1` separation from label text
 
@@ -60,11 +60,13 @@ Inherited from tailwind.config.js fontSize scale. No new sizes for this phase.
 | Heading | 20px | 600 | 1.2 | `text-heading` |
 | Display | 28px | 600 | 1.15 | `text-display` |
 
-**Ghost chip text:** `text-xs` (12px) at weight 400 (`font-medium` per TagPill — see note). The existing TagPill uses `text-sm font-medium`. Ghost chips use `text-xs font-medium` to be visually subordinate to accepted pills. Muted color (`text-muted` = `var(--color-text-muted)`) further separates them.
+**Declared weights: 400 (normal) and 600 (semibold). No other weights are used in this phase.**
+
+**Ghost chip text:** `text-xs` (12px) at weight 400 (`font-normal`). The `text-xs` size and `text-muted` color provide sufficient visual subordination relative to accepted TagPills; weight contrast is redundant.
 
 **Empty-state inline message:** `text-xs` (12px) at weight 400, color `text-muted`. Placed inline next to sparkle button.
 
-**Settings toggle label:** `text-sm` (14px) at weight 500 — matches existing SettingRow `label` prop rendering. Description text: `text-sm` at weight 400, color `text-text-muted`.
+**Settings toggle label:** `text-sm` (14px) at weight 400 — matches the body weight tier. Description text: `text-sm` at weight 400, color `text-text-muted`. Label prominence is established by layout position (SettingRow grid), not by font weight.
 
 ---
 
@@ -127,10 +129,10 @@ The dashed border color is `--color-text-muted` at 50% opacity — NOT `--color-
 
 | Property | Value | Source |
 |----------|-------|--------|
-| Shape | `rounded-full` | CONTEXT.md D-12 (matches TagPill `rounded-lg` — researcher discretion: use `rounded-full` to match pill convention; TagPill uses `rounded-lg` per inspection but ghost chips should feel "softer" as pending items) |
-| Padding | `px-2.5 py-1` | CONTEXT.md D-12 |
+| Shape | `rounded-full` | CONTEXT.md D-12 (researcher discretion: `rounded-full` over TagPill's `rounded-lg` — softer feel signals pending status) |
+| Padding | `px-3 py-1` | CONTEXT.md D-12 (12px horizontal, 4px vertical — both multiples of 4) |
 | Font size | `text-xs` (12px) | Researcher discretion — subordinate to accepted TagPills (`text-sm`) |
-| Font weight | `font-medium` | CONTEXT.md D-12 |
+| Font weight | `font-normal` (400) | Researcher discretion — `text-xs` size + `text-muted` color provide sufficient subordination |
 | Line height | `leading-tight` | CONTEXT.md D-12 |
 | Background | `bg-transparent` | CONTEXT.md D-12 |
 | Border | `border-2 border-dashed border-muted/50` | CONTEXT.md D-12 + researcher discretion (border-2 confirmed) |
