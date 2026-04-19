@@ -411,3 +411,13 @@ textarea,
     scroll-behavior: auto !important;
   }
 }
+
+/* Phase 9 ONBRD-01..07 — FAB z-hoist during onboarding Step 2.
+ * OnboardingSpotlight adds the body class on mount and removes it on unmount.
+ * The FAB (Phase 8 D-22 — data-onboarding="quick-write-fab") sits at z-40 by
+ * default; while the spotlight is active it is hoisted above the backdrop
+ * (z-60) so the user can click it inside the cutout to advance the tour.
+ * UI-SPEC z-index stack table (lines 281-292) — locked here. */
+body.onboarding-spotlight-active [data-onboarding="quick-write-fab"] {
+  z-index: 80 !important;
+}
