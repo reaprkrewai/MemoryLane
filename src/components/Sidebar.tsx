@@ -1,12 +1,23 @@
-import { BookOpen, CalendarDays, Search, Settings, Plus } from "lucide-react";
+import {
+  BookOpen,
+  CalendarDays,
+  Home,
+  MessageSquare,
+  Plus,
+  Search,
+  Settings,
+} from "lucide-react";
 import { EntryList } from "./EntryList";
 import { useViewStore } from "../stores/viewStore";
 import { useEntryStore } from "../stores/entryStore";
+import { useSearchStore } from "../stores/searchStore";
 
 const navItems = [
+  { icon: Home, label: "Home", id: "home" },
   { icon: BookOpen, label: "Journal", id: "journal" },
   { icon: CalendarDays, label: "Calendar", id: "calendar" },
   { icon: Search, label: "Search", id: "search" },
+  { icon: MessageSquare, label: "Ask AI", id: "ask-ai" },
   { icon: Settings, label: "Settings", id: "settings" },
 ] as const;
 
@@ -16,25 +27,37 @@ export function Sidebar() {
   const navigateToEditor = useViewStore((s) => s.navigateToEditor);
   const createEntry = useEntryStore((s) => s.createEntry);
   const selectEntry = useEntryStore((s) => s.selectEntry);
+  const searchMode = useSearchStore((s) => s.searchMode);
+  const setSearchMode = useSearchStore((s) => s.setSearchMode);
 
-  // Treat 'editor' as 'journal' for nav highlight — editor is reached from journal
+  // Map active view → highlighted nav item. 'editor' rolls up under Journal (it's
+  // reached from the journal surface). 'search' splits by searchMode so Ask AI
+  // highlights when the user is actually in AI Q&A mode.
   const activeId =
-    activeView === "calendar"
+    activeView === "overview"
+      ? "home"
+      : activeView === "calendar"
       ? "calendar"
       : activeView === "search"
-      ? "search"
+      ? searchMode === "ai"
+        ? "ask-ai"
+        : "search"
       : activeView === "settings"
       ? "settings"
-      : activeView === "timeline" || activeView === "editor"
-      ? "journal"
       : "journal";
 
   const handleNavClick = (id: string) => {
-    if (id === "journal") {
+    if (id === "home") {
+      setView("overview");
+    } else if (id === "journal") {
       setView("timeline");
     } else if (id === "calendar") {
       setView("calendar");
     } else if (id === "search") {
+      setSearchMode("keyword");
+      setView("search");
+    } else if (id === "ask-ai") {
+      setSearchMode("ai");
       setView("search");
     } else if (id === "settings") {
       setView("settings");

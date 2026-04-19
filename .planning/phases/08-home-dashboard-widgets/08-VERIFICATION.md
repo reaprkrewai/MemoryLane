@@ -131,6 +131,26 @@ human_verification_count: 3
 
 ---
 
+## UAT Gap Closure (2026-04-18, post-verification)
+
+During manual UAT the user identified two navigation gaps caused by Phase 8 scope boundaries. Both were resolved as follow-up commits before closing Phase 8.
+
+| # | Gap | Root Cause | Fix | Commit |
+|---|-----|-----------|-----|--------|
+| G1 | No way to return to the Home (Overview) screen after leaving it | `Sidebar.tsx` navigation items were Journal / Calendar / Search / Settings — no Overview entry, because v1.0 landed on Timeline. Phase 8 made Overview the landing view but did not update the sidebar. `activeId` fallback also mapped `overview` → `journal`, so Overview could not highlight anywhere. | Added `Home` sidebar item (first in nav, `Home` icon, routes `setView("overview")`); reworked `activeId` to map each `activeView` correctly including `overview` → `"home"`. | (in this batch) |
+| G2 | No way to reach AI chat / Q&A | `QuickActions.tsx:26` ("Ask AI about your journal") was the former entry point; removed from Overview by Phase 8 decision D-03 (drop QuickActions). The AI Q&A surface still exists in `SearchView.tsx` under `searchMode === "ai"` with full plumbing (`searchStore.setSearchMode`, `qaService.askQuestion`, RAG retrieval, citations) — just unreachable. | Added `Ask AI` sidebar item (after Search, `MessageSquare` icon). Clicking it calls `setSearchMode("ai")` then `setView("search")`. `Search` item now calls `setSearchMode("keyword")` explicitly so the two modes split cleanly. `activeId` distinguishes the two in Search view by `searchMode`. | (in this batch) |
+
+**Files changed:** `src/components/Sidebar.tsx` (one file, ~30 lines of edits — new icons, two new nav items, two new click handlers, reworked `activeId` switch).
+
+**Verification:**
+- `npx tsc --noEmit` exit 0
+- `npm run build` exit 0
+- No changes to Phase 8 contracts (D-01..D-25 intact); `QuickActions.tsx` remains removed from Overview per D-03 — it stays in the repo as dead code for now (delete in a later sweep).
+
+**Scope assessment:** These gaps are Phase 8 regressions, not new features — the Ask AI plumbing already existed in v1.0 and the Home destination was made default by Phase 8 itself. Fixing them in-place preserves Phase 8's goal ("users land on a rich Overview view") and closes the navigation loop the refactor opened. No DASH requirement or ROADMAP success criterion changes.
+
+---
+
 ## Human Verification Required
 
 ### 1. App Launch — Overview as Default View
