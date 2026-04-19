@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Laugh, Smile, Meh, Frown, Angry } from "lucide-react"
 import {
   Tooltip,
@@ -20,9 +21,14 @@ interface MoodSelectorProps {
 }
 
 export function MoodSelector({ mood, onMoodChange }: MoodSelectorProps) {
+  const [springing, setSpringing] = useState<string | null>(null);
+
   const handleClick = (value: string) => {
+    // Trigger spring animation for 120ms on the clicked button
+    setSpringing(value);
+    setTimeout(() => setSpringing(null), 120);
     // Toggle: clicking an already-selected mood deselects it
-    onMoodChange(mood === value ? null : value)
+    onMoodChange(mood === value ? null : value);
   }
 
   return (
@@ -42,6 +48,7 @@ export function MoodSelector({ mood, onMoodChange }: MoodSelectorProps) {
                     isSelected
                       ? "bg-accent/20"
                       : "hover:bg-surface",
+                    springing === value ? "animate-mood-spring" : "",
                   ].join(" ")}
                   aria-label={label}
                   aria-pressed={isSelected}
