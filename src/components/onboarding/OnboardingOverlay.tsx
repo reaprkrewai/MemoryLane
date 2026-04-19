@@ -30,7 +30,7 @@
  * SettingsView.tsx all infer).
  */
 
-import { useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { Check } from "lucide-react";
 import {
   AlertDialog,
@@ -109,6 +109,19 @@ export function OnboardingOverlay() {
       fabRef.current = document.querySelector(FAB_SELECTOR) as HTMLElement | null;
     }
   }, [currentStep]);
+
+  // CR-02 fix: Reset currentStep to 0 whenever the onboarding gate re-opens
+  // (isOnboardingCompleted flips to false — fresh install OR Settings -> Replay).
+  // The component stays MOUNTED across the early-return-null guard below, so
+  // useState would otherwise persist "done" from a prior completion and every
+  // <AlertDialog open={currentStep === N}> would evaluate to false on replay,
+  // silently breaking SC #4 (Replay tour). Must run BEFORE the early return so
+  // hook order is preserved (effect always declared, regardless of gate).
+  useEffect(() => {
+    if (isOnboardingCompleted === false) {
+      setCurrentStep(0);
+    }
+  }, [isOnboardingCompleted]);
 
   // Defensive gate (App.tsx also gates) — if onboarding is completed or still
   // loading, render nothing.
