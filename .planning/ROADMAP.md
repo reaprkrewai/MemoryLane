@@ -100,9 +100,9 @@ Plans:
   5. OnboardingOverlay renders at the App.tsx level (above AppShell, alongside SettingsView) so it overlays every top-level view including Settings
 **Plans**: 3 plans planned
 Plans:
-- [ ] 09-01-PLAN.md — uiStore tri-state + onboardingService.ts (load/mark/replay) + db.ts migration seed for v1.0 users (ONBRD-03, ONBRD-05)
-- [ ] 09-02-PLAN.md — OnboardingSpotlight + OnboardingOverlay (3-step) + App.tsx mount (State 6.5 + State 6) + Ctrl/Cmd+N onboarding guard (ONBRD-01, ONBRD-02, ONBRD-06, ONBRD-07)
-- [ ] 09-03-PLAN.md — SettingsView HelpSection + Replay button wired to replayOnboarding() (ONBRD-04)
+- [x] 09-01-PLAN.md — uiStore tri-state + onboardingService.ts (load/mark/replay) + db.ts migration seed for v1.0 users (ONBRD-03, ONBRD-05)
+- [x] 09-02-PLAN.md — OnboardingSpotlight + OnboardingOverlay (3-step) + App.tsx mount (State 6.5 + State 6) + Ctrl/Cmd+N onboarding guard (ONBRD-01, ONBRD-02, ONBRD-06, ONBRD-07)
+- [x] 09-03-PLAN.md — SettingsView HelpSection + Replay button wired to replayOnboarding() (ONBRD-04)
 **UI hint**: yes
 
 ### Phase 10: Auto-Tagging AI Pipeline
