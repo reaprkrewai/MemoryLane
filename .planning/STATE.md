@@ -123,9 +123,9 @@ See: .planning/PROJECT.md (updated 2026-04-18 after v1.0 milestone close)
 
 - (none)
 
-### Known UX Issue (carried from v1.0, non-blocking)
+### Resolved Issues (v1.1)
 
-- Built-in AI download fails with OS error 216 ("not compatible with Windows version") — llama-server.exe from ggml-org/llama.cpp/b3920 release may be corrupted on download or require VC++ Redistributables. Workaround: use External Ollama backend. See [src-tauri/src/llama.rs:221](../src-tauri/src/llama.rs#L221).
+- **Built-in AI download — OS error 216** (carried from v1.0, fixed 2026-04-18 in commit `b413c6f`). Root cause: `llama.rs` downloaded from a fabricated URL (`llama-server-latest-windows-x64.exe`) that never existed in the `b3920` release. GitHub returned a 404 whose 9-byte "Not Found" body was written to disk as the `.exe`; Windows then tried to exec it and failed PE parsing with error 216. Fix rewrites `download_binary()` to (1) detect stub files under 100 KB and re-download, (2) fetch the correct `.zip` archive for each platform (`llama-b3920-bin-win-avx2-x64.zip` on Windows), (3) call `.error_for_status()` before writing bytes, (4) extract `llama-server(.exe)` + required shared libraries via the new `zip` crate. See [src-tauri/src/llama.rs:208](../src-tauri/src/llama.rs#L208).
 
 ### v1.0 Shipped Requirements (reference)
 
