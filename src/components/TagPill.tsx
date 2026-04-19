@@ -35,7 +35,7 @@ export function TagPill({ tag, onRemove, onColorChange }: TagPillProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div
-          className={`group inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all hover:shadow-sm animate-tag-pop-in ${isRemoving ? "animate-tag-pop-out" : ""}`}
+          className={`group inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all hover:shadow-sm ${isRemoving ? "animate-tag-pop-out" : "animate-tag-pop-in"}`}
           style={{
             backgroundColor: `color-mix(in srgb, ${tag.color} 12%, transparent)`,
             borderColor: `color-mix(in srgb, ${tag.color} 35%, transparent)`,
