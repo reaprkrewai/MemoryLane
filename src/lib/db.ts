@@ -113,6 +113,22 @@ CREATE TABLE IF NOT EXISTS app_lock (
  * Splits a SQL migration string into individual statements.
  * Handles multi-line statements (triggers, virtual tables) by tracking
  * BEGIN...END blocks and semicolons properly.
+ *
+ * LIMITATION (WR-04): BEGIN/END detection is line-based and string-unaware.
+ * The depth tracker scans `trimmed.toUpperCase()` for "BEGIN" / "END" / "END;"
+ * / lines ending in " BEGIN" — it does NOT understand single-quoted string
+ * literals, comments, or SQLite's CASE-expression `END WHEN` / `END IF`.
+ * Concretely, do NOT add any of the following to MIGRATION_SQL above:
+ *   - String literals containing the substrings "BEGIN" or "END"
+ *     (e.g., INSERT INTO foo VALUES('BEGIN') will increment depth and
+ *     swallow the next semicolon, producing one malformed statement).
+ *   - CASE expressions whose END appears on its own line outside a
+ *     trigger body (will decrement depth incorrectly).
+ *   - Trailing inline comments after END; on the same line.
+ * If a future migration legitimately needs any of the above, replace this
+ * splitter with a real tokenizer (peggy / nearley / sqlite-parser) that
+ * respects quoted strings and comments. Phase-9 seed at L188+ is safe
+ * because it lives outside MIGRATION_SQL and uses parameterized execute().
  */
 function splitSqlStatements(sql: string): string[] {
   const statements: string[] = [];
