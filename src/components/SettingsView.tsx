@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Palette, Shield, Database, ChevronRight, Loader2, Sparkles, Check, Circle } from "lucide-react";
+import { Palette, Shield, Database, ChevronRight, Loader2, Sparkles, Check, Circle, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useUiStore } from "../stores/uiStore";
 import { useAIStore } from "../stores/aiStore";
@@ -7,6 +7,7 @@ import { useDataExport } from "../hooks/useDataExport";
 import { useExportFile } from "../hooks/useExportFile";
 import * as hybridAI from "../lib/hybridAIService";
 import { saveAIBackendPreference } from "../utils/aiSettingsService";
+import { replayOnboarding } from "../utils/onboardingService";
 import { createExportZip } from "../utils/zipUtils";
 import { SettingRow } from "./SettingRow";
 import { OllamaSetupWizard } from "./OllamaSetupWizard";
@@ -584,6 +585,53 @@ function DataSection() {
   );
 }
 
+// --- Help Section (D-17 + ONBRD-04 — Replay onboarding tour) ---
+
+function HelpSection() {
+  const [isReplaying, setIsReplaying] = useState(false);
+
+  const handleReplay = async () => {
+    setIsReplaying(true);
+    try {
+      // replayOnboarding (Plan 01) deletes the settings row AND flips
+      // useUiStore.isOnboardingCompleted to false. The OnboardingOverlay
+      // mounted by App.tsx (Plan 02) reacts to that primitive and re-mounts
+      // at Step 1 — no app restart needed (D-16). On error, this helper logs
+      // via console.error and returns silently (no toast — UI-SPEC L176).
+      await replayOnboarding();
+    } finally {
+      setIsReplaying(false);
+    }
+  };
+
+  return (
+    <section>
+      <SectionHeader icon={<HelpCircle size={16} />} title="Help" />
+      <div className="border-t border-border">
+        <SettingRow
+          label="Replay onboarding tour"
+          description="Restart the welcome flow from the beginning"
+        >
+          <button
+            onClick={() => void handleReplay()}
+            disabled={isReplaying}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-label rounded-md border border-border text-muted hover:border-accent/50 hover:text-text transition-colors font-medium disabled:opacity-50"
+          >
+            {isReplaying ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                Resetting...
+              </>
+            ) : (
+              "Replay"
+            )}
+          </button>
+        </SettingRow>
+      </div>
+    </section>
+  );
+}
+
 // --- Main Settings View ---
 export function SettingsView() {
   const showSetupWizard = useAIStore((s) => s.showSetupWizard);
@@ -606,6 +654,7 @@ export function SettingsView() {
           <SecuritySection />
           <AIFeaturesSection />
           <DataSection />
+          <HelpSection />
         </div>
 
         {/* Version footer */}
