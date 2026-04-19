@@ -55,7 +55,7 @@ Goal: turn the working MVP into a habit-forming daily driver — land users on a
 
 ### Microinteractions & Animations
 
-- [ ] **ANIM-01**: Dashboard widgets stagger-in on Overview mount with 50ms-per-card delay (CSS keyframes from `animations.css`)
+- [x] **ANIM-01**: Dashboard widgets stagger-in on Overview mount with 50ms-per-card delay (CSS keyframes from `animations.css`)
 - [x] **ANIM-02**: Tag pills scale pop-in on add (0.8→1.0) and scale-out on remove (1.0→0.8 + fade)
 - [x] **ANIM-03**: Modals, popovers, and AlertDialogs fade + scale (0.95→1.0) on open; reverse on close
 - [x] **ANIM-04**: Mood selector buttons provide a tactile spring-feedback animation on click (scale 1.0→0.9→1.0)
@@ -120,7 +120,7 @@ Goal: turn the working MVP into a habit-forming daily driver — land users on a
 | AUTOTAG-05 | Phase 10 | Complete |
 | AUTOTAG-06 | Phase 10 | Complete |
 | AUTOTAG-07 | Phase 10 | Complete |
-| ANIM-01 | Phase 11 | Pending |
+| ANIM-01 | Phase 11 | Complete |
 | ANIM-02 | Phase 11 | Complete |
 | ANIM-03 | Phase 11 | Complete |
 | ANIM-04 | Phase 11 | Complete |

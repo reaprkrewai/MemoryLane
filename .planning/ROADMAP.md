@@ -35,7 +35,7 @@ Full phase details archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROAD
 - [ ] **Phase 8: Home Dashboard & Widgets** — Overview as default view with 7 widgets (stat cards, mood trends, On This Day, recent entries, writing prompts, AI insights, Quick-Write FAB)
 - [ ] **Phase 9: First-Run Onboarding** — 3-step welcome flow with SQLite-persisted completion, auto-skip for existing users, replay from Settings
 - [x] **Phase 10: Auto-Tagging AI Pipeline** — Sparkle-triggered local LLM tag suggestions with JSON-Schema constraint, ghost-chip accept/dismiss UX, off by default (completed 2026-04-19)
-- [ ] **Phase 11: Microinteractions & Tag Management** — Dashboard stagger-in, tag-pill pop-in, modal scales, mood spring feedback; expanded 12-color palette + Tag Management settings view
+- [x] **Phase 11: Microinteractions & Tag Management** — Dashboard stagger-in, tag-pill pop-in, modal scales, mood spring feedback; expanded 12-color palette + Tag Management settings view (completed 2026-04-19)
 
 ---
 
@@ -136,7 +136,7 @@ Plans:
 **Plans**: 3 plans planned
 Plans:
 - [x] 11-01-PLAN.md — TAGUX-02 palette refactor (12 tokens) + renameTag store action + db.ts color backfill + animations.css keyframes + tailwind.config.js tokens (Wave 1)
-- [ ] 11-02-PLAN.md — TagPill pop-in/out + MoodSelector spring + OverviewView stagger + JournalView crossfade (Wave 2, ANIM-01/02/04/05)
+- [x] 11-02-PLAN.md — TagPill pop-in/out + MoodSelector spring + OverviewView stagger + JournalView crossfade (Wave 2, ANIM-01/02/04/05)
 - [x] 11-03-PLAN.md — TagManagementSection new component + SettingsView integration (Wave 3, TAGUX-03..07)
 **UI hint**: yes
 
