@@ -47,13 +47,14 @@ export function TagSuggestButton({
 
     try {
       const result = await suggestTagsForEntry(content, existingTagNames);
-      window.clearTimeout(slowId);
-
       if (result.length === 0) {
         setShowEmptyMsg(true);
       } else {
         setSuggestions(result);
       }
+    } catch (err) {
+      // D-10 error state: silent, log only.
+      console.error("[tag-suggestions] handleSparkleClick failed:", err);
     } finally {
       window.clearTimeout(slowId);
       setIsLoading(false);
