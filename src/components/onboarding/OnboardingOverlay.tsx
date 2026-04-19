@@ -135,7 +135,18 @@ export function OnboardingOverlay() {
   };
 
   // Step 1 -> Step 2 advance (no DB write until completion/skip).
-  const handleStep1Continue = () => setCurrentStep(1);
+  // WR-02 fix: capture the FAB element BEFORE setCurrentStep so the Popover's
+  // first commit sees a populated fabRef.current. Without this, React's
+  // render-then-effect ordering means the Popover initially mounts with
+  // fabRef.current === null and floating-ui anchors at (0,0) for a frame
+  // before useLayoutEffect populates the ref. Front-loading the DOM query
+  // here eliminates the one-frame visual jump. The useLayoutEffect on
+  // [currentStep] still re-captures defensively (e.g., font-scale change
+  // between Step 1 and Step 2 that re-mounts the FAB).
+  const handleStep1Continue = () => {
+    fabRef.current = document.querySelector(FAB_SELECTOR) as HTMLElement | null;
+    setCurrentStep(1);
+  };
 
   // Step 2 -> Step 3 advance.
   const handleStep2GotIt = () => setCurrentStep(2);
