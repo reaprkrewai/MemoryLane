@@ -58,6 +58,33 @@ export async function askQuestion(
   }
 }
 
+/**
+ * Request structured JSON output from the active AI backend.
+ * Ollama: uses /api/chat + `format` parameter (JSON Schema constrained decoding).
+ * Embedded: uses /v1/chat/completions + `response_format` (OpenAI-compat JSON Schema).
+ *
+ * Returns the parsed JSON object matching the schema. Throws on HTTP error or
+ * JSON parse failure — callers are responsible for catching (tagSuggestionService
+ * wraps this in try/catch and returns [] on any failure per D-03 graceful fallback).
+ *
+ * CRITICAL: Ollama's `format` parameter is only honored on /api/chat, NOT /api/generate.
+ * The existing askOllamaQuestion uses /api/generate by design (Q&A with streaming-style
+ * prompt); do not refactor it — instead this new helper uses /api/chat.
+ */
+export async function requestStructured(
+  prompt: string,
+  jsonSchema: object,
+  systemPrompt?: string
+): Promise<unknown> {
+  const backend = useAIStore.getState().aiBackend;
+
+  if (backend === "embedded") {
+    return requestStructuredEmbedded(prompt, jsonSchema, systemPrompt);
+  } else {
+    return requestStructuredOllama(prompt, jsonSchema, systemPrompt);
+  }
+}
+
 // ============================================================================
 // EMBEDDED LLAMA.CPP SERVER (OpenAI-compatible API)
 // ============================================================================
@@ -144,6 +171,50 @@ Keep responses concise and thoughtful.`;
   const citations = parseCitations(answer);
 
   return { answer, citations };
+}
+
+async function requestStructuredEmbedded(
+  prompt: string,
+  jsonSchema: object,
+  systemPrompt?: string
+): Promise<unknown> {
+  const url = `http://localhost:${EMBEDDED_PORT}/v1/chat/completions`;
+
+  const messages: Array<{ role: "system" | "user"; content: string }> = [];
+  if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
+  messages.push({ role: "user", content: prompt });
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "local",
+      messages,
+      stream: false,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "tag_suggestions",
+          schema: jsonSchema,
+        },
+      },
+      temperature: 0.3,
+      top_p: 0.9,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Embedded structured request failed: ${response.statusText}`
+    );
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) {
+    throw new Error("Empty response from embedded backend");
+  }
+  return JSON.parse(content);
 }
 
 // ============================================================================
@@ -238,6 +309,45 @@ Keep responses concise and thoughtful.`;
   const citations = parseCitations(answer);
 
   return { answer, citations };
+}
+
+async function requestStructuredOllama(
+  prompt: string,
+  jsonSchema: object,
+  systemPrompt?: string
+): Promise<unknown> {
+  // CRITICAL: /api/chat — NOT /api/generate. Ollama only honors `format` on the chat endpoint.
+  const url = `http://localhost:${OLLAMA_PORT}/api/chat`;
+
+  const messages: Array<{ role: "system" | "user"; content: string }> = [];
+  if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
+  messages.push({ role: "user", content: prompt });
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "llama2:7b", // matches existing askOllamaQuestion model string for consistency
+      messages,
+      stream: false,
+      format: jsonSchema, // schema object passed directly — no wrapper key (distinct from OpenAI spec)
+      temperature: 0.3,
+      top_p: 0.9,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Ollama structured request failed: ${response.statusText}`
+    );
+  }
+
+  const data = await response.json();
+  const content = data.message?.content; // /api/chat response shape — NOT data.response
+  if (!content) {
+    throw new Error("Empty response from Ollama");
+  }
+  return JSON.parse(content);
 }
 
 // ============================================================================
