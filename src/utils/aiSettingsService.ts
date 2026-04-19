@@ -6,6 +6,8 @@
 import { getDb } from "../lib/db";
 import type { AIBackend } from "../stores/aiStore";
 
+const TAG_SUGGESTIONS_KEY = "tag_suggestions_enabled";
+
 /**
  * Load the persisted AI backend preference from database
  * Falls back to "embedded" if not set
@@ -74,5 +76,45 @@ export async function triggerReembeddingOnBackendSwitch(): Promise<void> {
     );
   } catch (err) {
     console.error("Failed to trigger re-embedding:", err);
+  }
+}
+
+/**
+ * Load the persisted "Tag suggestions" toggle (AUTOTAG-06).
+ * Returns false on missing row, invalid value, or DB error — matches D-16 default-off contract.
+ */
+export async function loadTagSuggestionsEnabled(): Promise<boolean> {
+  try {
+    const db = await getDb();
+    const rows = await db.select<{ value: string }[]>(
+      `SELECT value FROM settings WHERE key = ?`,
+      [TAG_SUGGESTIONS_KEY]
+    );
+
+    if (rows.length > 0 && rows[0].value) {
+      return rows[0].value === "1";
+    }
+  } catch (err) {
+    console.error("[tag-suggestions] Failed to load setting:", err);
+  }
+
+  return false; // AUTOTAG-06: default off
+}
+
+/**
+ * Persist the "Tag suggestions" toggle.
+ * CRITICAL: uses the 3-column INSERT form matching the settings table DDL in db.ts.
+ * DO NOT clone the 4-column form from saveAIBackendPreference — that is a latent bug
+ * referencing a non-existent `created_at` column in the settings table.
+ */
+export async function saveTagSuggestionsEnabled(value: boolean): Promise<void> {
+  try {
+    const db = await getDb();
+    await db.execute(
+      `INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES (?, ?, ?)`,
+      [TAG_SUGGESTIONS_KEY, value ? "1" : "0", Date.now()]
+    );
+  } catch (err) {
+    console.error("[tag-suggestions] Failed to save setting:", err);
   }
 }
