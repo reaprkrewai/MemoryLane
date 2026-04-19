@@ -28,3 +28,5 @@ reqwest = { version = "0.12", features = ["stream"] }
 futures = "0.3"
 uuid = { version = "1", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
+# Built-in AI backend: extract llama.cpp release archives (ggml-org publishes .zip, not raw .exe)
+zip = { version = "0.6", default-features = false, features = ["deflate"] }
